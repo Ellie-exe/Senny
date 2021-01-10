@@ -1,0 +1,20 @@
+{
+  "name": "senny-rewrite",
+  "version": "1.0.0",
+  "description": "private utility bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ellie",
+  "license": "ISC",
+  "dependencies": {
+    "@jakeyprime/logger": "^1.0.3",
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "dateformat": "^4.4.1",
+    "discord.js": "github:discordjs/discord.js#c4c817116f868cedb4ec20bcbf90b9b3d382621e",
+    "logger": "0.0.1",
+    "snowflake-util": "^1.0.1"
+  }
+}
