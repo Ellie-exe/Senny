@@ -6,8 +6,6 @@ const config = require('./config.json');
 
 const client = new Discord.Client();
 
-//test
-
 client.on('shardReady', () => {
     let counter = -1;
     
