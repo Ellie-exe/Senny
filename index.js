@@ -38,10 +38,24 @@ client.on('error', err => {
     logger.error(err);
 });
 
+process.on('unhandledRejection', err => {
+    logger.error(err);
+});
+
 client.on('message', message => {
     const args = message.content.split(' ').slice(1);
 
     try {
+        if (message.content.startsWith('!d bump') && message.channel.guild.id === '573272766149558272') {
+            logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
+
+            message.channel.send(`Okay, I'll remind ${message.channel} about: \`!d bump\` in: \`2h\``);
+
+            setTimeout(function () {
+                message.channel.send(`Hello ${message.author.toString()}! You asked me to remind you about: \`!d bump\``);
+            }, 7200000);
+        }
+
         if (message.content.startsWith(config.prefix + 'eval')) {
             logger.info(`${message.channel.id} ${message.author.tag}: /eval`);
 
