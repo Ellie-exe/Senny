@@ -109,7 +109,7 @@ client.on('message', message => {
                 return;
             }
 
-            exec('git pull origin main', (error, stdout, stderr) => {
+            exec('git pull origin master', (error, stdout, stderr) => {
                 if (error) {
                     logger.error(error);
                     message.channel.send(`\`\`\`\n${error}\n\`\`\``);
