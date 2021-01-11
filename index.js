@@ -599,7 +599,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                 MEMBER_VERIFICATION_GATE_ENABLED: 'Member Verification Gate Enabled'
             };
             
-            guild.features.forEach(f => features.push(featrueNames[f]));
+            guild.features.length === 0 ? features.push('None') : guild.features.forEach(f => features.push(featrueNames[f]));
             
             client.api
                 .interactions(id)(token)
@@ -611,7 +611,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                             title: `${guild.name}`,
                             description:
                                 `Owner: ${guild.owner}\n`+
-                                `System Channel: ${guild.systemChannel ? guild.systemChannel : '`None`'}\n`+
+                                `System Channel: ${guild.systemChannel || '`None`'}\n`+
                                 `ID: \`${guild.id}\`\n`+
                                 `Created: \`${dateFormat(guild.createdAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
                                 `Bot Joined: \`${dateFormat(guild.joinedAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
@@ -622,9 +622,9 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                                 `Banner: ${guild.bannerURL() ? `[\`Link\`](${guild.bannerURL({format: 'png', dynamic: true, size: 4096})})` : '`None`'}\n`+
                                 `Splash: ${guild.splashURL() ? `[\`Link\`](${guild.splashURL({format: 'png', dynamic: true, size: 4096})})` : '`None`'}\n`+
                                 `Icon: ${guild.iconURL() ? `[\`Link\`](${guild.iconURL({format: 'png', dynamic: true, size: 4096})})` : '`None`'}\n\n`+
-                                `Rules or Guidelines Channel: ${guild.rulesChannel ? guild.rulesChannel : '`None`'}\n`+
-                                `Community Updates Channel: ${guild.publicUpdatesChannel ? guild.publicUpdatesChannel : '`None`'}\n`+
-                                `Primary Language: \`${guild.preferredLocale ? guild.preferredLocale : '`None`'}\`\n\n`+
+                                `Rules or Guidelines Channel: ${guild.rulesChannel || '`None`'}\n`+
+                                `Community Updates Channel: ${guild.publicUpdatesChannel || '`None`'}\n`+
+                                `Primary Language: \`${guild.preferredLocale || '`None`'}\`\n\n`+
                                 `Boosts: \`${guild.premiumSubscriptionCount} Boosts\`\n`+
                                 `Boost Level: \`Tier ${guild.premiumTier}\`\n\n`+
                                 `Verification Level: \`${verificationNames[guild.verificationLevel]}\`\n`+
@@ -814,7 +814,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                             description:
                                 `Profile: ${member.toString()}\n`+
                                 `ID: \`${member.id}\`\n`+
-                                `Nick: \`${member.nickname ? member.nickname : 'None'}\`\n`+
+                                `Nick: \`${member.nickname || 'None'}\`\n`+
                                 `Bot: \`${member.user.bot ? 'True' : 'False'}\`\n`+
                                 `Status: ${statusIcon[member.user.presence.status]}\`${statusText[member.user.presence.status]}\`\n`+
                                 `Created: \`${dateFormat(member.user.createdAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
