@@ -432,7 +432,6 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                 let seconds = 0;
 
                 const duration = time.split(' ');
-                const numbers = '0' || '1' || '2' || '3' || '4' || '5' || '6' || '7' || '8' || '9';
 
                 for (let i = 0; i < duration.length; i++) {
                     if (duration[i] === 'year' || duration[i] === 'years') {
@@ -457,9 +456,9 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                         seconds = duration[i - 1] * 1000;
 
                     } else if (duration[i].endsWith('y')) {
-                        years = duration[i].substring(0, duration[i].length - 2) * 52 * 4 * 7 * 24 * 60 * 60 * 1000;
+                        years = duration[i].substring(0, duration[i].length - 1) * 52 * 4 * 7 * 24 * 60 * 60 * 1000;
 
-                    } else if (duration[i].endsWith('o')) {
+                    } else if (duration[i].endsWith('mo')) {
                         months = duration[i].substring(0, duration[i].length - 2) * 4 * 7 * 24 * 60 * 60 * 1000;
                         
                     } else if (duration[i].endsWith('w')) {
