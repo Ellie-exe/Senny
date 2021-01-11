@@ -21,7 +21,7 @@ client.on('shardReady', () => {
 
         client.user.setActivity(activity[counter].name, {type: activity[counter].type});
     
-    }, 10000);
+    }, 30000);
 
     logger.info(`Bot ready in ${client.guilds.cache.array().length} guilds`);
 });
