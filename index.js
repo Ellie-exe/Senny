@@ -428,21 +428,20 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                 let minutes = 0;
                 let seconds = 0;
 
-                time.split(' ').forEach(duration => {
-                    switch (duration.charAt(duration.length - 1)) {
-                        case 'h':
-                            hours = duration.substring(0, duration.length - 1) * 60 * 60 * 1000;
-                            break;
+                const duration = time.split(' ');
 
-                        case 'm':
-                            minutes = duration.substring(0, duration.length - 1) * 60 * 1000;
-                            break;
+                for (let i = 0; i < duration.length; i++) {
+                    if (duration[i] === 'hour' || duration[i] === 'hours') {
+                        hours = duration[i - 1] * 60 * 60 * 1000;
+                    
+                    } else if (duration[i] === 'minute' || duration[i] === 'minutes') {
+                        minutes = duration[i - 1] * 60 * 1000;
+                    
+                    } else if (duration[i] === 'second' || duration[i] === 'seconds') {
+                        seconds = duration[i - 1] * 1000;
 
-                        case 's':
-                            seconds = duration.substring(0, duration.length - 1) * 1000;
-                            break;
-                    }
-                });
+                    }  
+                }
 
                 timeout = hours + minutes + seconds;
             }
