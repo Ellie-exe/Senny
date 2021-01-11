@@ -1,8 +1,7 @@
 const Discord = require('discord.js');
 const dateFormat = require('dateformat');
 const logger = require('@jakeyprime/logger');
-const { exec } = require('child_process');
-const config = require('./config.json');
+const exec = require('child_process');
 
 const client = new Discord.Client();
 
@@ -56,10 +55,10 @@ client.on('message', message => {
             }, 7200000);
         }
 
-        if (message.content.startsWith(config.prefix + 'eval')) {
-            logger.info(`${message.channel.id} ${message.author.tag}: /eval`);
+        if (message.content.startsWith(process.env.prefix + 'eval')) {
+            logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}eval`);
 
-            if(config.owners.includes(message.author.id) === false) {
+            if(process.env.owners.includes(message.author.id) === false) {
                 message.channel.send('<:red_x:717257458657263679> Error: `DiscordAPIError: Missing Permissions`');
                 return;
             }
@@ -83,10 +82,10 @@ client.on('message', message => {
             }
         }
 
-        if (message.content.startsWith(config.prefix + 'restart')) {
-            logger.info(`${message.channel.id} ${message.author.tag}: /restart`);
+        if (message.content.startsWith(process.env.prefix + 'restart')) {
+            logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}restart`);
 
-            if(config.owners.includes(message.author.id) === false) {
+            if(process.env.owners.includes(message.author.id) === false) {
                 message.channel.send('<:red_x:717257458657263679> Error: `DiscordAPIError: Missing Permissions`');
                 return;
             }
@@ -99,10 +98,10 @@ client.on('message', message => {
 
         }
 
-        if (message.content.startsWith(config.prefix + 'stop')) {
-            logger.info(`${message.channel.id} ${message.author.tag}: /stop`);
+        if (message.content.startsWith(process.env.prefix + 'stop')) {
+            logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}stop`);
 
-            if(config.owners.includes(message.author.id) === false) {
+            if(process.env.owners.includes(message.author.id) === false) {
                 message.channel.send('<:red_x:717257458657263679> Error: `DiscordAPIError: Missing Permissions`');
                 return;
             }
@@ -115,10 +114,10 @@ client.on('message', message => {
 
         }
 
-        if (message.content.startsWith(config.prefix + 'pull')) {
-            logger.info(`${message.channel.id} ${message.author.tag}: /pull`);
+        if (message.content.startsWith(process.env.prefix + 'pull')) {
+            logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}pull`);
 
-            if(config.owners.includes(message.author.id) === false) {
+            if(process.env.owners.includes(message.author.id) === false) {
                 message.channel.send('<:red_x:717257458657263679> Error: `DiscordAPIError: Missing Permissions`');
                 return;
             }
@@ -133,7 +132,7 @@ client.on('message', message => {
                         embed: {
                             title: 'Git Pulled',
                             description: `\`\`\`\n${stdout}\n${stderr}\n\`\`\``,
-                            color: config.color
+                            color: process.env.color
                         }
                     };
                     
@@ -424,26 +423,64 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                 timeout = date - Date.now();
             
             } else if (data.options[1].value === 'duration') {
+                let years = 0;
+                let months = 0;
+                let weeks = 0;
+                let days = 0;
                 let hours = 0;
                 let minutes = 0;
                 let seconds = 0;
 
                 const duration = time.split(' ');
+                const numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
                 for (let i = 0; i < duration.length; i++) {
-                    if (duration[i] === 'hour' || duration[i] === 'hours') {
+                    if (duration[i] === 'year' || duration[i] === 'years') {
+                        years = duration[i - 1] * 52 * 4 * 7 * 24 * 60 * 60 * 1000;
+
+                    } else if (duration[i] === 'month' || duration[i] === 'months') {
+                        months = duration[i - 1] * 4 * 7 * 24 * 60 * 60 * 1000;
+                        
+                    } else if (duration[i] === 'week' || duration[i] === 'weeks') {
+                        weeks = duration[i - 1] * 7 * 24 * 60 * 60 * 1000;
+
+                    } else if (duration[i] === 'day' || duration[i] == 'days') {
+                        days = duration[i - 1] * 24 * 60 * 60 * 1000;
+
+                    } else if (duration[i] === 'hour' || duration[i] === 'hours') {
                         hours = duration[i - 1] * 60 * 60 * 1000;
-                    
+                        
                     } else if (duration[i] === 'minute' || duration[i] === 'minutes') {
                         minutes = duration[i - 1] * 60 * 1000;
-                    
+                        
                     } else if (duration[i] === 'second' || duration[i] === 'seconds') {
                         seconds = duration[i - 1] * 1000;
 
-                    }  
+                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'y') {
+                        years = duration[i].substring(0, duration[i].length - 2) * 52 * 4 * 7 * 24 * 60 * 60 * 1000;
+
+                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'o') {
+                        months = duration[i].substring(0, duration[i].length - 2) * 4 * 7 * 24 * 60 * 60 * 1000;
+                        
+                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'w') {
+                        weeks = duration[i].substring(0, duration[i].length - 1) * 7 * 24 * 60 * 60 * 1000;
+                        
+                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'd') {
+                        days = duration[i].substring(0, duration[i].length - 1) * 24 * 60 * 60 * 1000;
+
+                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'h') {
+                        hours = duration[i].substring(0, duration[i].length - 1) * 60 * 60 * 1000;
+
+                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'm') {
+                        minutes = duration[i].substring(0, duration[i].length - 1) * 60 * 1000;
+
+                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 's') {
+                        seconds = duration[i].substring(0, duration[i].length - 1) * 1000;
+
+                    }
                 }
 
-                timeout = hours + minutes + seconds;
+                timeout = years + months + weeks + days + hours + minutes + seconds;
             }
 
             if (isNaN(timeout)) {
@@ -646,7 +683,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                                 `<:member:772872418481930282> \`${numMembers} Members\`\n`+
                                 `<:bot:772872483661414400> \`${numBots} Bots\`\n\n`+
                                 `Features: \`${features.join(', ')}\``,
-                            color: config.color,
+                            color: process.env.color,
                             thumbnail: {
                                 url: guild.iconURL ? guild.iconURL({format: 'png', dynamic: true, size: 4096}) : 'https://ellie.is.gay/1eUNml2tV',
                             }
@@ -826,7 +863,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                                 `Roles: ${roles.join(', ')}\n\n`+
                                 `Flags: \`${flags.join(', ')}\`\n\n`+
                                 `Permissions: \`${perms.join(', ')}\``,
-                            color: config.color,
+                            color: process.env.color,
                             thumbnail: {
                                 url: member.user.displayAvatarURL(),
                             }
@@ -841,4 +878,4 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
     }
 });
 
-client.login(config.token);
+client.login(process.env.token);
