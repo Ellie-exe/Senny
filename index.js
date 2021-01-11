@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const dateFormat = require('dateformat');
 const logger = require('@jakeyprime/logger');
-const exec = require('child_process');
+const {exec} = require('child_process');
 
 const client = new Discord.Client();
 
@@ -432,7 +432,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                 let seconds = 0;
 
                 const duration = time.split(' ');
-                const numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+                const numbers = '0' || '1' || '2' || '3' || '4' || '5' || '6' || '7' || '8' || '9';
 
                 for (let i = 0; i < duration.length; i++) {
                     if (duration[i] === 'year' || duration[i] === 'years') {
@@ -456,25 +456,25 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                     } else if (duration[i] === 'second' || duration[i] === 'seconds') {
                         seconds = duration[i - 1] * 1000;
 
-                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'y') {
+                    } else if (duration[i].endsWith('y')) {
                         years = duration[i].substring(0, duration[i].length - 2) * 52 * 4 * 7 * 24 * 60 * 60 * 1000;
 
-                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'o') {
+                    } else if (duration[i].endsWith('o')) {
                         months = duration[i].substring(0, duration[i].length - 2) * 4 * 7 * 24 * 60 * 60 * 1000;
                         
-                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'w') {
+                    } else if (duration[i].endsWith('w')) {
                         weeks = duration[i].substring(0, duration[i].length - 1) * 7 * 24 * 60 * 60 * 1000;
                         
-                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'd') {
+                    } else if (duration[i].endsWith('d')) {
                         days = duration[i].substring(0, duration[i].length - 1) * 24 * 60 * 60 * 1000;
 
-                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'h') {
+                    } else if (duration[i].endsWith('h')) {
                         hours = duration[i].substring(0, duration[i].length - 1) * 60 * 60 * 1000;
 
-                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 'm') {
+                    } else if (duration[i].endsWith('m')) {
                         minutes = duration[i].substring(0, duration[i].length - 1) * 60 * 1000;
 
-                    } else if (numbers.includes(duration[i].charAt(0)) && duration[i].charAt(duration[i].length - 1) === 's') {
+                    } else if (duration[i].endsWith('s')) {
                         seconds = duration[i].substring(0, duration[i].length - 1) * 1000;
 
                     }
