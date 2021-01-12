@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const dateFormat = require('dateformat');
 const logger = require('@jakeyprime/logger');
 const {exec} = require('child_process');
+const axios = require('axios');
 
 const client = new Discord.Client();
 
@@ -405,6 +406,22 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                 }})
                 .catch(err => logger.error(err));
         
+        } else if (data.name === 'redpanda') {
+            const image = await axios.get('https://api.chewey-bot.top/red-panda?auth=2d3aca1f-e0dc-4d23-acea-049f926ed38d');
+
+            logger.info(image);
+
+            client.api
+                .interactions(id)(token)
+                .callback
+                .post({data: {
+                    type: 4,
+                    data: {
+                        content: `yuh`
+                    }
+                }})
+                .catch(err => logger.error(err));
+
         } else if (data.name === 'remind') {
             const time = data.options[2].value;
 
@@ -795,7 +812,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
                 SYSTEM: 'System',
                 BUGHUNTER_LEVEL_2: 'Bug Hunter Level 2',
                 VERIFIED_BOT: 'Verified Bot',
-                EARLY_VERIFIED_DEVELOPER: 'Early Verified Bot Developer',
+                EARLY_VERIFIED_BOT_DEVELOPER: 'Early Verified Bot Developer',
                 VERIFIED_DEVELOPER: 'Verified Developer',
             };
             
