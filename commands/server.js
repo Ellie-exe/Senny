@@ -5,7 +5,7 @@ module.exports = {
     name: 'server',
     async execute(i) {
         const guild = i.client.guilds.cache.get(i.guild_id);
-        const options = { format: 'png', dynamic: true, size: 4096 };
+        const options = {format: 'png', dynamic: true, size: 4096};
 
         const notificationNames = {
             ALL: 'All Messages',

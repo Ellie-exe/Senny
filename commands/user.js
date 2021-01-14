@@ -6,7 +6,7 @@ module.exports = {
     async execute(i) {
         const member = i.client.guilds.cache.get(i.guild_id).members.cache.get(i.data.options ? i.data.options[0].value : i.user.id);
         const guild = i.client.guilds.cache.get(i.guild_id);
-        const options = { format: 'png', dynamic: true, size: 4096 };
+        const options = {format: 'png', dynamic: true, size: 4096};
 
         const statusIcon = {
             online: '<:online:718302081399783573>', 

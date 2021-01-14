@@ -132,24 +132,6 @@ client.on('message', message => {
     const command = args.shift().toLowerCase();
 
     if (message.author.bot) return;
-    
-    if (message.content.startsWith('!d bump') && message.channel.guild.id === '573272766149558272') {
-        try {
-            logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
-            message.channel.send(`Okay, I'll remind ${message.channel} about: \`!d bump\` in: \`2 hours\``);
-
-            setTimeout(function () {
-                message.channel.send(`Hello ${message.author.toString()}! You asked me to remind you about: \`!d bump\``);
-            
-            }, 7200000);
-        
-        } catch (err) {
-            logger.error(err);
-        
-        }
-
-        return;
-    }
 
     if (message.content.startsWith(process.env.prefix + 'reload')) {
         try {
@@ -168,6 +150,24 @@ client.on('message', message => {
                 const command = require(`./commands/${file}`);
                 client.commands.set(command.name, command);
             }
+        
+        } catch (err) {
+            logger.error(err);
+        
+        }
+
+        return;
+    }
+    
+    if (message.content.startsWith('!d bump') && message.channel.guild.id === '573272766149558272') {
+        try {
+            logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
+            message.channel.send(`Okay, I'll remind ${message.channel} about: \`!d bump\` in: \`2 hours\``);
+
+            setTimeout(function () {
+                message.channel.send(`Hello ${message.author.toString()}! You asked me to remind you about: \`!d bump\``);
+            
+            }, 7200000);
         
         } catch (err) {
             logger.error(err);
