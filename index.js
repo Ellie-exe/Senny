@@ -3,7 +3,6 @@ const constants = require('./utils/constants');
 const logger = require('@jakeyprime/logger');
 const schedule = require('node-schedule');
 const dateFormat = require('dateformat');
-const {exec} = require('child_process');
 const Enmap = require('enmap');
 const fs = require('fs');
 
