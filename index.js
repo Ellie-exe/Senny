@@ -7,8 +7,6 @@ const {exec} = require('child_process');
 const Enmap = require('enmap');
 const fs = require('fs');
 
-exec('npm i');
-
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
@@ -131,7 +129,7 @@ client.on('shardReady', () => {
 });
 
 client.on('shardReconnecting', () => {
-    logger.warn('Bot reconnecting');
+    logger.warning('Bot reconnecting');
 });
 
 client.on('shardError', err => {

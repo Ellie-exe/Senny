@@ -54,6 +54,21 @@ module.exports = {
                     }
                 });
 
+                exec('npm i', (err, stdout, stderr) => {
+                    if (err) {
+                        logger.error(err);
+                        message.channel.send(`\`\`\`\n${err}\n\`\`\``);
+        
+                    } else {
+                        const embed = new MessageEmbed()
+                            .setTitle('Packages Updated')
+                            .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
+                            .setColor(process.env.color);
+                            
+                        message.channel.send(embed);
+                    }
+                });
+
                 break;
             }
         }
