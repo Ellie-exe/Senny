@@ -129,7 +129,7 @@ client.on('shardReady', () => {
 });
 
 client.on('shardReconnecting', () => {
-    logger.warning('Bot reconnecting');
+    logger.warn('Bot reconnecting');
 });
 
 client.on('shardError', err => {
@@ -151,7 +151,7 @@ client.on('interactionCreate', command => {
 
     try {
         logger.info(`${command.channel_id} ${command.user.username}#${command.user.discriminator}: /${command.data.name}`);
-        client.commands.get(command.data.name).execute(i);
+        client.commands.get(command.data.name).execute(command);
     
     } catch (err) {
         logger.error(err);
