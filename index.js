@@ -174,7 +174,7 @@ client.on('message', message => {
 
     if (message.author.bot) return;
 
-    if (message.content.startsWith(process.env.prefix + 'reload')) {
+    if (message.content.startsWith(process.env.prefix + 'dev reload')) {
         try {
             logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}reload`);
 
