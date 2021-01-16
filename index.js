@@ -148,8 +148,17 @@ client.ws.on('INTERACTION_CREATE', interaction => client.emit('interactionCreate
 client.on('interactionCreate', command => {
     if (!client.commands.has(command.data.name)) return;
 
+    const tag = `${command.user.username}#${command.user.discriminator}`;
+
     try {
-        logger.info(`${command.channel_id} ${command.user.username}#${command.user.discriminator}: /${command.data.name}`);
+        if (command.data.name === 'remind') {
+            logger.info(`${command.channel_id} ${tag}: /${command.data.name} ${command.data.options[0].name}`);
+        
+        } else {
+            logger.info(`${command.channel_id} ${tag}: /${command.data.name}`);
+        
+        }
+        
         client.commands.get(command.data.name).execute(command);
     
     } catch (err) {
