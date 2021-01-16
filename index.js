@@ -1,6 +1,13 @@
 const Discord = require('discord.js');
+const constants = require('./utils/constants');
 const logger = require('@jakeyprime/logger');
+const schedule = require('node-schedule');
+const dateFormat = require('dateformat');
+const {exec} = require('child_process');
+const Enmap = require('enmap');
 const fs = require('fs');
+
+exec('npm i');
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -10,6 +17,27 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     client.commands.set(command.name, command);
+}
+
+const enmap = new Enmap({name: 'senny'});
+(async function() {await enmap.defer}());
+
+const indexes = enmap.indexes;
+
+for (let i = 0; i < indexes.length; i++) {
+    const key = indexes[i];
+    const date = enmap.get(key, 'date');
+
+    schedule.scheduleJob(date, function() {
+        if (enmap.indexes.includes(key)) {
+            const channel = client.channels.cache.get(enmap.get(key, 'channel_id'));
+            const author = client.users.cache.get(enmap.get(key, 'author_id'));
+            const text = enmap.get(key, 'text');
+
+            channel.send(`Hello ${author.toString()}! You asked me to remind you about: \`${text}\``);
+            enmap.delete(key);
+        }
+    });
 }
 
 class Interaction {
@@ -28,15 +56,17 @@ class Interaction {
         client.api
             .interactions(this.id)(this.token)
             .callback
-            .post({
-                data: {
-                    type: type, 
+            .post(
+                {
                     data: {
-                        content: content,
-                        flags: flags
+                        type: type, 
+                        data: {
+                            content: content,
+                            flags: flags
+                        }
                     }
                 }
-            })
+            )
             .catch(err => logger.error(err));
     }
 
@@ -44,14 +74,16 @@ class Interaction {
         client.api
             .interactions(this.id)(this.token)
             .callback
-            .post({
-                data: {
-                    type: type, 
+            .post(
+                {
                     data: {
-                        embeds: [embed]
+                        type: type, 
+                        data: {
+                            embeds: [embed]
+                        }
                     }
                 }
-            })
+            )
             .catch(err => logger.error(err));
     }
 
@@ -59,11 +91,13 @@ class Interaction {
         client.api
             .webhooks((await client.fetchApplication()).id)(this.token)
             .messages('@original')
-            .patch({
-                data: {
-                    content: content
+            .patch(
+                {
+                    data: {
+                        content: content
+                    }
                 }
-            })
+            )
             .catch(err => logger.error(err));
     }
 
@@ -112,17 +146,18 @@ process.on('unhandledRejection', err => {
     logger.error(err);
 });
 
-client.ws.on('INTERACTION_CREATE', i => client.emit('interactionCreate', new Interaction(i)));
+client.ws.on('INTERACTION_CREATE', interaction => client.emit('interactionCreate', new Interaction(interaction)));
 
-client.on('interactionCreate', i => {
-    if (!client.commands.has(i.data.name)) return;
+client.on('interactionCreate', command => {
+    if (!client.commands.has(command.data.name)) return;
 
     try {
-        logger.info(`${i.channel_id} ${i.user.username}#${i.user.discriminator}: /${i.data.name}`);
-        client.commands.get(i.data.name).execute(i);
+        logger.info(`${command.channel_id} ${command.user.username}#${command.user.discriminator}: /${command.data.name}`);
+        client.commands.get(command.data.name).execute(i);
     
     } catch (err) {
         logger.error(err);
+        command.send(`${constants.emojis.redX} Error: \`${err}\``, 3, 64);
     
     }
 });
@@ -138,11 +173,11 @@ client.on('message', message => {
             logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}reload`);
 
             if(process.env.owners.includes(message.author.id) === false) {
-                message.channel.send('<:red_x:717257458657263679> Error: `DiscordAPIError: Missing Permissions`');
+                message.channel.send(`${constants.emojis.redX} Error: \`DiscordAPIError: Missing Permissions\``);
                 return;
             }
 
-            message.react('<:green_tick:717257440202326058>');
+            message.react(constants.emojis.greenTick);
 
             for (const file of commandFiles) {
                 delete require.cache[require.resolve(`./commands/${file}`)];
@@ -153,6 +188,7 @@ client.on('message', message => {
         
         } catch (err) {
             logger.error(err);
+            message.channel.send(`${constants.emojis.redX} Error: \`${err}\``);
         
         }
 
@@ -162,29 +198,61 @@ client.on('message', message => {
     if (message.content.startsWith('!d bump') && message.channel.guild.id === '573272766149558272') {
         try {
             logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
-            message.channel.send(`Okay, I'll remind ${message.channel} about: \`!d bump\` in: \`2 hours\``);
 
-            setTimeout(function () {
-                message.channel.send(`Hello ${message.author.toString()}! You asked me to remind you about: \`!d bump\``);
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            const text = '!d bump';
+            const date = Date.now() + 7200000;
+            const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z')
             
-            }, 7200000);
+            let key = '';
+
+            for (let i = 0; i < 5; i++) {
+                key += characters.charAt(Math.random() * characters.length);
+            }
+
+            const reminder = {
+                author_id: message.author.id,
+                channel_id: message.channel.id,
+                channel_type: message.channel.type,
+                text: text,
+                date: date
+            }
+
+            enmap.set(key, reminder);
+            message.channel.send(`Okay, I'll remind ${message.channel} about: \`!d bump\` at: \`${display}\``);
+
+            schedule.scheduleJob(date, function() {
+                if (enmap.indexes.includes(key)) {
+                    message.channel.send(`Hello ${message.author.toString()}! You asked me to remind you about: \`${text}\``);
+                    enmap.delete(key);
+                }
+            });
         
         } catch (err) {
             logger.error(err);
+            message.channel.send(`${constants.emojis.redX} Error: \`${err}\``);
         
         }
 
         return;
     }
 
-    if (!message.content.startsWith(process.env.prefix) || message.author.bot) return;
+    if (!message.content.startsWith(process.env.prefix) || message.author.bot || !client.commands.has(command)) return;
 
     try {
-        logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command}`);
+        if (command === 'dev') {
+            logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command} ${args.join(' ')}`);
+
+        } else {
+            logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command}`);
+            
+        }
+
         client.commands.get(command).execute(message, args);
     
     } catch (err) {
         logger.error(err);
+        message.channel.send(`${constants.emojis.redX} Error: \`${err}\``);
     
     }
 });

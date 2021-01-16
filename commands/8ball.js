@@ -1,6 +1,6 @@
 module.exports = {
     name: '8ball',
-    async execute(i) {
+    async execute(command) {
         const responses = [
             'It is certain.',
             'It is decidedly so.',
@@ -24,9 +24,9 @@ module.exports = {
             'Very doubtful.'
         ];
 
-        const question = i.data.options[0].value;
+        const question = command.data.options[0].value;
         const response = responses[Math.floor(Math.random() * responses.length)];
 
-        i.send(`Question: ${question}\nResponse: ${response}`);
+        command.send(`Question: ${question}\nResponse: ${response}`);
     }
 };

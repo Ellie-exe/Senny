@@ -1,19 +1,20 @@
-const { exec } = require('child_process');
-const logger = require('@jakeyprime/logger');
-const { MessageEmbed } = require('discord.js');
-
 module.exports = {
     name: 'dev',
     async execute(message, args) {
+        const constants = require('../utils/constants');
+        const {MessageEmbed} = require('discord.js');
+        const logger = require('@jakeyprime/logger');
+        const {exec} = require('child_process');
+
         if(process.env.owners.includes(message.author.id) === false) {
-            message.channel.send('<:red_x:717257458657263679> Error: `DiscordAPIError: Missing Permissions`');
+            message.channel.send(`${constants.emojis.redX} Error: \`DiscordAPIError: Missing Permissions\``);
             return;
         }
 
         switch (args[0]) {
             case 'restart': {
                 try {
-                    message.react('<:green_tick:717257440202326058>');
+                    message.react(constants.emojis.greenTick);
                     exec('pm2 restart config.json && pm2 save');
                 
                 } catch (err) {
@@ -26,7 +27,7 @@ module.exports = {
 
             case 'stop': {
                 try {
-                    message.react('<:green_tick:717257440202326058>');
+                    message.react(constants.emojis.greenTick);
                     exec('pm2 stop config.json && pm2 save');
 
                 } catch (err) {

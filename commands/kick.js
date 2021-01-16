@@ -1,13 +1,17 @@
-const logger = require('@jakeyprime/logger');
-
 module.exports = {
     name: 'kick',
-    async execute(i) {
-        const member = i.client.guilds.cache.get(i.guild_id).members.cache.get(i.data.options[0].value);
-        const author = i.client.guilds.cache.get(i.guild_id).members.cache.get(i.user.id);
+    async execute(command) {
+        const constants = require('../utils/constants');
+        const logger = require('@jakeyprime/logger');
+
+        const guild_id = command.guild_id;
+        const author_id = command.user.id;
+        const user_id = command.data.options[0].value;
+        const member = command.client.guilds.cache.get(guild_id).members.cache.get(user_id);
+        const author = command.client.guilds.cache.get(guild_id).members.cache.get(author_id);
 
         if (author.hasPermission('KICK_MEMBERS') === false) {
-            i.send(`<:red_x:717257458657263679> Error: \`DiscordAPIError: Missing Permissions\``, 3, 64);
+            command.send(`${constants.emojis.redX} Error: \`DiscordAPIError: Missing Permissions\``, 3, 64);
             return;
         } 
                     
@@ -17,15 +21,15 @@ module.exports = {
         let silent = false;
         let error = false;
                     
-        for (let j = 1; j < i.data.options.length; j++) {
-            switch (i.data.options[j].name) {
+        for (let i = 1; i < command.data.options.length; i++) {
+            switch (command.data.options[i].name) {
                 case 'reason':
-                    reason = i.data.options[j].value;
+                    reason = command.data.options[i].value;
                     displayReason = reason;
                     break;
 
                 case 'silent':
-                    silent = i.data.options[j].value;
+                    silent = command.data.options[i].value;
                     break;
             }
         }
@@ -33,18 +37,18 @@ module.exports = {
         await member.kick(reason)
             .catch((err) => {
                 logger.error(err);
-                i.send(`<:red_x:717257458657263679> Error: \`${err}\``, 3, 64);
+                command.send(`${constants.emojis.redX} Error: \`${err}\``, 3, 64);
                 error = true;
             });
 
         if (error === false) {
             switch (silent) { 
                 case false:
-                    i.send(`${displayMember} has been kicked from the server for reason: \`${displayReason}\``);
+                    command.send(`${displayMember} has been kicked from the server for reason: \`${displayReason}\``);
                     break;
                             
                 case true:
-                    i.send(`${displayMember} has been kicked from the server for reason: \`${displayReason}\``, 3, 64);
+                    command.send(`${displayMember} has been kicked from the server for reason: \`${displayReason}\``, 3, 64);
                     break;
             }
         }

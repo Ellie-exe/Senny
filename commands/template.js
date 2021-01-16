@@ -1,6 +1,6 @@
 module.exports = {
     name: '',
-    async execute(i) {
+    async execute(command) {
         
     }
 };

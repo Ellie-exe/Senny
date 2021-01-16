@@ -1,12 +1,12 @@
 module.exports = {
     name: 'ping',
-    async execute(i) {
+    async execute(command) {
         const start = Date.now();
-        await i.send('Pinging...');
+        await command.send('Pinging...');
 
         const end = Date.now();
         setTimeout(function () {
-            i.edit(`Pong! Took **${end - start}**ms`);
+            command.edit(`Pong! Took **${end - start}**ms`);
                 
         }, 1000);
     }

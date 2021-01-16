@@ -1,11 +1,13 @@
-const { MessageEmbed } = require('discord.js');
-const dateFormat = require('dateformat');
-
 module.exports = {
     name: 'user',
-    async execute(i) {
-        const member = i.client.guilds.cache.get(i.guild_id).members.cache.get(i.data.options ? i.data.options[0].value : i.user.id);
-        const guild = i.client.guilds.cache.get(i.guild_id);
+    async execute(command) {
+        const {MessageEmbed} = require('discord.js');
+        const dateFormat = require('dateformat');
+
+        const guild_id = command.guild_id;
+        const member_id = command.data.options ? command.data.options[0].value : command.user.id;
+        const member = command.client.guilds.cache.get(guild_id).members.cache.get(member_id);
+        const guild = command.client.guilds.cache.get(guild_id);
         const options = {format: 'png', dynamic: true, size: 4096};
 
         const statusIcon = {
@@ -26,29 +28,29 @@ module.exports = {
         const boost = member.premiumSince ? `Since ${dateFormat(member.premiumSince, 'mmmm d, yyyy "at" h:MM TT Z')}` : 'No';
         const icon = member.user.avatarURL() ? `[\`Link\`](${member.user.avatarURL(options)})` : '`None`';
 
-        let presence = '\n';
-        member.presence.activities.length === 0 ? presence = '`None`\n' : member.presence.activities.forEach(p => {
-            switch (p.type) {
+        let activities = '\n';
+        member.presence.activities.length === 0 ? activities = '`None`\n' : member.presence.activities.forEach(activity => {
+            switch (activity.type) {
                 case 'COMPETING': {
-                    presence += `\n> Competing in **${p.name}**\n`;
+                    activities += `\n> Competing in **${activity.name}**\n`;
                     break;
                 }
 
                 case 'CUSTOM_STATUS': {
-                    presence += `\n> **${p.emoji ? `${p.emoji} ` : ''}${p.state || ''}**\n`;
+                    activities += `\n> **${activity.emoji ? `${activity.emoji} ` : ''}${activity.state || ''}**\n`;
                     break;
                 }
                         
                 case 'LISTENING': {
-                    if (p.name !== 'Spotify') {
-                        presence += `\n> Listening to **${p.name}**`;
+                    if (activity.name !== 'Spotify') {
+                        activities += `\n> Listening to **${activity.name}**`;
                             
                     } else {
-                        presence +=
-                            `\n> Listening to **${p.name}**`+
-                            `\n> **[${p.details}](https://open.spotify.com/track/${p.syncID})**`+
-                            `\n> By ${p.state}`+
-                            `\n> On ${p.assets.largeText}\n`;
+                        activities +=
+                            `\n> Listening to **${activity.name}**`+
+                            `\n> **[${activity.details}](https://open.spotify.com/track/${activity.syncID})**`+
+                            `\n> By ${activity.state}`+
+                            `\n> On ${activity.assets.largeText}\n`;
                     }
 
                     break;
@@ -57,8 +59,8 @@ module.exports = {
                 case 'PLAYING': {
                     let duration;
 
-                    if (p.timestamps) {
-                        const time = p.timestamps;
+                    if (activity.timestamps) {
+                        const time = activity.timestamps;
                         const ms = time.end === null ? Date.now() - Date.parse(time.start) : Date.parse(time.end) - Date.now();
                         const type = time.end === null ? 'elapsed' : 'left';
 
@@ -84,23 +86,36 @@ module.exports = {
                     } else {
                         duration = '';
                     }
+
+                    let party = '';
+
+                    switch (!activity.party) {
+                        case false: {
+                            party = `(${activity.party.size[0]} of ${activity.party.size[1]})`;
+                            break;
+                        }
+                    }
                             
-                    presence += 
-                        `\n> Playing **${p.name}**`+
-                        `${p.details ? `\n> ${p.details}` : ''}`+
-                        `${p.state ? `\n> ${p.state}` : ''} ${p.party ? `(${p.party.size[0]} of ${p.party.size[1]})` : ''}`+
+                    activities += 
+                        `\n> Playing **${activity.name}**`+
+                        `${activity.details ? `\n> ${activity.details}` : ''}`+
+                        `${activity.state ? `\n> ${activity.state}` : ''} ${party}`+
                         `${duration}\n`;
 
                     break;
                 }
                         
                 case 'STREAMING': {
-                    presence += `\n> Live on **${p.name}**\n> **[${p.details}](${p.url})**\n> Playing ${p.state}\n`;
+                    activities += 
+                        `\n> Live on **${activity.name}**`+
+                        `\n> **[${activity.details}](${activity.url})**`+
+                        `\n> Playing ${activity.state}\n`;
+
                     break;
                 }
                         
                 case 'WATCHING': {
-                    presence += `\n> Watching **${p.name}**\n`;
+                    activities += `\n> Watching **${activity.name}**\n`;
                     break;
                 }
             }
@@ -184,7 +199,7 @@ module.exports = {
                 `Status: ${statusIcon[member.user.presence.status]}\`${statusText[member.user.presence.status]}\`\n`+
                 `Created: \`${dateFormat(member.user.createdAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
                 `Joined: \`${dateFormat(member.joinedAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
-                `Activity: ${presence}\n`+
+                `Activity: ${activities}\n`+
                 `Join Position: \`${join}\`\n`+
                 `Color: \`${member.displayHexColor}\`\n`+
                 `Booster: \`${boost}\`\n`+
@@ -196,6 +211,6 @@ module.exports = {
             .setColor(process.env.color)
             .setThumbnail(member.user.displayAvatarURL(options));
 
-        i.embed(embed);
+        command.embed(embed);
     }
 };

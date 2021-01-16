@@ -1,10 +1,10 @@
-const { MessageEmbed } = require('discord.js');
-const dateFormat = require('dateformat');
-
 module.exports = {
     name: 'server',
-    async execute(i) {
-        const guild = i.client.guilds.cache.get(i.guild_id);
+    async execute(command) {
+        const {MessageEmbed} = require('discord.js');
+        const dateFormat = require('dateformat');
+
+        const guild = command.client.guilds.cache.get(command.guild_id);
         const options = {format: 'png', dynamic: true, size: 4096};
 
         const notificationNames = {
@@ -166,6 +166,6 @@ module.exports = {
             .setColor(process.env.color)
             .setThumbnail(guild.iconURL(options) || 'https://ellie.is.gay/1eUNml2tV');
 
-        i.embed(embed);
+        command.embed(embed);
     }
 };
