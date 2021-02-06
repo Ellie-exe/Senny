@@ -1,6 +1,9 @@
-module.exports = {
-    name: '8ball',
-    async execute(command) {
+/**
+ * @param {import('../types').Interaction} command
+ * @param {import('../types').Utils} utils
+ */
+module.exports.execute = async (command, utils) => {
+    try {
         const responses = [
             'It is certain.',
             'It is decidedly so.',
@@ -27,6 +30,10 @@ module.exports = {
         const question = command.data.options[0].value;
         const response = responses[Math.floor(Math.random() * responses.length)];
 
-        command.send(`Question: ${question}\nResponse: ${response}`);
+        command.send(`Question: \`${question}\`\nResponse: \`${response}\``);
+
+    } catch (err) {
+        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        utils.logger.error(err);
     }
 };

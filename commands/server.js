@@ -1,10 +1,12 @@
-module.exports = {
-    name: 'server',
-    async execute(command) {
-        const {MessageEmbed} = require('discord.js');
-        const dateFormat = require('dateformat');
-
-        const guild = command.client.guilds.cache.get(command.guild_id);
+const { MessageEmbed } = require('discord.js');
+const dateFormat = require('dateformat');
+/**
+ * @param {import('../types').Interaction} command
+ * @param {import('../types').Utils} utils
+ */
+module.exports.execute = async (command, utils) => {
+    try {
+        const guild = command.client.guilds.cache.get(command.guildID);
         const options = {format: 'png', dynamic: true, size: 4096};
 
         const notificationNames = {
@@ -33,8 +35,8 @@ module.exports = {
         let announcementChannels = 0;
         let storeChannels = 0;
 
-        guild.channels.cache.forEach((c) => {
-            switch (c.type) {
+        guild.channels.cache.forEach(channel => {
+            switch (channel.type) {
                 case 'text':
                     textChannels++;
                     totalChannels++;
@@ -69,8 +71,8 @@ module.exports = {
         let numMembers = 0;
         let numBots = 0;
 
-        guild.members.cache.forEach((m) => {
-            switch (m.user.presence.status) {
+        guild.members.cache.array().forEach(member => {
+            switch (member.user.presence.status) {
                 case 'online':
                     onlineMembers++;
                     break;
@@ -88,7 +90,7 @@ module.exports = {
                     break;
             }
 
-            switch (m.user.bot) {
+            switch (member.user.bot) {
                 case false:
                     numMembers++;
                     break;
@@ -98,7 +100,7 @@ module.exports = {
                     break;
             }
         });
-                
+        
         const featrueNames = {
             ANIMATED_ICON: 'Animated Icon',
             BANNER: 'Banner',
@@ -121,9 +123,11 @@ module.exports = {
                 
         let features = [];
         guild.features.length === 0 ? features.push('None') : guild.features.forEach(f => features.push(featrueNames[f]));
+
+        const icon = guild.iconURL(options) || 'https://ellie.is.gay/1eUNml2tV';
                 
         const embed = new MessageEmbed()
-            .setTitle(guild.name)
+            .setAuthor(`${guild.name} - Information`, null, icon)
             .setDescription(
                 `Owner: ${guild.owner}\n`+
                 `System Channel: ${guild.systemChannel || '`None`'}\n`+
@@ -164,8 +168,12 @@ module.exports = {
                 `Features: \`${features.join(', ')}\``
             )
             .setColor(process.env.color)
-            .setThumbnail(guild.iconURL(options) || 'https://ellie.is.gay/1eUNml2tV');
+            .setThumbnail(icon);
 
         command.embed(embed);
+
+    } catch (err) {
+        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        utils.logger.error(err);
     }
 };

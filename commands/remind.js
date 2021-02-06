@@ -1,21 +1,20 @@
-module.exports = {
-    name: 'remind',
-    async execute(command) {
-        const constants = require('../utils/constants');
-        const {MessageEmbed} = require('discord.js');
-        const logger = require('@jakeyprime/logger');
-        const schedule = require('node-schedule');
-        const dateFormat = require('dateformat');
-        const Enmap = require('enmap');
-
-        const enmap = new Enmap({name: 'senny'});
-        (async function() {await enmap.defer}());
+const { MessageEmbed } = require('discord.js');
+const schedule = require('node-schedule');
+const dateFormat = require('dateformat');
+const Enmap = require('enmap');
+/**
+ * @param {import('../types').Interaction} command
+ * @param {import('../types').Utils} utils
+ */
+module.exports.execute = async (command, utils) => {
+    try {
+        const reminder = new Enmap({name: 'reminder'});
 
         const data = command.data.options[0];
 
         function parse(time) {
-            const values = time.split(' ');
-
+            const times = time.match(/\d+\s\w+|\d+\w+/g);
+            
             let years = 0;
             let months = 0;
             let weeks = 0;
@@ -24,122 +23,40 @@ module.exports = {
             let minutes = 0;
             let seconds = 0;
 
-            for (let i = 0; i < values.length; i++) {
-                switch (values[i]) {
-                    case 'year': {
-                        years = values[i - 1] * 365 * 24 * 60 * 60 * 1000;
+            times.forEach(time => {
+                const value = time.match(/\d+/g)[0];
+                const label = time.match(/(?<=\s|\d)mo|(?<=\s|\d)[a-zA-Z]/g)[0];
+
+                switch (label) {
+                    case 'y':
+                        years = value * 365 * 24 * 60 * 60 * 1000;
                         break;
-                    }
-                                
-                    case 'years': {
-                        years = values[i - 1] * 365 * 24 * 60 * 60 * 1000;
+
+                    case 'mo':
+                        months = value * 30 * 24 * 60 * 60 * 1000;
                         break;
-                    }
 
-                    case 'month': {
-                        months = values[i - 1] * 30 * 24 * 60 * 60 * 1000;
+                    case 'w':
+                        weeks = value * 7 * 24 * 60 * 60 * 1000;
                         break;
-                    }
 
-                    case 'months': {
-                        months = values[i - 1] * 30 * 24 * 60 * 60 * 1000;
+                    case 'd':
+                        days = value * 24 * 60 * 60 * 1000;
                         break;
-                    }
 
-                    case 'week': {
-                        weeks = values[i - 1] * 7 * 24 * 60 * 60 * 1000;
+                    case 'h':
+                        hours = value * 60 * 60 * 1000;
                         break;
-                    }
 
-                    case 'weeks': {
-                        weeks = values[i - 1] * 7 * 24 * 60 * 60 * 1000;
+                    case 'm':
+                        minutes = value * 60 * 1000;
                         break;
-                    }
-                        
-                    case 'day': {
-                        days = values[i - 1] * 24 * 60 * 60 * 1000;
+
+                    case 's':
+                        seconds = value * 1000;
                         break;
-                    }
-
-                    case 'days': {
-                        days = values[i - 1] * 24 * 60 * 60 * 1000;
-                        break;
-                    }
-
-                    case 'hour': {
-                        hours = values[i - 1] * 60 * 60 * 1000;
-                        break;
-                    }
-
-                    case 'hours': {
-                        hours = values[i - 1] * 60 * 60 * 1000;
-                        break;
-                    }
-
-                    case 'minute': {
-                        minutes = values[i - 1] * 60 * 1000;
-                        break;
-                    }
-
-                    case 'minutes': {
-                        minutes = values[i - 1] * 60 * 1000;
-                        break;
-                    }
-
-                    case 'second': {
-                        seconds = values[i - 1] * 1000;
-                        break;
-                    }
-
-                    case 'seconds': {
-                        seconds = values[i - 1] * 1000;
-                        break;
-                    }
-                        
-                    case 'and': {
-                        break;
-                    }
-
-                    default: {
-                        switch (values[i].charAt(values[i].length - 1)) {
-                            case 'y': {
-                                years = values[i].substring(0, values[i].length - 1) * 365 * 24 * 60 * 60 * 1000;
-                                break;
-                            }
-
-                            case 'o': {
-                                months = values[i].substring(0, values[i].length - 2) * 30 * 24 * 60 * 60 * 1000;
-                                break;
-                            }
-
-                            case 'w': {
-                                weeks = values[i].substring(0, values[i].length - 1) * 7 * 24 * 60 * 60 * 1000;
-                                break;
-                            }
-
-                            case 'd': {
-                                days = values[i].substring(0, values[i].length - 1) * 24 * 60 * 60 * 1000;
-                                break;
-                            }
-
-                            case 'h': {
-                                hours = values[i].substring(0, values[i].length - 1) * 60 * 60 * 1000;
-                                break;
-                            }
-
-                            case 'm': {
-                                minutes = values[i].substring(0, values[i].length - 1) * 60 * 1000;
-                                break;
-                            }
-
-                            case 's': {
-                                seconds = values[i].substring(0, values[i].length - 1) * 1000;
-                                break;
-                            }
-                        }
-                    }
                 }
-            }
+            });
 
             return years + months + weeks + days + hours + minutes + seconds;
         }
@@ -153,46 +70,47 @@ module.exports = {
                 let date;
 
                 switch (type) {
-                    case 'duration': {
+                    case 'duration':
                         date = Date.now() + parse(time);
                         break;
-                    }
 
-                    case 'date': {
+                    case 'date':
                         date = Date.parse(time);
                         break;
-                    }
                 }
 
-                const author = command.client.users.cache.get(command.user.id);
-                const channel = command.client.channels.cache.get(command.channel_id);
+                const author = await command.client.users.fetch(command.user.id);
+                const channel = command.client.channels.cache.get(command.channelID);
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
-                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                
-                let key = '';
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    
+                let reminderID = '';
+                for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.random() * characters.length);
 
-                for (let i = 0; i < 5; i++) {
-                    key += characters.charAt(Math.random() * characters.length);
-                }
-
-                const reminder = {
-                    author_id: author.id,
-                    channel_id: channel.id,
-                    channel_type: channel.type,
+                reminder.set(reminderID, {
+                    authorID: author.id,
+                    channelID: channel.id,
+                    channelType: channel.type,
                     date: date,
                     text: text
-                }
+                });
 
                 command.send(`Okay, I'll remind ${channel} about: \`${text}\` at: \`${display}\``);
-                enmap.set(key, reminder);
 
-                schedule.scheduleJob(date, function() {
-                    if (enmap.indexes.includes(key)) {
-                        channel.send(`Hello ${author.toString()}! You asked me to remind you about: \`${text}\``);
-                        enmap.delete(key);
+                schedule.scheduleJob(date, async () => {
+                    try {
+                        const mention = author.toString();
+                        if (reminder.indexes.includes(reminderID)) {
+                            await channel.send(`Hello ${mention}! You asked me to remind you about: \`${text}\``);
+                            reminder.delete(reminderID);
+                        }
+                    
+                    } catch (err) {
+                        channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
+                        utils.logger.error(err);
                     }
                 });
-                
+                    
                 break;
             }
 
@@ -204,62 +122,64 @@ module.exports = {
                 let date;
 
                 switch (type) {
-                    case 'duration': {
+                    case 'duration':
                         date = Date.now() + parse(time);
                         break;
-                    }
 
-                    case 'date': {
+                    case 'date':
                         date = Date.parse(time);
                         break;
-                    }
                 }
 
-                const author = command.client.users.cache.get(command.user.id);
+                const author = await command.client.users.fetch(command.authorID);
                 const channel = await author.createDM();
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
-                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                
-                let key = '';
-
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    
+                let reminderID = '';
                 for (let i = 0; i < 5; i++) {
-                    key += characters.charAt(Math.random() * characters.length);
+                    reminderID += characters.charAt(Math.random() * characters.length);
                 }
 
-                const reminder = {
-                    author_id: author.id,
-                    channel_id: channel.id,
-                    channel_type: channel.type,
+                reminder.set(reminderID, {
+                    authorID: author.id,
+                    channelID: channel.id,
+                    channelType: channel.type,
                     date: date,
                     text: text
-                }
+                });
 
                 command.send(`Okay, I'll remind you about: \`${text}\` at: \`${display}\``);
-                enmap.set(key, reminder);
 
-                schedule.scheduleJob(date, function() {
-                    if (enmap.indexes.includes(key)) {
-                        channel.send(`Hello ${author.toString()}! You asked me to remind you about: \`${text}\``);
-                        enmap.delete(key);
+                schedule.scheduleJob(date, async () => {
+                    try {
+                        const mention = author.toString();
+                        if (reminder.indexes.includes(reminderID)) {
+                            await channel.send(`Hello ${mention}! You asked me to remind you about: \`${text}\``);
+                            reminder.delete(reminderID);
+                        }
+                    
+                    } catch (err) {
+                        channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
+                        utils.logger.error(err);
                     }
                 });
-                
+                    
                 break;
             }
 
             case 'list': {
-                const author = command.client.users.cache.get(command.user.id);
-                const indexes = enmap.indexes;
+                const author = await command.client.users.fetch(command.authorID);
+                const indexes = reminder.indexes;
                 
-                let keys = [];
-
+                let reminderIDs = [];
                 for (let i = 0; i < indexes.length; i++) {
-                    if (enmap.get(indexes[i], 'author_id') === author.id) {
-                        keys.push(indexes[i]);
+                    if (reminder.get(indexes[i], 'authorID') === author.id) {
+                        reminderIDs.push(indexes[i]);
                     }
                 }
 
-                const reminders = enmap.fetch(keys);
+                const reminders = reminder.fetch(reminderIDs);
                 const embed = new MessageEmbed()
                     .setAuthor(`${author.tag} - Reminders`)
                     .setColor(process.env.color);
@@ -268,28 +188,24 @@ module.exports = {
                     embed.setDescription('You have no reminders');
                 
                 } else {
-                    for (let i = 0; i < keys.length; i++) {
-                        const channel_id = reminders.get(keys[i], 'channel_id');
-                        const channel_type = reminders.get(keys[i], 'channel_type');
-                        const date = reminders.get(keys[i], 'date');
-                        const text = reminders.get(keys[i], 'text');
+                    for (let i = 0; i < reminderIDs.length; i++) {
+                        const channelID = reminders.get(reminderIDs[i], 'channelID');
+                        const channelType = reminders.get(reminderIDs[i], 'channelType');
+                        const date = reminders.get(reminderIDs[i], 'date');
+                        const text = reminders.get(reminderIDs[i], 'text');
 
-                        let channel = '';
-
-                        switch (channel_type === 'dm') {
-                            case true: {
-                                channel = `<@${author.id}>`;
+                        switch (channelType === 'dm') {
+                            case true:
+                                var channel = `<@${author.id}>`;
                                 break;
-                            }
                         
-                            case false: {
-                                channel = `<#${channel_id}>`;
+                            case false:
+                                var channel = `<#${channelID}>`;
                                 break;
-                            }
                         }
 
                         embed.addField(
-                            `Reminder [\`${keys[i]}\`]`,
+                            `Reminder [\`${reminderIDs[i]}\`]`,
                             `Destination: ${channel}\n`+
                             `Time: \`${dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
                             `Text: \`${text}\``
@@ -303,20 +219,47 @@ module.exports = {
 
             case 'delete': {
                 const id = data.options[0].value;
+                const author = await command.client.users.fetch(command.authorID);
+                const indexes = reminder.indexes;
+                
+                let reminderIDs = [];
 
-                if (enmap.indexes.includes(id)) {
-                    enmap.delete(id);
+                for (let i = 0; i < indexes.length; i++) {
+                    if (reminder.get(indexes[i], 'authorID') === author.id) {
+                        reminderIDs.push(indexes[i]);
+                    }
+                }
+
+                if (id.toLowerCase() === 'all') {
+                    command.send(`Okay, I'll delete all your reminders`);
+                    
+                    for (let i = 0; i < reminderIDs.length; i++) {
+                        reminder.delete(reminderIDs[i]);
+                    }
+                    
+                    return;
+                }
+
+                if (!reminderIDs.includes(id)) {
+                    throw new Error('You cannot delete someone else\'s reminders');
+                }
+
+                if (reminder.indexes.includes(id)) {
                     command.send(`Okay, I'll delete the reminder: \`${id}\``);
+                    reminder.delete(id);
                 
                 } else {
-                    const err = 'That reminder does not exist'
-                    logger.error(err);
-                    command.send(`${constants.emojis.redX} Error: \`${err}\``);
-                
+                    const err = 'That reminder does not exist';
+                    command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+                    utils.logger.error(err);
                 }
                 
                 break;
             }
         }
+
+    } catch (err) {
+        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        utils.logger.error(err);
     }
 };

@@ -1,30 +1,23 @@
-module.exports = {
-    name: 'eval',
-    async execute(message, args) {
-        const constants = require('../utils/constants');
-        const logger = require('@jakeyprime/logger');
+/**
+ * @param {import('../types').Message} message
+ * @param {import('../types').Args} args
+ * @param {import('../types').Utils} utils 
+ */
+module.exports.execute = async (message, args, utils) => {
+    try {
+        if(!process.env.owners.includes(message.author.id)) throw new Error('Missing Permissions');
 
-        if(process.env.owners.includes(message.author.id) === false) {
-            message.channel.send(`${constants.emojis.redX} Error: \`DiscordAPIError: Missing Permissions\``);
-            return;
+        const code = args.join(' ');
+        let evaled = eval(code);
+
+        if (typeof evaled !== 'string') {
+            evaled = require('util').inspect(evaled);
         }
+    
+        await message.channel.send(evaled, {code: 'xl', split: true});
         
-        try {
-            const code = args.join(' ');
-            let evaled = eval(code);
-
-            if (typeof evaled !== 'string')
-                evaled = require('util').inspect(evaled);
-
-            message.channel.send(evaled, {code: 'xl'})
-                .catch(err => {
-                    message.channel.send(err, {code: 'xl'});
-                    logger.error(err);
-                });
-        
-        } catch (err) {
-            message.channel.send(err, {code: 'xl'});
-            logger.error(err);
-        }
+    } catch (err) {
+        message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
+        utils.logger.error(err);
     }
 };

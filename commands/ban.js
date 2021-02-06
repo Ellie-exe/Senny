@@ -1,61 +1,45 @@
-module.exports = {
-    name: 'ban',
-    async execute(command) {
-        const constants = require('../utils/constants');
-        const logger = require('@jakeyprime/logger');
+/**
+ * @param {import('../types').Interaction} command
+ * @param {import('../types').Utils} utils
+ */
+module.exports.execute = async (command, utils) => {
+    try {
+        const options = command.data.options;
+        const guildID = command.guildID;
+        const guild = command.client.guilds.cache.get(guildID);
+        const member = await guild.members.fetch(command.data.options[0].value);
+        const author = await guild.members.fetch(command.authorID);
 
-        const guild_id = command.guild_id;
-        const author_id = command.user.id;
-        const user_id = command.data.options[0].value;
-        const member = command.client.guilds.cache.get(guild_id).members.cache.get(user_id);
-        const author = command.client.guilds.cache.get(guild_id).members.cache.get(author_id);
-                
         let days = 0;
         let reason = undefined;
-        let displayReason = 'None';
-        let displayMember = `${member.toString()} ${member.user.tag}`;
-        let silent = false;
-        let error = false;
+        let silent = undefined;
 
-        if (author.hasPermission('BAN_MEMBERS') === false) {
-            command.send(`${constants.emojis.redX} Error: \`DiscordAPIError: Missing Permissions\``, 3, 64);
-            return;
+        if (!author.hasPermission('BAN_MEMBERS') && !utils.isAdmin(author, guildID) && !utils.isMod(author, guildID)) {
+            throw new Error('Missing Permissions');
         }
-                
-        for (let i = 1; i < command.data.options.length; i++) {
-            switch (command.data.options[i].name) {
+
+        for (const option in options) {
+            switch (options[option].name) {
                 case 'delete':
-                    days = command.data.options[i].value;
+                    days = options[option].value;
                     break;
 
                 case 'reason':
-                    reason = command.data.options[i].value;
-                    displayReason = reason;
+                    reason = options[option].value;
                     break;
 
                 case 'silent':
-                    silent = command.data.options[i].value;
+                    silent = {type: 3, flags: 64};
                     break;
             }
         }
 
-        await member.ban({days: days, reason: reason})
-            .catch((err) => {
-                error = true;
-                logger.error(err);
-                command.send(`${constants.emojis.redX} Error: \`${err}\``, 3, 64);
-            });
+        await member.ban({days: days, reason: reason});
+        
+        command.send(`${member.toString()} ${member.user.tag} has been banned for reason: \`${reason || 'None'}\``, silent);
 
-        if (error === false) {
-            switch (silent) {
-                case false:
-                    command.send(`${displayMember} has been banned from the server for reason: \`${displayReason}\``);
-                    break;
-                            
-                case true:
-                    command.send(`${displayMember} has been banned from the server for reason: \`${displayReason}\``, 3, 64);
-                    break;
-            }
-        }
+    } catch (err) {
+        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        utils.logger.error(err);
     }
 };

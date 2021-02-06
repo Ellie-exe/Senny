@@ -1,4 +1,5 @@
+/data
+/json
+/node_modules
 /config.json
 /events.log
-/node_modules
-/data

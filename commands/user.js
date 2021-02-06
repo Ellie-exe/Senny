@@ -1,13 +1,15 @@
-module.exports = {
-    name: 'user',
-    async execute(command) {
-        const {MessageEmbed} = require('discord.js');
-        const dateFormat = require('dateformat');
-
-        const guild_id = command.guild_id;
-        const member_id = command.data.options ? command.data.options[0].value : command.user.id;
-        const member = command.client.guilds.cache.get(guild_id).members.cache.get(member_id);
-        const guild = command.client.guilds.cache.get(guild_id);
+const { MessageEmbed } = require('discord.js');
+const dateFormat = require('dateformat');
+/**
+ * @param {import('../types').Interaction} command
+ * @param {import('../types').Utils} utils
+ */
+module.exports.execute = async (command, utils) => {
+    try {
+        const guildID = command.guildID;
+        const memberID = command.data.options ? command.data.options[0].value : command.userID;
+        const member = await command.client.guilds.cache.get(guildID).members.fetch(memberID);
+        const guild = command.client.guilds.cache.get(guildID);
         const options = {format: 'png', dynamic: true, size: 4096};
 
         const statusIcon = {
@@ -32,25 +34,25 @@ module.exports = {
         member.presence.activities.length === 0 ? activities = '`None`\n' : member.presence.activities.forEach(activity => {
             switch (activity.type) {
                 case 'COMPETING': {
-                    activities += `\n> Competing in **${activity.name}**\n`;
+                    activities += `\nCompeting in **${activity.name}**\n`;
                     break;
                 }
 
                 case 'CUSTOM_STATUS': {
-                    activities += `\n> **${activity.emoji ? `${activity.emoji} ` : ''}${activity.state || ''}**\n`;
+                    activities += `\n${activity.emoji || ''} ${activity.state || ''}\n`;
                     break;
                 }
                         
                 case 'LISTENING': {
                     if (activity.name !== 'Spotify') {
-                        activities += `\n> Listening to **${activity.name}**`;
+                        activities += `\nListening to **${activity.name}**\n`;
                             
                     } else {
                         activities +=
-                            `\n> Listening to **${activity.name}**`+
-                            `\n> **[${activity.details}](https://open.spotify.com/track/${activity.syncID})**`+
-                            `\n> By ${activity.state}`+
-                            `\n> On ${activity.assets.largeText}\n`;
+                            `\nListening to **${activity.name}**`+
+                            `\n**[${activity.details}](https://open.spotify.com/track/${activity.syncID})**`+
+                            `\nBy ${activity.state}`+
+                            `\nOn ${activity.assets.largeText}\n`;
                     }
 
                     break;
@@ -77,10 +79,10 @@ module.exports = {
                             m < 10 ? m = '0' + m : m = m;
                             s < 10 ? s = '0' + s : s = s;
 
-                            h === '00' ? duration = `\n> ${m}:${s} ${type}` : duration = `\n> ${h}:${m}:${s} ${type}`;
+                            h === '00' ? duration = `\n${m}:${s} ${type}` : duration = `\n${h}:${m}:${s} ${type}`;
                                 
                         } else {
-                            duration = '\n> 00:00 left';
+                            duration = '\n00:00 left';
                         }
                             
                     } else {
@@ -89,7 +91,7 @@ module.exports = {
 
                     let party = '';
 
-                    switch (!activity.party) {
+                    switch (!activity.party?.size) {
                         case false: {
                             party = `(${activity.party.size[0]} of ${activity.party.size[1]})`;
                             break;
@@ -97,25 +99,31 @@ module.exports = {
                     }
                             
                     activities += 
-                        `\n> Playing **${activity.name}**`+
-                        `${activity.details ? `\n> ${activity.details}` : ''}`+
-                        `${activity.state ? `\n> ${activity.state}` : ''} ${party}`+
+                        `\nPlaying: **${activity.name}**`+
+                        `${activity.details ? `\n${activity.details}` : ''}`+
+                        `${activity.state ? `\n${activity.state}` : ''} ${party}`+
                         `${duration}\n`;
+
+                    playing = 
+                        `**${activity.name}**`+
+                        `${activity.details ? `\n${activity.details}` : ''}`+
+                        `${activity.state ? `\n${activity.state}` : ''} ${party}`+
+                        `${duration}`;
 
                     break;
                 }
                         
                 case 'STREAMING': {
                     activities += 
-                        `\n> Live on **${activity.name}**`+
-                        `\n> **[${activity.details}](${activity.url})**`+
-                        `\n> Playing ${activity.state}\n`;
+                        `\nLive on **${activity.name}**`+
+                        `\n**[${activity.details}](${activity.url})**`+
+                        `\nPlaying ${activity.state}\n`;
 
                     break;
                 }
                         
                 case 'WATCHING': {
-                    activities += `\n> Watching **${activity.name}**\n`;
+                    activities += `\nWatching **${activity.name}**\n`;
                     break;
                 }
             }
@@ -123,26 +131,53 @@ module.exports = {
 
         const roles = member.roles.cache.sort((a, b) => b.position - a.position).array();
 
+        const badgeEmojis = {
+            DISCORD_EMPLOYEE: '<:staff:714835631485747322>',
+            PARTNERED_SERVER_OWNER: '<:partner:748665161186934904>',
+            DISCORD_PARTNER: '<:partner:748665161186934904>',
+            HYPESQUAD_EVENTS: '<:hypesquadevents:714835064822956104>',
+            BUGHUNTER_LEVEL_1: '<:bughunter:749061946321666071>',
+            HOUSE_BRAVERY: '<:bravery:778877338988707841>',
+            HOUSE_BRILLIANCE: '<:brilliance:778877104712056832>',
+            HOUSE_BALANCE: '<:balance:778877245753786368>',
+            EARLY_SUPPORTER: '<:earlysupporter:714860883880443985>',
+            TEAM_USER: '',
+            SYSTEM: '',
+            BUGHUNTER_LEVEL_2: '<:bughuntergold:714835631452192789>',
+            VERIFIED_BOT: '',
+            EARLY_VERIFIED_BOT_DEVELOPER: '<:botdev:714835632077144064>',
+            VERIFIED_DEVELOPER: '<:botdev:714835632077144064>',
+        };
+
         const flagNames = {
             DISCORD_EMPLOYEE: 'Discord Employee',
             PARTNERED_SERVER_OWNER: 'Partnered Server Owner',
-            DISCORD_PARTNER: 'Discord Partner',
             HYPESQUAD_EVENTS: 'HypeSquad Events',
-            BUGHUNTER_LEVEL_1: 'Bug Hunter Level 1',
-            HOUSE_BRAVERY: 'House Bravery',
-            HOUSE_BRILLIANCE: 'House Brilliance',
-            HOUSE_BALANCE: 'House Balance',
+            BUGHUNTER_LEVEL_1: 'Discord Bug Hunter Level 1',
+            HOUSE_BRAVERY: 'HypeSquad Bravery',
+            HOUSE_BRILLIANCE: 'HypeSquad Billiance',
+            HOUSE_BALANCE: 'HypeSquad Balance',
             EARLY_SUPPORTER: 'Early Supporter',
             TEAM_USER: 'Team User',
             SYSTEM: 'System',
-            BUGHUNTER_LEVEL_2: 'Bug Hunter Level 2',
+            BUGHUNTER_LEVEL_2: 'Discord Bug Hunter Level 2',
             VERIFIED_BOT: 'Verified Bot',
-            EARLY_VERIFIED_BOT_DEVELOPER: 'Early Verified Bot Developer',
-            VERIFIED_DEVELOPER: 'Verified Developer',
-        };
-                
+            EARLY_VERIFIED_BOT_DEVELOPER: 'Early Verified Bot Developer'
+        }
+        
         let flags = [];
-        member.user.flags ? member.user.flags.toArray().forEach(f => flags.push(flagNames[f])) : flags.push('None');
+        switch (member.user.flags?.equals(0)) {
+            case undefined:
+                flags.push('None');
+                break;
+
+            case true:
+                flags.push('None');
+                break;
+
+            default:
+                member.user.flags.toArray().forEach(flag => flags.push(flagNames[flag]));
+        }
 
         const permNames = {
             ADMINISTRATOR: 'Administrator',
@@ -190,7 +225,7 @@ module.exports = {
         }
 
         const embed = new MessageEmbed()
-            .setTitle(member.user.tag)
+            .setAuthor(`${member.user.tag} - Information`, null, member.user.avatarURL())
             .setDescription(
                 `Profile: ${member.toString()}\n`+
                 `ID: \`${member.id}\`\n`+
@@ -212,5 +247,9 @@ module.exports = {
             .setThumbnail(member.user.displayAvatarURL(options));
 
         command.embed(embed);
+    
+    } catch (err) {
+        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        utils.logger.error(err);
     }
 };

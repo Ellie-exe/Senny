@@ -1,17 +1,24 @@
-module.exports = {
-    name: 'avatar',
-    async execute(command) {
-        const {MessageEmbed} = require('discord.js');
-
-        const user_id = command.data.options ? command.data.options[0].value : command.user.id;
-        const user = command.client.users.cache.get(user_id);
-        const avatar = user.displayAvatarURL().concat('?size=4096');
+const { MessageEmbed } = require('discord.js');
+/**
+ * @param {import('../types').Interaction} command
+ * @param {import('../types').Utils} utils
+ */
+module.exports.execute = async (command, utils) => {
+    try {
+        const guildID = command.guildID;
+        const userID = command.data.options ? command.data.options[0].value : command.userID;
+        const member = await command.client.guilds.cache.get(guildID).members.fetch(userID);
+        const avatarURL = member.user.displayAvatarURL({format: 'png', dynamic: true, size: 4096});
 
         const embed = new MessageEmbed()
-            .setAuthor(user.tag)
-            .setImage(avatar)
+            .setAuthor(`${member.user.tag} - Avatar`, null, avatarURL)
+            .setImage(avatarURL)
             .setColor(process.env.color);
-                
+
         command.embed(embed);
+
+    } catch (err) {
+        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        utils.logger.error(err);
     }
 };
