@@ -15,12 +15,29 @@ class Utils {
 
     async isAdmin(author, guild) {
         const adminRole = new Enmap({name: 'adminRole'});
-        return author.roles.cache.has(adminRole.get(guild));
+        const admin = await author.roles.cache.has(adminRole.get(guild));
+
+        if (admin === true) return true;
+        else return false;
     }
 
     async isMod(author, guild) {
         const modRole = new Enmap({name: 'modRole'});
-        return author.roles.cache.has(modRole.get(guild));
+        const mod = await author.roles.cache.has(modRole.get(guild));
+
+        if (mod === true) return true;
+        else return false;
+    }
+
+    async isStaff(author, guild) {
+        const modRole = new Enmap({name: 'modRole'});
+        const mod = await author.roles.cache.has(modRole.get(guild));
+        
+        const adminRole = new Enmap({name: 'adminRole'});
+        const admin = await author.roles.cache.has(adminRole.get(guild));
+
+        if (mod === true || admin === true) return true;
+        else return false;
     }
 }
 

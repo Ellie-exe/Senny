@@ -12,7 +12,7 @@ module.exports.execute = async (command, utils) => {
         
         switch (type) {
             case 'role': {
-                if (!author.hasPermission('MANAGE_ROLES') && !utils.isAdmin(author, guildID)) {
+                if (!author.hasPermission('MANAGE_ROLES') && await utils.isAdmin(author, guildID) === false) {
                     throw new Error('Missing Permissions');
                 }
 
@@ -24,7 +24,7 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'channel': {
-                if (!author.hasPermission('MANAGE_CHANNELS') && !utils.isAdmin(author, guildID)) {
+                if (!author.hasPermission('MANAGE_CHANNELS') && await utils.isAdmin(author, guildID) === false) {
                     throw new Error('Missing Permissions');
                 }
 

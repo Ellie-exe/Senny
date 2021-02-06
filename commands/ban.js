@@ -14,7 +14,7 @@ module.exports.execute = async (command, utils) => {
         let reason = undefined;
         let silent = undefined;
 
-        if (!author.hasPermission('BAN_MEMBERS') && !utils.isAdmin(author, guildID) && !utils.isMod(author, guildID)) {
+        if (!author.hasPermission('BAN_MEMBERS') && await utils.isStaff(author, guildID) === false) {
             throw new Error('Missing Permissions');
         }
 

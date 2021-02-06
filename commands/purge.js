@@ -10,7 +10,7 @@ module.exports.execute = async (command, utils) => {
         const author = await guild.members.fetch(command.authorID);
         const amount = command.data.options[0].value;
 
-        if (!author.hasPermission('MANAGE_MESSAGES') && !utils.isMod(author, guildID) && !utils.isAdmin(author, guildID)) {
+        if (!author.hasPermission('MANAGE_MESSAGES') && await utils.isStaff(author, guildID) === false) {
             throw new Error('Missing Permissions');
         }
 

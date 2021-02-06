@@ -14,7 +14,7 @@ module.exports.execute = async (command, utils) => {
             case 'role': {
                 let roleOptions = {name: options[0].value};
                 
-                if (!author.hasPermission('MANAGE_ROLES') && !utils.isAdmin(author, guildID)) {
+                if (!author.hasPermission('MANAGE_ROLES') && await utils.isAdmin(author, guildID) === false) {
                     throw new Error('Missing Permissions');
                 }
 
@@ -47,7 +47,7 @@ module.exports.execute = async (command, utils) => {
             case 'channel': {
                 const name = options[1].value;
 
-                if (!author.hasPermission('MANAGE_CHANNELS') && !utils.isAdmin(author, guildID)) {
+                if (!author.hasPermission('MANAGE_CHANNELS') && await utils.isAdmin(author, guildID) === false) {
                     throw new Error('Missing Permissions');
                 }
 

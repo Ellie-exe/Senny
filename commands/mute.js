@@ -14,7 +14,7 @@ module.exports.execute = async (command, utils) => {
         const muteRole = new Enmap({name: 'muteRole'});
         const muteList = new Enmap({name: 'muteList'});
 
-        if (!utils.isMod(author, guildID) && !utils.isAdmin(author, guildID)) throw new Error('Missing Permissions');
+        if (await utils.isStaff(author, guildID) === false) throw new Error('Missing Permissions');
         if (!muteRole.indexes.includes(guildID)) throw new Error('The mute role has not been set');
         if (muteList.indexes.includes(member.id)) throw new Error('That user is already muted');
 

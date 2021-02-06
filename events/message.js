@@ -20,7 +20,7 @@ module.exports = async (message, commands, utils) => {
 
             const words = message.content.match(parseRegex(regex));
 
-            if (await utils.isMod(author, guildID) === false && await utils.isAdmin(author, guildID) === false) {
+            if (await utils.isStaff(author, guildID) === false) {
                 if (words !== null) {
                     await message.delete();
                     await message.author.createDM()

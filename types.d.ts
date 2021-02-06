@@ -15,8 +15,9 @@ declare class Utils {
         error(message: any): void;
 	};
 
-    isAdmin(member: GuildMember, guild: Snowflake): boolean;
-    isMod(member: GuildMember, guild: Snowflake): boolean;
+    isStaff(member: GuildMember, guild: Snowflake): Promise<boolean>;
+    isAdmin(member: GuildMember, guild: Snowflake): Promise<boolean>;
+    isMod(member: GuildMember, guild: Snowflake): Promise<boolean>;
 }
 
 declare class Interaction {
