@@ -22,6 +22,7 @@ module.exports = async (message, commands, utils) => {
 
             if (await utils.isStaff(author, guildID) === false) {
                 if (words !== null) {
+                    
                     await message.delete();
                     await message.author.createDM()
                         .then(async channel => {
