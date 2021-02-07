@@ -13,7 +13,7 @@ module.exports.execute = async (command, utils) => {
         const data = command.data.options[0];
 
         function parse(time) {
-            const times = time.match(/\d+\s\w+|\d+\w+/g);
+            const times = time.match(/\d+\s*\w+/g);
             
             let years = 0;
             let months = 0;
@@ -25,7 +25,7 @@ module.exports.execute = async (command, utils) => {
 
             times.forEach(time => {
                 const value = time.match(/\d+/g)[0];
-                const label = time.match(/(?<=\s|\d)mo|(?<=\s|\d)[a-zA-Z]/g)[0];
+                const label = time.match(/(?<=\s|\d)(mo|[ywdhms])/gi)[0];
 
                 switch (label) {
                     case 'y':
