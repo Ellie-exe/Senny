@@ -1,5 +1,6 @@
-const logger = require("@jakeyprime/logger");
-
-module.exports = async (err) => {
-    logger.error(err);
+/**
+ * @param {import('../../types').Utils} utils 
+ */
+module.exports = async (err, utils) => {
+    utils.logger.error(err);
 }

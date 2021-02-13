@@ -1,9 +1,9 @@
 const { MessageEmbed } = require('discord.js');
 const { exec } = require('child_process');
 /**
- * @param {import('../types').Message} message
- * @param {import('../types').args} args
- * @param {import('../types').Utils} utils 
+ * @param {import('../../types').Message} message
+ * @param {import('../../types').args} args
+ * @param {import('../../types').Utils} utils 
  */
 module.exports.execute = async (message, args, utils) => {
     try {

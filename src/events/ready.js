@@ -1,6 +1,9 @@
 const schedule = require('node-schedule');
 const Enmap = require('enmap');
-
+/**
+ * @param {import('../../types').Client} client 
+ * @param {import('../../types').Utils} utils 
+ */
 module.exports = async (client, utils) => {
     try {
         const enmap = new Enmap({name: 'reminders'});

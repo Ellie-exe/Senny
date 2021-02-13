@@ -1,5 +1,6 @@
-const logger = require("@jakeyprime/logger");
-
-module.exports = async () => {
-    logger.warn('Bot reconnecting');
+/**
+ * @param {import('../../types').Utils} utils 
+ */
+module.exports = async (utils) => {
+    utils.logger.warn('Bot reconnecting');
 }

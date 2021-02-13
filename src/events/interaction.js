@@ -1,6 +1,6 @@
 /**
- * @param {import('../types').Interaction} interaction
- * @param {import('../types').Utils} utils
+ * @param {import('../../types').Interaction} interaction
+ * @param {import('../../types').Utils} utils
  */
 module.exports = async (interaction, commands, utils) => {
     try {

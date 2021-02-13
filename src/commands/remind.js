@@ -3,8 +3,8 @@ const schedule = require('node-schedule');
 const dateFormat = require('dateformat');
 const Enmap = require('enmap');
 /**
- * @param {import('../types').Interaction} command
- * @param {import('../types').Utils} utils
+ * @param {import('../../types').Interaction} command
+ * @param {import('../../types').Utils} utils
  */
 module.exports.execute = async (command, utils) => {
     try {

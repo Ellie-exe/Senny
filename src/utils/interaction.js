@@ -1,8 +1,8 @@
 module.exports = class Interaction {
     /**
-     * @param {import('../types').Interaction} interaction
-     * @param {import('../types').Client} client
-     * @param {import('../types').Utils} utils
+     * @param {import('../../types').Interaction} interaction
+     * @param {import('../../types').Client} client
+     * @param {import('../../types').Utils} utils
      */
     constructor(interaction, client, utils) {
         this.token = interaction.token;

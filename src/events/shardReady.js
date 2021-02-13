@@ -1,6 +1,8 @@
-const logger = require("@jakeyprime/logger");
-
-module.exports = async (client) => {
+/**
+ * @param {import('../../types').Client} client 
+ * @param {import('../../types').Utils} utils 
+ */
+module.exports = async (client, utils) => {
     try {
         let counter = -1;
         
@@ -18,9 +20,9 @@ module.exports = async (client) => {
         
         }, 30000);
 
-        logger.info(`Bot ready in ${client.guilds.cache.array().length} guilds`);
+        utils.logger.info(`Bot ready in ${client.guilds.cache.array().length} guilds`);
 
     } catch (err) {
-        logger.error(err);
+        utils.logger.error(err);
     }
 }

@@ -2,8 +2,8 @@ const schedule = require('node-schedule');
 const dateFormat = require('dateformat');
 const Enmap = require('enmap');
 /**
- * @param {import('../types').Message} message 
- * @param {import('../types').Utils} utils 
+ * @param {import('../../types').Message} message 
+ * @param {import('../../types').Utils} utils 
  */
 module.exports.execute = async (message, utils) => {
     try {

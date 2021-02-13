@@ -1,6 +1,6 @@
 /**
- * @param {import('../types').Interaction} command
- * @param {import('../types').Utils} utils
+ * @param {import('../../types').Interaction} command
+ * @param {import('../../types').Utils} utils
  */
 module.exports.execute = async (command, utils) => {
     try {
@@ -13,8 +13,8 @@ module.exports.execute = async (command, utils) => {
 };
 
 /**
- * @param {import('../types').Message} message 
- * @param {import('../types').Utils} utils 
+ * @param {import('../../types').Message} message 
+ * @param {import('../../types').Utils} utils 
  */
 module.exports.execute = async (message, args, utils) => {
     try {

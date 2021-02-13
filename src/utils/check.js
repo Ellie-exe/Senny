@@ -1,4 +1,5 @@
 const Enmap = require('enmap');
+
 module.exports = async (member, guild, options = {permissions: [], roles: []}) => {
     let check = false;
 

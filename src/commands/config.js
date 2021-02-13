@@ -1,15 +1,17 @@
 const Enmap = require('enmap');
 /**
- * @param {import('../types').Interaction} command
- * @param {import('../types').Utils} utils
+ * @param {import('../../types').Interaction} command
+ * @param {import('../../types').Utils} utils
  */
 module.exports.execute = async (command, utils) => {
     try {
         const author = await command.client.guilds.cache.get(command.guildID).members.fetch(command.authorID);
-        const owner = await command.client.guilds.cache.get(command.guildID).owner;
+        const guildID = command.guildID;
         const option = command.data.options[0].name;
         
-        if (author.id !== owner.id) throw new Error('Missing Permissions');
+        if (await utils.check(author, guildID, {permissions: ['ADMINISTRATOR'], roles: ['admin']}) === false) {
+            throw new Error('Missing Permissions');
+        }
 
         switch (option) {
             case 'roles': {

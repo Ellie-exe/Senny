@@ -1,8 +1,8 @@
 const { MessageEmbed } = require('discord.js');
 const axios = require('axios');
 /**
- * @param {import('../types').Interaction} command
- * @param {import('../types').Utils} utils
+ * @param {import('../../types').Interaction} command
+ * @param {import('../../types').Utils} utils
  */
 module.exports.execute = async (command, utils) => {
     try {

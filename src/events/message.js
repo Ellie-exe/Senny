@@ -1,8 +1,8 @@
 const Enmap = require('enmap');
 const parseRegex = require('regex-parser');
 /**
- * @param {import('../types').Message} message
- * @param {import('../types').Utils} utils
+ * @param {import('../../types').Message} message
+ * @param {import('../../types').Utils} utils
  */
 module.exports = async (message, commands, utils) => {
     try {
@@ -20,7 +20,7 @@ module.exports = async (message, commands, utils) => {
 
             const words = message.content.match(parseRegex(regex));
 
-            if (await utils.isStaff(author, guildID) === false) {
+            if (await utils.check(author, guildID, {roles: ['admin', 'mod']}) === false) {
                 if (words !== null) {
                     
                     await message.delete();
