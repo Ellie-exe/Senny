@@ -13,7 +13,7 @@ module.exports.execute = async (command, utils) => {
         let reason = undefined;
         let silent = undefined;
 
-        if (!author.hasPermission('KICK_MEMBERS') && await utils.isStaff(author, guildID) === false) {
+        if (await utils.check(author, guildID, {permissions: ['KICK_MEMBERS'], roles: ['admin', 'mod']}) === false) {
             throw new Error('Missing Permissions');
         }
 

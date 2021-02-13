@@ -1,4 +1,4 @@
-import { Client, GuildMember, Message, MessageEmbed, Snowflake, User } from 'discord.js';
+import { Client, Guild, GuildMember, Message, MessageEmbed, Snowflake, User, PermissionResolvable } from 'discord.js';
 import { Interaction } from './utils';
 
 type Client = Client;
@@ -7,7 +7,7 @@ type args = string[];
 
 declare class Utils {
     constants: Constants;
-
+    
     logger: {
         debug(message: any): void;
         info(message: any): void;
@@ -15,9 +15,7 @@ declare class Utils {
         error(message: any): void;
 	};
 
-    isStaff(member: GuildMember, guild: Snowflake): Promise<boolean>;
-    isAdmin(member: GuildMember, guild: Snowflake): Promise<boolean>;
-    isMod(member: GuildMember, guild: Snowflake): Promise<boolean>;
+    check(member: GuildMember, guild: Snowflake, options = {permissions: Array<PermissionResolvable>(), roles: array<string>()}): Promise<boolean>
 }
 
 declare class Interaction {
@@ -34,7 +32,7 @@ declare class Interaction {
     userID: Snowflake;
     client: Client;
     
-    send(content: any, options: {type: number, flags: number}): Promise<Message>;
+    send(content: any, options?: {type: number, flags: number}): Promise<Message>;
     embed(embed: MessageEmbed): Promise<Message>;
     edit(content: any): Promise<Message>;
 }

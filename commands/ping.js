@@ -4,6 +4,7 @@
  */
 module.exports.execute = async (command, utils) => {
     try {
+        setTimeout(async () => {
         const start = Date.now();
         await command.send('Pinging...');
 
@@ -11,7 +12,8 @@ module.exports.execute = async (command, utils) => {
         setTimeout(async () => {
             command.edit(`Pong! Took **${end - start}**ms`);
                     
-        }, 500);
+        }, 5000);
+    }, 5000);
 
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});

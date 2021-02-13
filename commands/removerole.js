@@ -9,7 +9,7 @@ module.exports.execute = async (command, utils) => {
         const member = await guild.members.fetch(command.data.options[0].value);
         const role = guild.roles.cache.get(command.data.options[1].value);
 
-        if (!author.hasPermission('MANAGE_ROLES') && await utils.isAdmin(author, guildID) === false) {
+        if (await utils.check(author, guildID, {permissions: ['MANAGE_ROLES'], roles: ['admin']}) === false) {
             throw new Error('Missing Permissions');
         }
 

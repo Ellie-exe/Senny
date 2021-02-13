@@ -1,4 +1,4 @@
-module.exports = class Constants {
+module.exports = new class Constants {
     constructor() {
         this.colors = {
             DeepSkyBlue: '0x00baff',
@@ -7,8 +7,7 @@ module.exports = class Constants {
 
         this.emojis = {
             greenTick: '<:green_tick:717257440202326058>',
-            redX: '<:red_x:717257458657263679>',
-            bot: '<:bot:803663385946095688>'
+            redX: '<:red_x:717257458657263679>'
         }
     }
 }

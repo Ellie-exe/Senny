@@ -7,7 +7,7 @@ let events = require('./events');
 const client = new discord.Client();
 
 client.ws.on('INTERACTION_CREATE', async data => {
-    client.emit('interaction', await utils.interaction(data, client, utils));
+    client.emit('interaction', new utils.Interaction(data, client, utils));
 });
 
 client.on('interaction', interaction => {
@@ -30,15 +30,9 @@ client.on('shardReconnecting', () => {
     events.shardReconnecting();
 });
 
-/**
 client.on('shardError', err => {
     events.shardError(err);
 });
-
-client.on('error', err => {
-    events.error(err);
-});
-*/
 
 process.on('unhandledRejection', err => {
     events.unhandledRejection(err);
