@@ -23,19 +23,19 @@ client.on('ready', () => {
 });
 
 client.on('shardReady', () => {
-    events.shardReady(client);
+    events.shardReady(client, utils);
 });
 
 client.on('shardReconnecting', () => {
-    events.shardReconnecting();
+    events.shardReconnecting(utils);
 });
 
 client.on('shardError', err => {
-    events.shardError(err);
+    events.shardError(err, utils);
 });
 
 process.on('unhandledRejection', err => {
-    events.unhandledRejection(err);
+    events.unhandledRejection(err, utils);
 });
 
 module.exports.reload = function reload() {
