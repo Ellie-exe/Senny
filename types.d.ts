@@ -4,6 +4,7 @@ import { Interaction } from './utils';
 type Client = Client;
 type Message = Message;
 type args = string[];
+type error = Error;
 
 declare class Utils {
     constants: Constants;
