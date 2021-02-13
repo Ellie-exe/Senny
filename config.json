@@ -1,0 +1,15 @@
+{
+    "apps": [
+        {
+            "name": "Senny Beta",
+            "script": "./src/index.js",
+            "args": ["--color"],
+            "env": {
+                "token": "NjgxODY4MzYyNTk0MTIzODA2.XlUtZg.Q7t8UaLtp13cftCPbsatyuwfF7I",
+                "owners": ["468854398806654976", "406903688200716289"],
+                "prefix": "//",
+                "color": "0x3a86ff"
+            }
+        }
+    ]
+}
