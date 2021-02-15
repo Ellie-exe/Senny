@@ -1,18 +1,20 @@
+const logger = require('@jakeyprime/logger');
+
 /**
  * @param {import('../../types').Interaction} command
  * @param {import('../../types').Utils} utils
  */
 module.exports.execute = async (command, utils) => {
     try {
-        const unit = command.data.options[0].value;
-        const value = command.data.options[1].value;
+        const value = command.data.options[0].value;
+        const unit = command.data.options[1].value;
 
-        let conversion = '';
-        let units = '';
+        let conversion;
+        let units;
 
         switch (unit) {
             case 'fahrenheit':
-                conversion = `${(value - 32) * 5 / 9}°C`;
+                conversion = `${Math.round((value - 32) * 5 / 9)}°C`;
                 units = '°F';
                 break;
 
