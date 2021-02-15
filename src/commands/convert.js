@@ -12,7 +12,7 @@ module.exports.execute = async (command, utils) => {
 
         switch (unit) {
             case 'fahrenheit':
-                conversion = `${Math.round((value - 32) * 5 / 9)}°C`;
+                conversion = `${(value - 32) * 5 / 9}°C`;
                 units = '°F';
                 break;
 
