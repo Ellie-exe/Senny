@@ -11,8 +11,11 @@ module.exports.execute = async (message, utils) => {
         const displayDate = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const text = '!d bump';
-        
+
+        const bump = new Enmap({name: 'bump'});
         const reminder = new Enmap({name: 'reminder'});
+
+        if (!bump.get(message.guild.id)) return;
 
         let reminderID = '';
         for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.random() * characters.length);
