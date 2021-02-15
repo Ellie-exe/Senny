@@ -218,7 +218,7 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'delete': {
-                const id = data.options[0].value;
+                const id = data.options[0].value.toUpperCase();
                 const author = await command.client.users.fetch(command.authorID);
                 const indexes = reminder.indexes;
 
