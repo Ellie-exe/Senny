@@ -21,18 +21,14 @@ module.exports.execute = async (command, utils) => {
                 total += roll;
             }
 
-            //rolls.splice(-1, 1, `and ${rolls[rolls.length - 1]}`);
-
-            var response = `Rolled: \`${rolls.join(', ')}\`\nTotal: \`${total}\``;
+            command.send(`${total} [\`${rolls.join(', ')}\`]`);
 
         } else {
             const sides = dice;
-            const roll = [Math.floor(Math.random() * sides)];
+            const roll = [Math.floor(Math.random() * sides + 1)];
 
-            var response = `You rolled a: \`${roll}\``;
+            command.send(roll);
         }
-        
-        command.send(response);
 
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
