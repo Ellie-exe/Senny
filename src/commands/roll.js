@@ -21,9 +21,9 @@ module.exports.execute = async (command, utils) => {
                 total += roll;
             }
 
-            rolls.splice(-1, 1, `and ${rolls[rolls.length - 1]}`);
+            //rolls.splice(-1, 1, `and ${rolls[rolls.length - 1]}`);
 
-            var response = `You rolled a: \`${rolls.join(', ')}\`\nFor a total of: \`${total}\``;
+            var response = `Rolled: \`${rolls.join(', ')}\`\nTotal: \`${total}\``;
 
         } else {
             const sides = dice;
