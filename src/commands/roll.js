@@ -11,6 +11,8 @@ module.exports.execute = async (command, utils) => {
             const modifier = die[0];
             const sides = die[1];
 
+            if (modifier < 0 || sides < 0) throw new Error('Negative numbers');
+
             const rolls = [];
             let total = 0;
 
@@ -26,6 +28,8 @@ module.exports.execute = async (command, utils) => {
         } else {
             const sides = dice;
             const roll = Math.floor(Math.random() * sides + 1);
+
+            if (sides < 0) throw new Error('Negative numbers');
 
             command.send(roll);
         }
