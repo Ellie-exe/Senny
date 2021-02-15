@@ -32,7 +32,9 @@ module.exports = async (message, commands, utils) => {
             }
         }
 
-        if (message.content.startsWith('!d bump') && message.guild.id === '573272766149558272') {
+        const bump = new Enmap({name: 'bump'});
+
+        if (message.content.startsWith('!d bump') && bump.get(message.guild.id) !== undefined) {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
             commands['bump'].execute(message, utils);
             return;
