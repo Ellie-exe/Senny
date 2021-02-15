@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js');
 const Enmap = require('enmap');
 /**
  * @param {import('../../types').Interaction} command
@@ -92,6 +93,50 @@ module.exports.execute = async (command, utils) => {
                     }
                 }
 
+                break;
+            }
+
+            case 'show': {
+                const guildID = command.guildID;
+                const guild = command.client.guilds.cache.get(guildID);
+
+                const adminRoles = new Enmap({name: 'adminRole'});
+                const modRoles = new Enmap({name: 'modRole'});
+                const muteRoles = new Enmap({name: 'muteRole'});
+                const filters = new Enmap({name: 'filter'});
+
+                const adminRoleID = adminRoles.get(guildID);
+                const modRoleID = modRoles.get(guildID);
+                const muteRoleID = muteRoles.get(guildID);
+                const filter = filters.get(guildID);
+
+                let adminRole;
+                let modRole;
+                let muteRole;
+
+                if (adminRoleID !== undefined) {
+                    adminRole = guild.roles.cache.get(adminRoleID);
+                }
+                
+                if (modRoleID !== undefined) {
+                    modRole = guild.roles.cache.get(modRoleID);
+                }
+                
+                if (muteRoleID !== undefined) {
+                    muteRole = guild.roles.cache.get(muteRoleID);
+                }
+
+                const embed = new MessageEmbed()
+                    .setAuthor(`${guild.name} - Config`)
+                    .setDescription(
+                        `Admin Role: ${adminRole || '`Not Set`'}\n`+
+                        `Mod Role: ${modRole || '`Not Set`'}\n`+
+                        `Mute Role: ${muteRole || '`Not Set`'}\n`+
+                        `Filter: ${filter || '`Not Set`'}`
+                    )
+                    .setColor(process.env.color);
+
+                command.embed([embed]);
                 break;
             }
         }
