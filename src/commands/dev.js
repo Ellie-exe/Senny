@@ -58,7 +58,7 @@ module.exports.execute = async (message, args, utils) => {
                     }
                 });
 
-                message.channel.send([gitEmbed, packagesEmbed]).catch(err => {utils.logger.error(err)});
+                message.channel.send(gitEmbed, packagesEmbed).catch(err => {utils.logger.error(err)});
                 break;
             }
 
