@@ -6,22 +6,22 @@ const Enmap = require('enmap');
  */
 module.exports = async (client, utils) => {
     try {
-        const enmap = new Enmap({name: 'reminders'});
+        const reminder = new Enmap({name: 'reminder'});
 
-        const indexes = enmap.indexes;
+        const indexes = reminder.indexes;
 
         for (const index in indexes) {
-            const key = indexes[index];
-            const channel = client.channels.cache.get(enmap.get(key, 'channelID'));
-            const author = await client.users.fetch(enmap.get(key, 'authorID'));
-            const text = enmap.get(key, 'text');
-            const date = enmap.get(key, 'date');
+            const reminderID = indexes[index];
+            const channel = client.channels.cache.get(reminder.get(reminderID, 'channelID'));
+            const author = await client.users.fetch(reminder.get(reminderID, 'authorID'));
+            const text = reminder.get(reminderID, 'text');
+            const date = reminder.get(reminderID, 'date');
 
             schedule.scheduleJob(date, async () => {
                 try {
-                    if (enmap.indexes.includes(key)) {
+                    if (reminder.indexes.includes(reminderID)) {
                         await channel.send(`Hello ${author.toString()}! You asked me to remind you about: \`${text}\``);
-                        enmap.delete(key);
+                        reminder.delete(reminderID);
                     }
                 
                 } catch (err) {
