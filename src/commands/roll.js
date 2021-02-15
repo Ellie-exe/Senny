@@ -11,7 +11,8 @@ module.exports.execute = async (command, utils) => {
             const modifier = die[0];
             const sides = die[1];
 
-            if (modifier < 0 || sides < 0) throw new Error('Negative numbers');
+            if (modifier < 1 || sides < 1) throw new Error('Negative numbers');
+            if (modifier % 1 !== 0 || sides % 1 !== 0) throw new Error('Not a whole number');
 
             const rolls = [];
             let total = 0;
@@ -29,7 +30,8 @@ module.exports.execute = async (command, utils) => {
             const sides = dice;
             const roll = Math.floor(Math.random() * sides + 1);
 
-            if (sides < 0) throw new Error('Negative numbers');
+            if (sides < 1) throw new Error('Negative numbers');
+            if (sides % 1 !== 0) throw new Error('Not a whole number');
 
             command.send(roll);
         }
