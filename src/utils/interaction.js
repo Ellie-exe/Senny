@@ -41,7 +41,7 @@ module.exports = class Interaction {
         }
     }
 
-    async embed(embed, options = {type: 4}) {
+    async embed(embeds, options = {type: 4}) {
         try {
             await this.client.api
                 .interactions(this.id)(this.token)
@@ -50,7 +50,7 @@ module.exports = class Interaction {
                     data: {
                         type: options.type, 
                         data: {
-                            embeds: [embed]
+                            embeds: embeds
                         }
                     }
                 });

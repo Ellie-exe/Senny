@@ -246,7 +246,7 @@ module.exports.execute = async (command, utils) => {
             .setColor(process.env.color)
             .setThumbnail(member.user.displayAvatarURL(options));
 
-        command.embed(embed);
+        command.embed([embed]);
     
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});

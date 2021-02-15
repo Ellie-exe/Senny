@@ -126,7 +126,8 @@ module.exports.execute = async (command, utils) => {
 
         const icon = guild.iconURL(options) || 'https://ellie.is.gay/1eUNml2tV';
                 
-        const embed = new MessageEmbed()
+        const embed1 = new MessageEmbed()
+            .setURL('https://ellie.is.gay')
             .setAuthor(`${guild.name} - Information`, null, icon)
             .setDescription(
                 `Owner: ${guild.owner}\n`+
@@ -170,7 +171,22 @@ module.exports.execute = async (command, utils) => {
             .setColor(process.env.color)
             .setThumbnail(icon);
 
-        command.embed(embed);
+        let embeds = [embed1];
+
+        if (guild.splashURL() !== null && guild.bannerURL() !== null) {
+            embed1.setImage(guild.splashURL(options));
+
+            const embed2 = new MessageEmbed()
+                .setURL('https://ellie.is.gay')
+                .setImage(guild.bannerURL(options));
+
+            embeds.push(embed2);
+        
+        } else if (guild.splashURL() !== null || guild.bannerURL() !== null) {
+            embed1.setImage(guild.splashURL(options) || guild.bannerURL(options));
+        }
+
+        command.embed(embeds);
 
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});

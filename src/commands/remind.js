@@ -213,7 +213,7 @@ module.exports.execute = async (command, utils) => {
                     }
                 }
 
-                command.embed(embed);
+                command.embed([embed]);
                 break;
             }
 

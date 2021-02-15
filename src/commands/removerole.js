@@ -4,7 +4,8 @@
  */
 module.exports.execute = async (command, utils) => {
     try {
-        const guild = command.client.guilds.cache.get(command.guildID);
+        const guildID = command.guildID;
+        const guild = command.client.guilds.cache.get(guildID);
         const author = await guild.members.fetch(command.authorID);
         const member = await guild.members.fetch(command.data.options[0].value);
         const role = guild.roles.cache.get(command.data.options[1].value);
