@@ -12,7 +12,7 @@ module.exports.execute = async (command, utils) => {
             const sides = die[1];
 
             if (modifier < 0 || sides < 0) throw new Error('Cannot roll negative dice');
-            if (modifier === 0 || sides === 0) throw new Error('Cannot roll zero dice')
+            if (modifier === 0 || sides === 0) throw new Error('Cannot roll zero dice');
             if (modifier % 1 !== 0 || sides % 1 !== 0) throw new Error('Cannot roll partial dice');
 
             const rolls = [];
