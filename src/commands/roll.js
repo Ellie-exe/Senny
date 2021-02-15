@@ -25,7 +25,7 @@ module.exports.execute = async (command, utils) => {
 
         } else {
             const sides = dice;
-            const roll = [Math.floor(Math.random() * sides + 1)];
+            const roll = Math.floor(Math.random() * sides + 1);
 
             command.send(roll);
         }
