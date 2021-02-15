@@ -29,19 +29,18 @@ module.exports.execute = async (message, args, utils) => {
             }
 
             case 'pull': {
-                const gitEmbed = new MessageEmbed();
-                const packagesEmbed = new MessageEmbed();
-
                 exec('git pull origin master', (err, stdout, stderr) => {
                     if (err) {
                         message.channel.send(`\`\`\`\n${err}\n\`\`\``).catch(err => utils.logger.error(err));
                         utils.logger.error(err);
-            
+
                     } else {
-                        gitEmbed
+                        const embed = new MessageEmbed()
                             .setTitle('Git Pulled')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
+
+                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
                     }
                 });
 
@@ -49,16 +48,17 @@ module.exports.execute = async (message, args, utils) => {
                     if (err) {
                         message.channel.send(`\`\`\`\n${err}\n\`\`\``).catch(err => utils.logger.error(err));
                         utils.logger.error(err);
-            
+
                     } else {
-                        packagesEmbed
+                        const embed = new MessageEmbed()
                             .setTitle('Packages Updated')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
+
+                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
                     }
                 });
 
-                message.channel.send(gitEmbed, packagesEmbed).catch(err => {utils.logger.error(err)});
                 break;
             }
 
@@ -66,7 +66,7 @@ module.exports.execute = async (message, args, utils) => {
                 throw new Error('Command not found');
             }
         }
-    
+
     } catch (err) {
         message.channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
         utils.logger.error(err);
