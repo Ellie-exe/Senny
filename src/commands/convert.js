@@ -7,8 +7,8 @@ module.exports.execute = async (command, utils) => {
         const unit = command.data.options[0].value;
         const value = command.data.options[1].value;
 
-        let conversion;
-        let units
+        let conversion = '';
+        let units = '';
 
         switch (unit) {
             case 'fahrenheit':
