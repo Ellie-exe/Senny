@@ -184,7 +184,7 @@ module.exports.execute = async (command, utils) => {
                     .setAuthor(`${author.tag} - Reminders`)
                     .setColor(process.env.color);
 
-                if (keys.length === 0) {
+                if (reminderIDs.length === 0) {
                     embed.setDescription('You have no reminders');
                 
                 } else {
