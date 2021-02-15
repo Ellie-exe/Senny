@@ -21,7 +21,7 @@ module.exports.execute = async (command, utils) => {
                 total += roll;
             }
 
-            command.send(`${total} [\`${rolls.join(', ')}\`]`);
+            command.send(`${total} \`[${rolls.join(', ')}]\``);
 
         } else {
             const sides = dice;
