@@ -9,8 +9,7 @@ module.exports.execute = async (command, utils) => {
         let choices = options.split(/ +/);
         if (options.includes(',')) choices = options.split(/,\s+/);
 
-        const choice = choices[Math.floor(Math.random() * choices.length)];
-        command.send(`Choices: \`${choices.join(', ')}\`\nResponse: \`${choice}\``);
+        command.send(choices[Math.floor(Math.random() * choices.length)]);
 
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
