@@ -29,18 +29,19 @@ module.exports.execute = async (message, args, utils) => {
             }
 
             case 'pull': {
+                const gitEmbed = new MessageEmbed();
+                const packagesEmbed = new MessageEmbed();
+
                 exec('git pull origin master', (err, stdout, stderr) => {
                     if (err) {
                         message.channel.send(`\`\`\`\n${err}\n\`\`\``).catch(err => utils.logger.error(err));
                         utils.logger.error(err);
             
                     } else {
-                        const embed = new MessageEmbed()
+                        gitEmbed
                             .setTitle('Git Pulled')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
-                                
-                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
                     }
                 });
 
@@ -50,15 +51,14 @@ module.exports.execute = async (message, args, utils) => {
                         utils.logger.error(err);
             
                     } else {
-                        const embed = new MessageEmbed()
+                        packagesEmbed
                             .setTitle('Packages Updated')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
-                                
-                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
                     }
                 });
 
+                message.channel.send([gitEmbed, packagesEmbed]).catch(err => {utils.logger.error(err)});
                 break;
             }
 
