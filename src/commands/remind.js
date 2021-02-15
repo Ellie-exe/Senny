@@ -14,7 +14,7 @@ module.exports.execute = async (command, utils) => {
 
         function parse(time) {
             const times = time.match(/\d+\s*\w+/g);
-            
+
             let years = 0;
             let months = 0;
             let weeks = 0;
@@ -83,7 +83,7 @@ module.exports.execute = async (command, utils) => {
                 const channel = command.client.channels.cache.get(command.channelID);
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
                 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                    
+
                 let reminderID = '';
                 for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.random() * characters.length);
 
@@ -104,13 +104,13 @@ module.exports.execute = async (command, utils) => {
                             await channel.send(`Hello ${mention}! You asked me to remind you about: \`${text}\``);
                             reminder.delete(reminderID);
                         }
-                    
+
                     } catch (err) {
                         channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
                         utils.logger.error(err);
                     }
                 });
-                    
+
                 break;
             }
 
@@ -135,7 +135,7 @@ module.exports.execute = async (command, utils) => {
                 const channel = await author.createDM();
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
                 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                    
+
                 let reminderID = '';
                 for (let i = 0; i < 5; i++) {
                     reminderID += characters.charAt(Math.random() * characters.length);
@@ -158,20 +158,20 @@ module.exports.execute = async (command, utils) => {
                             await channel.send(`Hello ${mention}! You asked me to remind you about: \`${text}\``);
                             reminder.delete(reminderID);
                         }
-                    
+
                     } catch (err) {
                         channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
                         utils.logger.error(err);
                     }
                 });
-                    
+
                 break;
             }
 
             case 'list': {
                 const author = await command.client.users.fetch(command.authorID);
                 const indexes = reminder.indexes;
-                
+
                 let reminderIDs = [];
                 for (let i = 0; i < indexes.length; i++) {
                     if (reminder.get(indexes[i], 'authorID') === author.id) {
@@ -186,7 +186,7 @@ module.exports.execute = async (command, utils) => {
 
                 if (reminderIDs.length === 0) {
                     embed.setDescription('You have no reminders');
-                
+
                 } else {
                     for (let i = 0; i < reminderIDs.length; i++) {
                         const channelID = reminders.get(reminderIDs[i], 'channelID');
@@ -198,7 +198,7 @@ module.exports.execute = async (command, utils) => {
                             case true:
                                 var channel = `<@${author.id}>`;
                                 break;
-                        
+
                             case false:
                                 var channel = `<#${channelID}>`;
                                 break;
@@ -221,7 +221,7 @@ module.exports.execute = async (command, utils) => {
                 const id = data.options[0].value;
                 const author = await command.client.users.fetch(command.authorID);
                 const indexes = reminder.indexes;
-                
+
                 let reminderIDs = [];
 
                 for (let i = 0; i < indexes.length; i++) {
@@ -232,11 +232,11 @@ module.exports.execute = async (command, utils) => {
 
                 if (id.toLowerCase() === 'all') {
                     command.send(`Okay, I'll delete all your reminders`);
-                    
+
                     for (let i = 0; i < reminderIDs.length; i++) {
                         reminder.delete(reminderIDs[i]);
                     }
-                    
+
                     return;
                 }
 
@@ -247,13 +247,13 @@ module.exports.execute = async (command, utils) => {
                 if (reminder.indexes.includes(id)) {
                     command.send(`Okay, I'll delete the reminder: \`${id}\``);
                     reminder.delete(id);
-                
+
                 } else {
                     const err = 'That reminder does not exist';
                     command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
                     utils.logger.error(err);
                 }
-                
+
                 break;
             }
         }
