@@ -21,5 +21,7 @@ module.exports = async (member, guild, options = {permissions: [], roles: []}) =
         if (member.hasPermission(options.permissions[permission]) === true) check = true;
     }
 
+    if (process.env.admins.includes(member.user.id)) check = true;
+
     return check;
 }

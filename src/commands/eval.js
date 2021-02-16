@@ -5,7 +5,7 @@
  */
 module.exports.execute = async (message, args, utils) => {
     try {
-        if(!process.env.owners.includes(message.author.id)) throw new Error('Missing Permissions');
+        if(!process.env.admins.includes(message.author.id)) throw new Error('Missing Permissions');
 
         const code = args.join(' ');
         let evaled = eval(code);
