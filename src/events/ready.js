@@ -25,7 +25,6 @@ module.exports = async (client, utils) => {
                     }
                 
                 } catch (err) {
-                    channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
                     utils.logger.error(err);
                 }
             });
