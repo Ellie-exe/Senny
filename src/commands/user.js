@@ -131,24 +131,6 @@ module.exports.execute = async (command, utils) => {
 
         const roles = member.roles.cache.sort((a, b) => b.position - a.position).array();
 
-        const badgeEmojis = {
-            DISCORD_EMPLOYEE: '<:staff:714835631485747322>',
-            PARTNERED_SERVER_OWNER: '<:partner:748665161186934904>',
-            DISCORD_PARTNER: '<:partner:748665161186934904>',
-            HYPESQUAD_EVENTS: '<:hypesquadevents:714835064822956104>',
-            BUGHUNTER_LEVEL_1: '<:bughunter:749061946321666071>',
-            HOUSE_BRAVERY: '<:bravery:778877338988707841>',
-            HOUSE_BRILLIANCE: '<:brilliance:778877104712056832>',
-            HOUSE_BALANCE: '<:balance:778877245753786368>',
-            EARLY_SUPPORTER: '<:earlysupporter:714860883880443985>',
-            TEAM_USER: '',
-            SYSTEM: '',
-            BUGHUNTER_LEVEL_2: '<:bughuntergold:714835631452192789>',
-            VERIFIED_BOT: '',
-            EARLY_VERIFIED_BOT_DEVELOPER: '<:botdev:714835632077144064>',
-            VERIFIED_DEVELOPER: '<:botdev:714835632077144064>',
-        };
-
         const flagNames = {
             DISCORD_EMPLOYEE: 'Discord Employee',
             PARTNERED_SERVER_OWNER: 'Partnered Server Owner',
@@ -249,7 +231,7 @@ module.exports.execute = async (command, utils) => {
         command.embed([embed]);
     
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);
     }
 };

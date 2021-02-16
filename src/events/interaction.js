@@ -24,7 +24,7 @@ module.exports = async (interaction, commands, utils) => {
         commands[command.name].execute(interaction, utils);
         
     } catch (err) {
-        interaction.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        interaction.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);
     }
 }

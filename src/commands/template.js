@@ -7,7 +7,7 @@ module.exports.execute = async (command, utils) => {
 
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {typs: 3, flags: 64});
+        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {typs: 3, flags: 64});
         utils.logger.error(err);
     }
 };
@@ -21,7 +21,7 @@ module.exports.execute = async (message, args, utils) => {
 
 
     } catch (err) {
-        message.channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
+        message.channel.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``).catch(err => utils.logger.error(err));
         utils.logger.error(err);
     }
 };

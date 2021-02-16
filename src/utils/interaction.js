@@ -34,10 +34,10 @@ module.exports = class Interaction {
                 });
         
         } catch (err) {
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} Error: \`${err}\``)
-                .catch(err => this.utils.logger.error(err));
             this.utils.logger.error(err);
+            const channel = this.client.channels.cache.get(this.channelID);
+            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
+                .catch(err => this.utils.logger.error(err));
         }
     }
 
@@ -56,10 +56,10 @@ module.exports = class Interaction {
                 });
         
         } catch (err) {
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} Error: \`${err}\``)
-                .catch(err => this.utils.logger.error(err));
             this.utils.logger.error(err);
+            const channel = this.client.channels.cache.get(this.channelID);
+            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
+                .catch(err => this.utils.logger.error(err));
         }
     }
 
@@ -75,10 +75,10 @@ module.exports = class Interaction {
                 });
         
         } catch (err) {
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} Error: \`${err}\``)
-                .catch(err => this.utils.logger.error(err));
             this.utils.logger.error(err);
+            const channel = this.client.channels.cache.get(this.channelID);
+            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
+                .catch(err => this.utils.logger.error(err));
         }
     }
 
@@ -90,10 +90,10 @@ module.exports = class Interaction {
                 .delete();
         
         } catch (err) {
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} Error: \`${err}\``)
-                .catch(err => this.utils.logger.error(err));
             this.utils.logger.error(err);
+            const channel = this.client.channels.cache.get(this.channelID);
+            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
+                .catch(err => this.utils.logger.error(err));
         }
     }
 }

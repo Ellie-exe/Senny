@@ -28,7 +28,7 @@ module.exports.execute = async (command, utils) => {
         command.send(`${member.toString()}'s nickname has been set to: \`${nick || 'None'}\``);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);
     }
 };

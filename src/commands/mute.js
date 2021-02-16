@@ -23,7 +23,7 @@ module.exports.execute = async (command, utils) => {
         muteList.set(member.id, true);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} Error: \`${err}\``, {type: 3, flags: 64});
+        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);
     }
 };
