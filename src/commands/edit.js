@@ -43,8 +43,8 @@ module.exports.execute = async (command, utils) => {
                     }
                 }
 
-                const role = await role.edit(roleOptions);
-                command.send(`Success! ${role} has been edited`);
+                const newRole = await role.edit(roleOptions);
+                command.send(`Success! ${newRole} has been edited`);
                 break;
             }
 
@@ -104,8 +104,8 @@ module.exports.execute = async (command, utils) => {
                     }     
                 }
 
-                const channel = await channel.edit(channelOptions);
-                command.send(`Success! ${channel} has been created`);
+                const newChannel = await channel.edit(channelOptions);
+                command.send(`Success! ${newChannel} has been created`);
                 break;
             }
         }
