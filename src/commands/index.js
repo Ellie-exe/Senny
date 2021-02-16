@@ -8,6 +8,7 @@ module.exports.convert = require('./convert');
 module.exports.create = require('./create');
 module.exports.delete = require('./delete');
 module.exports.dev = require('./dev');
+module.exports.edit = require('./edit');
 module.exports.eval = require('./eval');
 module.exports.giverole = require('./giverole');
 module.exports.jumbo = require('./jumbo');
