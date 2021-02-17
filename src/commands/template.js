@@ -4,7 +4,7 @@
  */
 module.exports.execute = async (command, utils) => {
     try {
-        const test = true;
+
 
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {typs: 3, flags: 64});
