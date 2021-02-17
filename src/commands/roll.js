@@ -20,7 +20,7 @@ module.exports.execute = async (command, utils) => {
 
             for (let i = 0; i < modifier; i++) {
                 const roll = Math.floor(Math.random() * sides + 1);
-                
+
                 rolls.push(roll);
                 total += roll;
             }

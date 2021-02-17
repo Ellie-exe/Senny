@@ -9,8 +9,8 @@ const mariadb = require('mariadb');
 module.exports.execute = async (command, utils) => {
     try {
         const conn = await mariadb.createConnection({
-            user: process.env.user, 
-            password: process.env.password, 
+            user: process.env.user,
+            password: process.env.password,
             database: process.env.database
         });
 
@@ -144,7 +144,7 @@ module.exports.execute = async (command, utils) => {
                     try {
                         const reminder = await conn.query('SELECT reminderID FROM reminders WHERE reminderID=(?)', [reminderID]);
                         if (reminder.length === 0) return;
-                        
+
                         await channel.send(`Hello ${user.toString()}! You asked me to remind you about: \`${text}\``);
                         await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
 
@@ -207,7 +207,7 @@ module.exports.execute = async (command, utils) => {
                 }
 
                 const reminder = await conn.query('SELECT * FROM reminders WHERE reminderID=(?)', [reminderID]);
-                
+
                 if (reminder.length === 0) throw new Error('That reminder does not exist');
                 if (reminder[0].userID !== user.id) throw new Error('You cannot delete someone else\`s reminders');
 

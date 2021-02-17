@@ -2,14 +2,14 @@ const schedule = require('node-schedule');
 const dateFormat = require('dateformat');
 const mariadb = require('mariadb');
 /**
- * @param {import('../../types').Message} message 
- * @param {import('../../types').Utils} utils 
+ * @param {import('../../types').Message} message
+ * @param {import('../../types').Utils} utils
  */
 module.exports.execute = async (message, utils) => {
     try {
         const conn = await mariadb.createConnection({
-            user: process.env.user, 
-            password: process.env.password, 
+            user: process.env.user,
+            password: process.env.password,
             database: process.env.database
         });
 
@@ -30,7 +30,7 @@ module.exports.execute = async (message, utils) => {
             try {
                 const reminder = await conn.query('SELECT reminderID FROM reminders WHERE reminderID=(?)', [reminderID]);
                 if (reminder.length === 0) return;
-                
+
                 await channel.send(`Hello ${user.toString()}! You asked me to remind you about: \`${text}\``);
                 await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
 

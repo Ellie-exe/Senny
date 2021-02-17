@@ -1,11 +1,11 @@
 /**
- * @param {import('../../types').Client} client 
- * @param {import('../../types').Utils} utils 
+ * @param {import('../../types').Client} client
+ * @param {import('../../types').Utils} utils
  */
 module.exports = async (client, utils) => {
     try {
         let counter = -1;
-        
+
         setInterval(async () => {
             (counter === 3) ? counter = 0 : counter++;
 
@@ -17,7 +17,7 @@ module.exports = async (client, utils) => {
             ];
 
             client.user.setActivity(activity[counter].name, {type: activity[counter].type});
-        
+
         }, 30000);
 
         utils.logger.info(`Bot ready in ${client.guilds.cache.array().length} guilds`);

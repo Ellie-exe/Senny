@@ -15,7 +15,7 @@ module.exports.execute = async (command, utils) => {
             .setColor(process.env.color);
 
         command.embed([embed]);
-    
+
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);

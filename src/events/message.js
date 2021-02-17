@@ -12,8 +12,8 @@ module.exports = async (message, commands, utils) => {
         if (message.author.bot) return;
 
         const conn = await mariadb.createConnection({
-            user: process.env.user, 
-            password: process.env.password, 
+            user: process.env.user,
+            password: process.env.password,
             database: process.env.database
         });
 
@@ -49,13 +49,13 @@ module.exports = async (message, commands, utils) => {
 
         if (command === 'dev') {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command} ${args[0]}`);
-        
+
         } else {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command}`);
         }
 
         commands[command].execute(message, args, utils);
-        
+
     } catch (err) {
         message.channel.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``).catch(err => utils.logger.error(err));
         utils.logger.error(err);

@@ -1,14 +1,14 @@
 const schedule = require('node-schedule');
 const mariadb = require('mariadb');
 /**
- * @param {import('../../types').Client} client 
- * @param {import('../../types').Utils} utils 
+ * @param {import('../../types').Client} client
+ * @param {import('../../types').Utils} utils
  */
 module.exports = async (client, utils) => {
     try {
         const conn = await mariadb.createConnection({
-            user: process.env.user, 
-            password: process.env.password, 
+            user: process.env.user,
+            password: process.env.password,
             database: process.env.database
         });
 

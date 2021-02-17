@@ -8,7 +8,7 @@ type error = Error;
 
 declare class Utils {
     constants: Constants;
-    
+
     logger: {
         debug(message: any): void;
         info(message: any): void;
@@ -32,7 +32,7 @@ declare class Interaction {
     authorID: Snowflake;
     userID: Snowflake;
     client: Client;
-    
+
     send(content: any, options?: {type: number, flags: number}): Promise<Message>;
     embed(embed: MessageEmbed): Promise<Message>;
     edit(content: any): Promise<Message>;

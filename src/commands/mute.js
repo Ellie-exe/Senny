@@ -11,13 +11,13 @@ module.exports.execute = async (command, utils) => {
         const member = await guild.members.fetch(userID);
         const author = await guild.members.fetch(command.user.id);
         const reason = command.data.options.length === 2 ? command.data.options[1].value : undefined;
-        
+
         const conn = await mariadb.createConnection({
-            user: process.env.user, 
-            password: process.env.password, 
+            user: process.env.user,
+            password: process.env.password,
             database: process.env.database
         });
-        
+
         const muteRole = await conn.query('SELECT roleID FROM muteRoles WHERE guildID=(?)', [guildID]);
         const muteList = await conn.query('SELECT userID FROM muteList WHERE userID=(?)', [userID]);
 

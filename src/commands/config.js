@@ -6,25 +6,24 @@ const mariadb = require('mariadb');
  */
 module.exports.execute = async (command, utils) => {
     try {
-        const author = await command.client.guilds.cache.get(command.guildID).members.fetch(command.authorID);
         const guildID = command.guildID;
+        const guild = command.client.guilds.cache.get(guildID);
+        const author = await guild.members.fetch(command.authorID);
         const option = command.data.options[0].name;
-        
+
         if (await utils.check(author, guildID, {permissions: ['ADMINISTRATOR'], roles: ['admin']}) === false) {
             throw new Error('Missing Permissions');
         }
 
         const conn = await mariadb.createConnection({
-            user: process.env.user, 
-            password: process.env.password, 
+            user: process.env.user,
+            password: process.env.password,
             database: process.env.database
         });
 
         switch (option) {
             case 'mute': {
-                const guildID = command.guildID;
                 const roleID = command.data.options[0].options[0].value;
-                const guild = command.client.guilds.cache.get(guildID);
                 const role = guild.roles.cache.get(roleID);
 
                 await conn.query('INSERT INTO muteRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
@@ -35,9 +34,7 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'mod': {
-                const guildID = command.guildID;
                 const roleID = command.data.options[0].options[0].value;
-                const guild = command.client.guilds.cache.get(guildID);
                 const role = guild.roles.cache.get(roleID);
 
                 await conn.query('INSERT INTO modRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
@@ -48,9 +45,7 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'admin': {
-                const guildID = command.guildID;
                 const roleID = command.data.options[0].options[0].value;
-                const guild = command.client.guilds.cache.get(guildID);
                 const role = guild.roles.cache.get(roleID);
 
                 await conn.query('INSERT INTO adminRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
@@ -61,7 +56,6 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'filter': {
-                const guildID = command.guildID;
                 const options = command.data.options[0].options[0].value;
 
                 switch (options) {
@@ -70,7 +64,7 @@ module.exports.execute = async (command, utils) => {
 
                         await conn.query('INSERT INTO filters VALUES (?, ?) ON DUPLICATE KEY UPDATE regex=(?)', [guildID, regex, regex]);
                         command.send(`Success! The filter has been set with the regex: \`${regex}\``, {type: 3, flags: 64});
-                        
+
                         await conn.end();
                         break;
                     }
@@ -81,7 +75,7 @@ module.exports.execute = async (command, utils) => {
 
                         await conn.query('DELETE FROM filters WHERE guildID=(?)', [guildID]);
                         command.send(`Success! The filter has been turned off`, {type: 3, flags: 64});
-                        
+
                         await conn.end();
                         break;
                     }
@@ -91,7 +85,6 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'bump': {
-                const guildID = command.guildID;
                 const options = command.data.options[0].options[0].value;
 
                 switch (options) {
@@ -101,7 +94,7 @@ module.exports.execute = async (command, utils) => {
 
                         await conn.query('INSERT INTO bumpReminders VALUES (?)', [guildID]);
                         command.send(`Success! You will now be reminded to bump`, {type: 3, flags: 64});
-                        
+
                         await conn.end();
                         break;
                     }
@@ -122,9 +115,6 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'view': {
-                const guildID = command.guildID;
-                const guild = command.client.guilds.cache.get(guildID);
-                
                 const adminRole = await conn.query('SELECT roleID FROM adminRoles WHERE guildID=(?)', [guildID]);
                 const modRole = await conn.query('SELECT roleID FROM modRoles WHERE guildID=(?)', [guildID]);
                 const muteRole = await conn.query('SELECT roleID FROM muteRoles WHERE guildID=(?)', [guildID]);

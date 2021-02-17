@@ -13,7 +13,7 @@ module.exports.execute = async (command, utils) => {
         switch (type) {
             case 'role': {
                 let roleOptions = {name: options[0].value};
-                
+
                 if (await utils.check(author, guildID, {permissions: ['MANAGE_ROLES'], roles: ['admin']}) === false) {
                     throw new Error('Missing Permissions');
                 }
@@ -39,7 +39,7 @@ module.exports.execute = async (command, utils) => {
                 }
 
                 const role = await guild.roles.create(roleOptions);
-                
+
                 command.send(`Success! ${role} has been created`);
                 break;
             }
@@ -78,7 +78,7 @@ module.exports.execute = async (command, utils) => {
                                     break;
                             }
                         }
-                        
+
                         const channel = await guild.channels.create(name, channelOptions);
 
                         command.send(`Success! ${channel} has been created`);
@@ -107,7 +107,7 @@ module.exports.execute = async (command, utils) => {
                                     break;
                             }
                         }
-                        
+
                         const channel = await guild.channels.create(name, channelOptions);
 
                         command.send(`Success! ${channel} has been created`);
@@ -124,7 +124,7 @@ module.exports.execute = async (command, utils) => {
                                     break;
                             }
                         }
-                        
+
                         const channel = await guild.channels.create(name, channelOptions);
 
                         command.send(`Success! ${channel} has been created`);
@@ -135,7 +135,7 @@ module.exports.execute = async (command, utils) => {
                 break;
             }
         }
-    
+
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);
