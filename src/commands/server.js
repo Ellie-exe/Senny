@@ -41,12 +41,12 @@ module.exports.execute = async (command, utils) => {
                     textChannels++;
                     totalChannels++;
                     break;
-                        
+
                 case 'voice':
                     voiceChannels++;
                     totalChannels++;
                     break;
-                        
+
                 case 'category':
                     categoryChannels++;
                     totalChannels++;
@@ -56,7 +56,7 @@ module.exports.execute = async (command, utils) => {
                     announcementChannels++;
                     totalChannels++;
                     break;
-                        
+
                 case 'store':
                     storeChannels++;
                     totalChannels++;
@@ -76,11 +76,11 @@ module.exports.execute = async (command, utils) => {
                 case 'online':
                     onlineMembers++;
                     break;
-                        
+
                 case 'idle':
                     idleMembers++;
                     break;
-                        
+
                 case 'dnd':
                     dndMembers++;
                     break;
@@ -100,7 +100,7 @@ module.exports.execute = async (command, utils) => {
                     break;
             }
         });
-        
+
         const featrueNames = {
             ANIMATED_ICON: 'Animated Icon',
             BANNER: 'Banner',
@@ -120,12 +120,12 @@ module.exports.execute = async (command, utils) => {
             ENABLED_DISCOVERABLE_BEFORE: 'Enabled Discoverable Before',
             MEMBER_VERIFICATION_GATE_ENABLED: 'Member Verification Gate Enabled'
         };
-                
+
         let features = [];
         guild.features.length === 0 ? features.push('None') : guild.features.forEach(f => features.push(featrueNames[f]));
 
         const icon = guild.iconURL(options) || 'https://ellie.is.gay/1eUNml2tV';
-                
+
         const embed1 = new MessageEmbed()
             .setURL('https://ellie.is.gay')
             .setAuthor(`${guild.name} - Information`, null, icon)
@@ -181,7 +181,7 @@ module.exports.execute = async (command, utils) => {
                 .setImage(guild.bannerURL(options));
 
             embeds.push(embed2);
-        
+
         } else if (guild.splashURL() !== null || guild.bannerURL() !== null) {
             embed1.setImage(guild.splashURL(options) || guild.bannerURL(options));
         }

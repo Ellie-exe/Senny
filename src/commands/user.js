@@ -13,7 +13,7 @@ module.exports.execute = async (command, utils) => {
         const options = {format: 'png', dynamic: true, size: 4096};
 
         const statusIcon = {
-            online: '<:online:718302081399783573>', 
+            online: '<:online:718302081399783573>',
             idle: '<:idle:718302096096624741>',
             dnd: '<:dnd:718302130695438346>',
             offline: '<:offline:718302145698594838>'
@@ -42,11 +42,11 @@ module.exports.execute = async (command, utils) => {
                     activities += `\n${activity.emoji || ''} ${activity.state || ''}\n`;
                     break;
                 }
-                        
+
                 case 'LISTENING': {
                     if (activity.name !== 'Spotify') {
                         activities += `\nListening to **${activity.name}**\n`;
-                            
+
                     } else {
                         activities +=
                             `\nListening to **${activity.name}**`+
@@ -57,7 +57,7 @@ module.exports.execute = async (command, utils) => {
 
                     break;
                 }
-                        
+
                 case 'PLAYING': {
                     let duration;
 
@@ -80,11 +80,11 @@ module.exports.execute = async (command, utils) => {
                             s < 10 ? s = '0' + s : s = s;
 
                             h === '00' ? duration = `\n${m}:${s} ${type}` : duration = `\n${h}:${m}:${s} ${type}`;
-                                
+
                         } else {
                             duration = '\n00:00 left';
                         }
-                            
+
                     } else {
                         duration = '';
                     }
@@ -97,14 +97,14 @@ module.exports.execute = async (command, utils) => {
                             break;
                         }
                     }
-                            
-                    activities += 
+
+                    activities +=
                         `\nPlaying: **${activity.name}**`+
                         `${activity.details ? `\n${activity.details}` : ''}`+
                         `${activity.state ? `\n${activity.state}` : ''} ${party}`+
                         `${duration}\n`;
 
-                    playing = 
+                    playing =
                         `**${activity.name}**`+
                         `${activity.details ? `\n${activity.details}` : ''}`+
                         `${activity.state ? `\n${activity.state}` : ''} ${party}`+
@@ -112,16 +112,16 @@ module.exports.execute = async (command, utils) => {
 
                     break;
                 }
-                        
+
                 case 'STREAMING': {
-                    activities += 
+                    activities +=
                         `\nLive on **${activity.name}**`+
                         `\n**[${activity.details}](${activity.url})**`+
                         `\nPlaying ${activity.state}\n`;
 
                     break;
                 }
-                        
+
                 case 'WATCHING': {
                     activities += `\nWatching **${activity.name}**\n`;
                     break;
@@ -146,7 +146,7 @@ module.exports.execute = async (command, utils) => {
             VERIFIED_BOT: 'Verified Bot',
             EARLY_VERIFIED_BOT_DEVELOPER: 'Early Verified Bot Developer'
         }
-        
+
         let flags = [];
         switch (member.user.flags?.equals(0)) {
             case undefined:
@@ -200,7 +200,7 @@ module.exports.execute = async (command, utils) => {
             case true:
                 perms.push('Administrator');
                 break;
-                        
+
             case false:
                 member.permissions.toArray().forEach(p => perms.push(permNames[p]));
                 break;
@@ -229,7 +229,7 @@ module.exports.execute = async (command, utils) => {
             .setThumbnail(member.user.displayAvatarURL(options));
 
         command.embed([embed]);
-    
+
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);

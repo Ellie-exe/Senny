@@ -14,7 +14,7 @@ module.exports.execute = async (command, utils) => {
             case 'role': {
                 const role = guild.roles.cache.get(options[0].value);
                 let roleOptions = {};
-                
+
                 if (await utils.check(author, guildID, {permissions: ['MANAGE_ROLES'], roles: ['admin']}) === false) {
                     throw new Error('Missing Permissions');
                 }
@@ -101,7 +101,7 @@ module.exports.execute = async (command, utils) => {
                         case 'position':
                             channelOptions['position'] = options[option].value;
                             break;
-                    }     
+                    }
                 }
 
                 const newChannel = await channel.edit(channelOptions);
@@ -109,7 +109,7 @@ module.exports.execute = async (command, utils) => {
                 break;
             }
         }
-    
+
     } catch (err) {
         command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
         utils.logger.error(err);

@@ -48,7 +48,7 @@ module.exports.execute = async (command, utils) => {
             case true:
                 perms.push('Administrator');
                 break;
-                        
+
             case false:
                 role.permissions.toArray().forEach(p => perms.push(permNames[p]));
                 break;

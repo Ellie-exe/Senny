@@ -13,9 +13,9 @@ module.exports.execute = async (message, args, utils) => {
         if (typeof evaled !== 'string') {
             evaled = require('util').inspect(evaled);
         }
-    
+
         await message.channel.send(evaled, {code: 'xl', split: true});
-        
+
     } catch (err) {
         message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
         utils.logger.error(err);

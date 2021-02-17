@@ -2,8 +2,8 @@ const mariadb = require('mariadb');
 
 module.exports = async (member, guildID, options = {permissions: [], roles: []}) => {
     const conn = await mariadb.createConnection({
-        user: process.env.user, 
-        password: process.env.password, 
+        user: process.env.user,
+        password: process.env.password,
         database: process.env.database
     });
 
@@ -11,14 +11,14 @@ module.exports = async (member, guildID, options = {permissions: [], roles: []})
 
     if (options.roles.includes('admin')) {
         const res = await conn.query('SELECT roleID FROM adminRoles WHERE guildID=(?)', [guildID]);
-        
+
         if (res.length === 0) return;
         if (await member.roles.cache.has(res[0].roleID)) check = true;
     }
-    
+
     if (options.roles.includes('mod')) {
         const res = await conn.query('SELECT roleID FROM modRoles WHERE guildID=(?)', [guildID]);
-        
+
         if (res.length === 0) return;
         if (await member.roles.cache.has(res[0].roleID)) check = true;
     }

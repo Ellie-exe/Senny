@@ -32,7 +32,7 @@ module.exports = class Interaction {
                         }
                     }
                 });
-        
+
         } catch (err) {
             this.utils.logger.error(err);
             const channel = this.client.channels.cache.get(this.channelID);
@@ -48,13 +48,13 @@ module.exports = class Interaction {
                 .callback
                 .post({
                     data: {
-                        type: options.type, 
+                        type: options.type,
                         data: {
                             embeds: embeds
                         }
                     }
                 });
-        
+
         } catch (err) {
             this.utils.logger.error(err);
             const channel = this.client.channels.cache.get(this.channelID);
@@ -73,7 +73,7 @@ module.exports = class Interaction {
                         content: content
                     }
                 });
-        
+
         } catch (err) {
             this.utils.logger.error(err);
             const channel = this.client.channels.cache.get(this.channelID);
@@ -88,7 +88,7 @@ module.exports = class Interaction {
                 .webhooks((await this.client.fetchApplication()).id)(this.token)
                 .messages('@original')
                 .delete();
-        
+
         } catch (err) {
             this.utils.logger.error(err);
             const channel = this.client.channels.cache.get(this.channelID);
