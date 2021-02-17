@@ -1,5 +1,5 @@
-const Enmap = require('enmap');
 const parseRegex = require('regex-parser');
+const mariadb = require('mariadb');
 /**
  * @param {import('../../types').Message} message
  * @param {import('../../types').Utils} utils
@@ -11,37 +11,41 @@ module.exports = async (message, commands, utils) => {
 
         if (message.author.bot) return;
 
-        const filter = new Enmap({name: 'filter'});
-        const regex = filter.get(message.guild.id);
+        const conn = await mariadb.createConnection({
+            user: process.env.user, 
+            password: process.env.password, 
+            database: process.env.database
+        });
 
-        if (regex !== undefined) {
+        const regex = await conn.query('SELECT regex FROM filters WHERE guildID=(?)', [message.guild.id]);
+
+        if (regex.length !== 0) {
             const author = await message.guild.members.fetch(message.author.id);
             const guildID = message.guild.id;
 
-            const words = message.content.match(parseRegex(regex));
+            const words = message.content.match(parseRegex(regex[0].regex));
 
             if (await utils.check(author, guildID, {roles: ['admin', 'mod']}) === false) {
                 if (words !== null) {
-                    
+                    const channel = await message.author.createDM();
+
                     await message.delete();
-                    await message.author.createDM()
-                        .then(async channel => {
-                            await channel.send(`Hey! You cannot say \`${words.join(', ')}\` in \`${message.guild.name}\``);
-                        });
+                    await channel.send(`Hey! You cannot say \`${words.join(', ')}\` in \`${message.guild.name}\``);
                 }
             }
         }
 
-        const bump = new Enmap({name: 'bump'});
-        const setting = bump.get(message.guild.id);
+        const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [message.guild.id]);
 
-        if (message.content.startsWith('!d bump') && setting !== undefined) {
+        if (message.content.startsWith('!d bump') && bump.length !== 0) {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
             commands['bump'].execute(message, utils);
             return;
         }
 
-        if (message.content.startsWith(process.env.prefix) === false || commands[command] === undefined) return;
+        await conn.end();
+
+        if (!message.content.startsWith(process.env.prefix) || commands[command] === undefined) return;
 
         if (command === 'dev') {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command} ${args[0]}`);

@@ -1,41 +1,42 @@
 const schedule = require('node-schedule');
 const dateFormat = require('dateformat');
-const Enmap = require('enmap');
+const mariadb = require('mariadb');
 /**
  * @param {import('../../types').Message} message 
  * @param {import('../../types').Utils} utils 
  */
 module.exports.execute = async (message, utils) => {
     try {
+        const conn = await mariadb.createConnection({
+            user: process.env.user, 
+            password: process.env.password, 
+            database: process.env.database
+        });
+
+        const user = message.author;
+        const channel = message.channel;
         const date = Date.now() + 7200000;
         const displayDate = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const text = '!d bump';
 
-        const reminder = new Enmap({name: 'reminder'});
-
         let reminderID = '';
-        for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.random() * characters.length);
+        for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.floor(Math.random() * characters.length));
 
-        reminder.set(reminderID, {
-            authorID: message.author.id,
-            channelID: message.channel.id,
-            channelType: message.channel.type,
-            date: date,
-            text: text
-        });
-        
-        await message.channel.send(`Okay, I'll remind ${message.channel} about: \`!d bump\` at: \`${displayDate}\``);
+        await conn.query('INSERT INTO reminders VALUES (?, ?, ?, ?, ?)', [reminderID, user.id, channel.id, date, text]);
+        await message.channel.send(`Okay, I'll remind ${channel} about: \`!d bump\` at: \`${displayDate}\``);
 
         schedule.scheduleJob(date, async () => {
             try {
-                if (reminder.indexes.includes(reminderID)) {
-                    await message.channel.send(`Hello ${message.author.toString()}! You asked me to remind you about: \`${text}\``);
-                    reminder.delete(reminderID);
-                }
-            
+                const reminder = await conn.query('SELECT reminderID FROM reminders WHERE reminderID=(?)', [reminderID]);
+                if (reminder.length === 0) return;
+                
+                await channel.send(`Hello ${user.toString()}! You asked me to remind you about: \`${text}\``);
+                await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
+
+                await conn.end();
+
             } catch (err) {
-                message.channel.send(`${utils.constants.emojis.redX} Error: \`${err}\``).catch(err => utils.logger.error(err));
                 utils.logger.error(err);
             }
         });

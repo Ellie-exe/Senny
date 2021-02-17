@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const Enmap = require('enmap');
+const mariadb = require('mariadb');
 /**
  * @param {import('../../types').Interaction} command
  * @param {import('../../types').Utils} utils
@@ -14,6 +14,12 @@ module.exports.execute = async (command, utils) => {
             throw new Error('Missing Permissions');
         }
 
+        const conn = await mariadb.createConnection({
+            user: process.env.user, 
+            password: process.env.password, 
+            database: process.env.database
+        });
+
         switch (option) {
             case 'mute': {
                 const guildID = command.guildID;
@@ -21,11 +27,10 @@ module.exports.execute = async (command, utils) => {
                 const guild = command.client.guilds.cache.get(guildID);
                 const role = guild.roles.cache.get(roleID);
 
-                const muteRole = new Enmap({name: 'muteRole'});
-
-                muteRole.set(guildID, roleID);
+                await conn.query('INSERT INTO muteRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
                 command.send(`Success! The mute role is now set to: \`${role.name}\``, {type: 3, flags: 64});
 
+                await conn.end();
                 break;
             }
 
@@ -35,11 +40,10 @@ module.exports.execute = async (command, utils) => {
                 const guild = command.client.guilds.cache.get(guildID);
                 const role = guild.roles.cache.get(roleID);
 
-                const modRole = new Enmap({name: 'modRole'});
-
-                modRole.set(guildID, roleID);
+                await conn.query('INSERT INTO modRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
                 command.send(`Success! The mod role is now set to: \`${role.name}\``, {type: 3, flags: 64});
 
+                await conn.end();
                 break;
             }
 
@@ -49,33 +53,36 @@ module.exports.execute = async (command, utils) => {
                 const guild = command.client.guilds.cache.get(guildID);
                 const role = guild.roles.cache.get(roleID);
 
-                const adminRole = new Enmap({name: 'adminRole'});
-
-                adminRole.set(guildID, roleID);
+                await conn.query('INSERT INTO adminRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
                 command.send(`Success! The admin role is now set to: \`${role.name}\``, {type: 3, flags: 64});
 
+                await conn.end();
                 break;
             }
 
             case 'filter': {
                 const guildID = command.guildID;
                 const options = command.data.options[0].options[0].value;
-                const filter = new Enmap({name: 'filter'});
 
                 switch (options) {
                     case 'on': {
                         const regex = command.data.options[0].options[1].value;
 
-                        filter.set(guildID, regex);
+                        await conn.query('INSERT INTO filters VALUES (?, ?) ON DUPLICATE KEY UPDATE regex=(?)', [guildID, regex, regex]);
                         command.send(`Success! The filter has been set with the regex: \`${regex}\``, {type: 3, flags: 64});
+                        
+                        await conn.end();
                         break;
                     }
 
                     case 'off': {
-                        if (!filter.get(guildID)) throw new Error('You do not have a filter set!');
+                        const regex = await conn.query('SELECT regex FROM filters WHERE guildID=(?)', [guildID]);
+                        if (regex.length === 0) throw new Error('You do not have a filter set');
 
-                        filter.delete(guildID);
+                        await conn.query('DELETE FROM filters WHERE guildID=(?)', [guildID]);
                         command.send(`Success! The filter has been turned off`, {type: 3, flags: 64});
+                        
+                        await conn.end();
                         break;
                     }
                 }
@@ -86,18 +93,27 @@ module.exports.execute = async (command, utils) => {
             case 'bump': {
                 const guildID = command.guildID;
                 const options = command.data.options[0].options[0].value;
-                const bump = new Enmap({name: 'bump'});
 
                 switch (options) {
                     case 'on': {
-                        bump.set(guildID, 'On');
-                        command.send(`Success! You will now be reminded to bump automatically`, {type: 3, flags: 64});
+                        const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [guildID]);
+                        if (bump.length !== 0) throw new Error('Bump reminders are already on');
+
+                        await conn.query('INSERT INTO bumpReminders VALUES (?)', [guildID]);
+                        command.send(`Success! You will now be reminded to bump`, {type: 3, flags: 64});
+                        
+                        await conn.end();
                         break;
                     }
 
                     case 'off': {
-                        bump.delete(guildID);
-                        command.send(`Success! You will no longer be reminded`, {type: 3, flags: 64});
+                        const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [guildID]);
+                        if (bump.length === 0) throw new Error('Bump reminders are already off');
+
+                        await conn.query('DELETE FROM filters WHERE guildID=(?)', [guildID]);
+                        command.send(`Success! You will no longer be reminded to bump`, {type: 3, flags: 64});
+
+                        await conn.end();
                         break;
                     }
                 }
@@ -108,53 +124,21 @@ module.exports.execute = async (command, utils) => {
             case 'view': {
                 const guildID = command.guildID;
                 const guild = command.client.guilds.cache.get(guildID);
-
-                const adminRoles = new Enmap({name: 'adminRole'});
-                const modRoles = new Enmap({name: 'modRole'});
-                const muteRoles = new Enmap({name: 'muteRole'});
-                const filters = new Enmap({name: 'filter'});
-                const bump = new Enmap({name: 'bump'});
-
-                const adminRoleID = adminRoles.get(guildID);
-                const modRoleID = modRoles.get(guildID);
-                const muteRoleID = muteRoles.get(guildID);
-                const filter = filters.get(guildID);
-                const bumpValue = bump.get(guildID);
-
-                let adminRole;
-                let modRole;
-                let muteRole;
-                let bumpBool;
-                let filterRegex;
-
-                if (adminRoleID !== undefined) {
-                    adminRole = guild.roles.cache.get(adminRoleID);
-                }
                 
-                if (modRoleID !== undefined) {
-                    modRole = guild.roles.cache.get(modRoleID);
-                }
-                
-                if (muteRoleID !== undefined) {
-                    muteRole = guild.roles.cache.get(muteRoleID);
-                }
-
-                if (bumpValue !== undefined) {
-                    bumpBool = `\`${bumpValue}\``;
-                }
-
-                if (filter !== undefined) {
-                    filterRegex = `\`\`\`${filter}\`\`\``;
-                }
+                const adminRole = await conn.query('SELECT roleID FROM adminRoles WHERE guildID=(?)', [guildID]);
+                const modRole = await conn.query('SELECT roleID FROM modRoles WHERE guildID=(?)', [guildID]);
+                const muteRole = await conn.query('SELECT roleID FROM muteRoles WHERE guildID=(?)', [guildID]);
+                const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [guildID]);
+                const regex = await conn.query('SELECT regex FROM filters WHERE guildID=(?)', [guildID]);
 
                 const embed = new MessageEmbed()
                     .setAuthor(`${guild.name} - Config`)
                     .setDescription(
-                        `Admin Role: ${adminRole || '`Not Set`'}\n`+
-                        `Mod Role: ${modRole || '`Not Set`'}\n`+
-                        `Mute Role: ${muteRole || '`Not Set`'}\n`+
-                        `Bump Reminder: ${bumpBool || '`Off`'}\n`+
-                        `Filter: ${filterRegex || '`Off`'}`
+                        `Admin Role: ${adminRole.length === 0 ? '`Not Set`' : guild.roles.cache.get(adminRole[0].roleID)}\n`+
+                        `Mod Role: ${modRole.length === 0 ? '`Not Set`' : guild.roles.cache.get(modRole[0].roleID)}\n`+
+                        `Mute Role: ${muteRole.length === 0 ? '`Not Set`' : guild.roles.cache.get(muteRole[0].roleID)}\n`+
+                        `Bump Reminder: ${bump.length === 0 ? '`Off`' : '`On`'}\n`+
+                        `Filter: ${regex.length === 0 ? '`Off`' : `\`\`\`${regex[0].regex}\`\`\``}`
                     )
                     .setColor(process.env.color);
 

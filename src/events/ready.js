@@ -1,34 +1,41 @@
 const schedule = require('node-schedule');
-const Enmap = require('enmap');
+const mariadb = require('mariadb');
 /**
  * @param {import('../../types').Client} client 
  * @param {import('../../types').Utils} utils 
  */
 module.exports = async (client, utils) => {
     try {
-        const reminder = new Enmap({name: 'reminder'});
+        const conn = await mariadb.createConnection({
+            user: process.env.user, 
+            password: process.env.password, 
+            database: process.env.database
+        });
 
-        const indexes = reminder.indexes;
+        const reminders = await conn.query('SELECT * FROM reminders');
 
-        for (const index in indexes) {
-            const reminderID = indexes[index];
-            const channel = client.channels.cache.get(reminder.get(reminderID, 'channelID'));
-            const author = await client.users.fetch(reminder.get(reminderID, 'authorID'));
-            const text = reminder.get(reminderID, 'text');
-            const date = reminder.get(reminderID, 'date');
+        reminders.forEach(async reminder => {
+            const reminderID = reminder.reminderID;
+            const channel = client.channels.cache.get(reminder.channelID);
+            const user = await client.users.fetch(reminder.userID);
+            const text = reminder.text;
+            const date = reminder.date;
 
             schedule.scheduleJob(date, async () => {
                 try {
-                    if (reminder.indexes.includes(reminderID)) {
-                        await channel.send(`Hello ${author.toString()}! You asked me to remind you about: \`${text}\``);
-                        reminder.delete(reminderID);
-                    }
-                
+                    const reminder = await conn.query('SELECT reminderID FROM reminders WHERE reminderID=(?)', [reminderID]);
+                    if (reminder.length === 0) return;
+
+                    await channel.send(`Hello ${user.toString()}! You asked me to remind you about: \`${text}\``);
+                    await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
+
+                    await conn.end();
+
                 } catch (err) {
                     utils.logger.error(err);
                 }
             });
-        }
+        });
 
     } catch (err) {
         utils.logger.error(err);
