@@ -130,7 +130,7 @@ module.exports.execute = async (command, utils) => {
                 }
 
                 const user = await command.client.users.fetch(command.user.id);
-                const channel = await author.createDM();
+                const channel = await user.createDM();
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
                 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
