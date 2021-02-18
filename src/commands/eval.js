@@ -1,3 +1,4 @@
+const mariadb = require('mariadb');
 /**
  * @param {import('../../types').Message} message
  * @param {import('../../types').Args} args
@@ -7,7 +8,15 @@ module.exports.execute = async (message, args, utils) => {
     try {
         if (!process.env.admins.includes(message.author.id)) throw new Error('Missing Permissions');
 
-        const code = args.join(' ');
+        const conn = await mariadb.createConnection({
+            user: process.env.user,
+            password: process.env.password,
+            database: process.env.database
+        });
+
+        let code = args.join(' ');
+        if (args.includes('await')) code = `(async () => {${args.join(' ')}})()`;
+
         let evaled = eval(code);
 
         if (typeof evaled !== 'string') {
