@@ -17,7 +17,7 @@ module.exports = async (message, commands, cache, utils) => {
             const author = await message.guild.members.fetch(message.author.id);
             const guildID = message.guild.id;
 
-            const words = message.content.match(parseRegex(regex[0].regex));
+            const words = message.content.match(parseRegex(regex));
 
             if (await utils.check(author, guildID, {roles: ['admin', 'mod']}) === false) {
                 if (words !== null) {
