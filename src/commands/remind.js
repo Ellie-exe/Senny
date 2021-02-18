@@ -178,7 +178,7 @@ module.exports.execute = async (command, utils) => {
 
                         embed.addField(
                             `Reminder [\`${reminder.reminderID}\`]`,
-                            `Destination: ${channel.toString()}\n`+
+                            `Destination: ${channel}\n`+
                             `Time: \`${dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
                             `Text: \`${text}\``
                         );
@@ -212,7 +212,7 @@ module.exports.execute = async (command, utils) => {
                 if (reminder[0].userID !== user.id) throw new Error('You cannot delete someone else\`s reminders');
 
                 await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
-                command.send(`Okay, I've deleted the reminder: \`${id}\``);
+                command.send(`Okay, I've deleted the reminder: \`${reminderID}\``);
 
                 await conn.end();
                 break;

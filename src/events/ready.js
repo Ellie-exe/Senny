@@ -16,7 +16,7 @@ module.exports = async (client, utils) => {
 
         reminders.forEach(async reminder => {
             const reminderID = reminder.reminderID;
-            const channel = client.channels.cache.get(reminder.channelID);
+            const channel = await client.channels.fetch(reminder.channelID);
             const user = await client.users.fetch(reminder.userID);
             const text = reminder.text;
             const date = reminder.date;
