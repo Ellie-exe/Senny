@@ -8,8 +8,9 @@ const { exec } = require('child_process');
 module.exports.execute = async (message, args, utils) => {
     try {
         if(!process.env.admins.includes(message.author.id)) throw new Error('Missing Permissions');
+        const option = args.shift().toLowerCase();
 
-        switch (args[0]) {
+        switch (option) {
             case 'reload': {
                 await message.react(utils.constants.emojis.greenTick);
                 require('../index').reload();
@@ -28,95 +29,20 @@ module.exports.execute = async (message, args, utils) => {
                 break;
             }
 
-            case 'pull': {
-                exec('git pull origin master', (err, stdout, stderr) => {
-                    if (err) {
-                        message.channel.send(`\`\`\`\n${err}\n\`\`\``).catch(err => utils.logger.error(err));
-                        utils.logger.error(err);
-
-                    } else {
-                        const embed = new MessageEmbed()
-                            .setTitle('Git Pulled')
-                            .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
-                            .setColor(process.env.color);
-
-                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
-                    }
-                });
-
+            case 'update': {
                 exec('npm i', (err, stdout, stderr) => {
                     if (err) {
-                        message.channel.send(`\`\`\`\n${err}\n\`\`\``).catch(err => utils.logger.error(err));
+                        const embed = new MessageEmbed()
+                            .setTitle('Error')
+                            .setDescription(`\`\`\`\n${err}\n\`\`\``)
+                            .setColor(process.env.color);
+
+                        message.channel.send(embed).catch(err => utils.logger.error(err));
                         utils.logger.error(err);
 
                     } else {
                         const embed = new MessageEmbed()
                             .setTitle('Packages Updated')
-                            .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
-                            .setColor(process.env.color);
-
-                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
-                    }
-                });
-
-                break;
-            }
-
-            case 'commit': {
-                args.shift();
-
-                exec('git add .', (err, stdout, stderr) => {
-                    if (err) {
-                        const embed = new MessageEmbed()
-                            .setTitle('Error')
-                            .setDescription(`\`\`\`\n${err}\n\`\`\``)
-                            .setColor(process.env.color);
-
-                        message.channel.send(embed).catch(err => utils.logger.error(err));
-                        utils.logger.error(err);
-
-                    } else {
-                        const embed = new MessageEmbed()
-                            .setTitle('Changes Staged')
-                            .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
-                            .setColor(process.env.color);
-
-                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
-                    }
-                });
-
-                exec(`git commit -m ${args.join(' ')}`, (err, stdout, stderr) => {
-                    if (err) {
-                        const embed = new MessageEmbed()
-                            .setTitle('Error')
-                            .setDescription(`\`\`\`\n${err}\n\`\`\``)
-                            .setColor(process.env.color);
-
-                        message.channel.send(embed).catch(err => utils.logger.error(err));
-                        utils.logger.error(err);
-
-                    } else {
-                        const embed = new MessageEmbed()
-                            .setTitle('Git Committed')
-                            .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
-                            .setColor(process.env.color);
-
-                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
-                    }
-                });
-
-                break;
-            }
-
-            case 'push': {
-                exec('git push origin master', (err, stdout, stderr) => {
-                    if (err) {
-                        message.channel.send(`\`\`\`\n${err}\n\`\`\``).catch(err => utils.logger.error(err));
-                        utils.logger.error(err);
-
-                    } else {
-                        const embed = new MessageEmbed()
-                            .setTitle('Git Pushed')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
 

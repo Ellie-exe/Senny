@@ -10,6 +10,7 @@ module.exports.delete = require('./delete');
 module.exports.dev = require('./dev');
 module.exports.edit = require('./edit');
 module.exports.eval = require('./eval');
+module.exports.git = require('./git');
 module.exports.giverole = require('./giverole');
 module.exports.jumbo = require('./jumbo');
 module.exports.kick = require('./kick');
