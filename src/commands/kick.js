@@ -30,7 +30,6 @@ module.exports.execute = async (command, utils) => {
         }
 
         await member.kick(reason);
-
         command.send(`${member.toString()} ${member.user.tag} has been kicked for reason: \`${reason || 'None'}\``, silent);
 
     } catch (err) {

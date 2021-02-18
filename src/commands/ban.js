@@ -35,7 +35,6 @@ module.exports.execute = async (command, utils) => {
         }
 
         await member.ban({days: days, reason: reason});
-
         command.send(`${member.toString()} ${member.user.tag} has been banned for reason: \`${reason || 'None'}\``, silent);
 
     } catch (err) {

@@ -7,7 +7,7 @@ module.exports.execute = async (command, utils) => {
         const options = command.data.options[0].value;
 
         let choices = options.split(/ +/);
-        if (options.includes(',')) choices = options.split(/,\s+/);
+        if (options.includes(',')) choices = options.split(/\s*,\s*/);
 
         command.send(choices[Math.floor(Math.random() * choices.length)]);
 

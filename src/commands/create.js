@@ -39,7 +39,6 @@ module.exports.execute = async (command, utils) => {
                 }
 
                 const role = await guild.roles.create(roleOptions);
-
                 command.send(`Success! ${role} has been created`);
                 break;
             }
@@ -80,7 +79,6 @@ module.exports.execute = async (command, utils) => {
                         }
 
                         const channel = await guild.channels.create(name, channelOptions);
-
                         command.send(`Success! ${channel} has been created`);
                         break;
                     }
@@ -109,7 +107,6 @@ module.exports.execute = async (command, utils) => {
                         }
 
                         const channel = await guild.channels.create(name, channelOptions);
-
                         command.send(`Success! ${channel} has been created`);
                         break;
                     }
@@ -126,7 +123,6 @@ module.exports.execute = async (command, utils) => {
                         }
 
                         const channel = await guild.channels.create(name, channelOptions);
-
                         command.send(`Success! ${channel} has been created`);
                         break;
                     }

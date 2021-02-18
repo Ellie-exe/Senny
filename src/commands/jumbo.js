@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed } = require('discord.js');
 /**
  * @param {import('../../types').Interaction} command
  * @param {import('../../types').Utils} utils

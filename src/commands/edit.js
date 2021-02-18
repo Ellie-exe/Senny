@@ -90,17 +90,6 @@ module.exports.execute = async (command, utils) => {
                             channelOptions['userLimit'] = options[option].value;
                             break;
 
-                        case 'parent':
-                            channelOptions['parent'] = options[option].value;
-                            break;
-
-                        case 'position':
-                            channelOptions['position'] = options[option].value;
-                            break;
-
-                        case 'position':
-                            channelOptions['position'] = options[option].value;
-                            break;
                     }
                 }
 

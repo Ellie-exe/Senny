@@ -15,14 +15,8 @@ module.exports.execute = async (command, utils) => {
             throw new Error('Missing Permissions');
         }
 
-        switch (command.data.options[1]?.value) {
-            case undefined:
-                var nick = null;
-                break;
-
-            default:
-                var nick = command.data.options[1].value;
-        }
+        let nick = null;
+        if (command.data.options[1]?.value !== undefined) nick = command.data.options[1].value;
 
         await member.setNickname(nick);
         command.send(`${member.toString()}'s nickname has been set to: \`${nick || 'None'}\``);
