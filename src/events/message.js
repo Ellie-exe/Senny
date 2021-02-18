@@ -47,7 +47,7 @@ module.exports = async (message, commands, utils) => {
 
         if (!message.content.startsWith(process.env.prefix) || commands[command] === undefined) return;
 
-        if (command === 'dev') {
+        if (command === 'dev' || command === 'git') {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command} ${args[0]}`);
 
         } else {
