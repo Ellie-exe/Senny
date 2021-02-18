@@ -52,10 +52,6 @@ module.exports.execute = async (message, args, utils) => {
 
                 break;
             }
-
-            default: {
-                throw new Error('Command not found');
-            }
         }
 
     } catch (err) {

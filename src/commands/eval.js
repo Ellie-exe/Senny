@@ -18,10 +18,7 @@ module.exports.execute = async (message, args, utils) => {
         if (args.includes('await')) code = `(async () => {${args.join(' ')}})()`;
 
         let evaled = eval(code);
-
-        if (typeof evaled !== 'string') {
-            evaled = require('util').inspect(evaled);
-        }
+        if (typeof evaled !== 'string') evaled = require('util').inspect(evaled);
 
         await message.channel.send(evaled, {code: 'xl', split: true});
 
