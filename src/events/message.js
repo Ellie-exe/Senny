@@ -35,8 +35,6 @@ module.exports = async (message, commands, cache, utils) => {
             return;
         }
 
-        await conn.end();
-
         if (!message.content.startsWith(process.env.prefix) || commands[command] === undefined) return;
 
         if (command === 'dev' || command === 'git') {
