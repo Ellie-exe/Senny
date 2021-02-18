@@ -1,25 +1,19 @@
 const parseRegex = require('regex-parser');
-const mariadb = require('mariadb');
 /**
  * @param {import('../../types').Message} message
  * @param {import('../../types').Utils} utils
  */
-module.exports = async (message, commands, utils) => {
+module.exports = async (message, commands, cache, utils) => {
     try {
         const args = message.content.slice(process.env.prefix.length).trim().split(/ +/);
         const command = args.shift().toLowerCase();
 
         if (message.author.bot) return;
 
-        const conn = await mariadb.createConnection({
-            user: process.env.user,
-            password: process.env.password,
-            database: process.env.database
-        });
+        const regex = cache.filter.get(message.guild.id);
+        const bump = cache.bump.get(message.guild.id);
 
-        const regex = await conn.query('SELECT regex FROM filters WHERE guildID=(?)', [message.guild.id]);
-
-        if (regex.length !== 0) {
+        if (regex !== undefined) {
             const author = await message.guild.members.fetch(message.author.id);
             const guildID = message.guild.id;
 
@@ -35,9 +29,7 @@ module.exports = async (message, commands, utils) => {
             }
         }
 
-        const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [message.guild.id]);
-
-        if (message.content.startsWith('!d bump') && bump.length !== 0) {
+        if (message.content.startsWith('!d bump') && bump !== undefined) {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
             commands['bump'].execute(message, utils);
             return;

@@ -5,6 +5,13 @@ let commands = require('./commands');
 let events = require('./events');
 
 const client = new discord.Client();
+const filterCache = new discord.Collection();
+const bumpCache = new discord.Collection();
+
+const cache = {
+    filter: filterCache,
+    bump: bumpCache
+}
 
 client.ws.on('INTERACTION_CREATE', async data => {
     client.emit('interaction', new utils.Interaction(data, client, utils));
@@ -15,11 +22,11 @@ client.on('interaction', interaction => {
 });
 
 client.on('message', messsage => {
-    events.message(messsage, commands, utils);
+    events.message(messsage, commands, cache, utils);
 });
 
 client.on('ready', () => {
-    events.ready(client, utils);
+    events.ready(client, cache, utils);
 });
 
 client.on('shardReady', () => {

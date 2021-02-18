@@ -42,7 +42,6 @@ module.exports.execute = async (message, utils) => {
         });
 
     } catch (err) {
-        message.channel.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``).catch(err => utils.logger.error(err));
         utils.logger.error(err);
     }
 }
