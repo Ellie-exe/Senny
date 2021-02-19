@@ -5,12 +5,9 @@ let commands = require('./commands');
 let events = require('./events');
 
 const client = new discord.Client();
-const filterCache = new discord.Collection();
-const bumpCache = new discord.Collection();
-
 const cache = {
-    filter: filterCache,
-    bump: bumpCache
+    filter: new discord.Collection(),
+    bump: new discord.Collection()
 }
 
 client.ws.on('INTERACTION_CREATE', async data => {
