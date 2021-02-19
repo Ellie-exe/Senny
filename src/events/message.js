@@ -10,6 +10,8 @@ module.exports = async (message, commands, cache, utils) => {
 
         if (message.author.bot) return;
 
+        utils.logger.debug(cache);
+
         const regex = cache.filter.get(message.guild.id);
         const bump = cache.bump.get(message.guild.id);
 
