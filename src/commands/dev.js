@@ -24,7 +24,7 @@ module.exports.execute = async (message, args, utils) => {
             }
 
             case 'stop': {
-                message.react(utils.constants.emojis.greenTick);
+                await message.react(utils.constants.emojis.greenTick);
                 exec('pm2 stop config.json && pm2 save');
                 break;
             }
