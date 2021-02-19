@@ -194,7 +194,7 @@ module.exports.execute = async (command, utils) => {
                 const user = await command.client.users.fetch(command.user.id);
 
                 if (reminderID === 'ALL') {
-                    const reminders = await conn.query('SELECT * FROM reminders WHERE userID=(?)', [userID]);
+                    const reminders = await conn.query('SELECT * FROM reminders WHERE userID=(?)', [command.userID]);
                     if (reminders.length === 0) throw new Error('You have no reminders to delete');
 
                     reminders.forEach(async reminder => {
