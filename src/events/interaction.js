@@ -1,8 +1,9 @@
 /**
  * @param {import('../../types').Interaction} interaction
  * @param {import('../../types').Utils} utils
+ * @param {import('../../types').Cache} cache
  */
-module.exports = async (interaction, commands, utils) => {
+module.exports = async (interaction, commands, utils, cache) => {
     try {
         const command = interaction.data;
         const channelID = interaction.channelID;
@@ -21,7 +22,7 @@ module.exports = async (interaction, commands, utils) => {
             return;
         }
 
-        commands[command.name].execute(interaction, utils);
+        commands[command.name].execute(interaction, utils, cache);
 
     } catch (err) {
         interaction.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});

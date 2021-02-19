@@ -2,15 +2,14 @@ const parseRegex = require('regex-parser');
 /**
  * @param {import('../../types').Message} message
  * @param {import('../../types').Utils} utils
+ * @param {import('../../types').Cache} cache
  */
-module.exports = async (message, commands, cache, utils) => {
+module.exports = async (message, commands, utils, cache) => {
     try {
         const args = message.content.slice(process.env.prefix.length).trim().split(/ +/);
         const command = args.shift().toLowerCase();
 
         if (message.author.bot) return;
-
-        utils.logger.debug(cache);
 
         const regex = cache.filter.get(message.guild.id);
         const bump = cache.bump.get(message.guild.id);

@@ -1,11 +1,11 @@
 const schedule = require('node-schedule');
-const discord = require('discord.js');
 const mariadb = require('mariadb');
 /**
  * @param {import('../../types').Client} client
  * @param {import('../../types').Utils} utils
+ * @param {import('../../types').Cache} cache
  */
-module.exports = async (client, cache, utils) => {
+module.exports = async (client, utils, cache) => {
     try {
         const conn = await mariadb.createConnection({
             user: process.env.user,

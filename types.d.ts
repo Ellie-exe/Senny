@@ -1,10 +1,15 @@
-import { Client, Guild, GuildMember, Message, MessageEmbed, Snowflake, User, PermissionResolvable } from 'discord.js';
+import { Client, GuildMember, Message, MessageEmbed, Snowflake, User, Collection } from 'discord.js';
 import { Interaction } from './utils';
 
 type Client = Client;
 type Message = Message;
 type args = string[];
 type error = Error;
+
+declare class Cache {
+    filter: Collection<Snowflake, string>;
+    bump: Collection<Snowflake, boolean>;
+}
 
 declare class Utils {
     constants: Constants;

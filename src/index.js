@@ -18,15 +18,15 @@ client.ws.on('INTERACTION_CREATE', async data => {
 });
 
 client.on('interaction', interaction => {
-    events.interaction(interaction, commands, utils);
+    events.interaction(interaction, commands, utils, cache);
 });
 
 client.on('message', messsage => {
-    events.message(messsage, commands, cache, utils);
+    events.message(messsage, commands, utils, cache);
 });
 
 client.on('ready', () => {
-    events.ready(client, cache, utils);
+    events.ready(client, utils, cache);
 });
 
 client.on('shardReady', () => {
