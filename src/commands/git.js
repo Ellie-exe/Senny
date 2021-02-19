@@ -114,7 +114,7 @@ module.exports.execute = async (message, args, utils) => {
             }
 
             case 'commit': {
-                exec(`git commit -m '${args.join(' ')}'`, (err, stdout, stderr) => {
+                exec(`git commit -m "${args.join(' ')}"`, (err, stdout, stderr) => {
                     if (err) {
                         const embed = new MessageEmbed()
                             .setTitle('Error')
