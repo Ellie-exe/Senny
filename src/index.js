@@ -26,9 +26,11 @@ client.on('ready', () => {
     events.ready(client, utils, cache);
 });
 
+/**
 client.on('shardReady', () => {
     events.shardReady(client, utils);
 });
+*/
 
 client.on('shardReconnecting', () => {
     events.shardReconnecting(utils);
