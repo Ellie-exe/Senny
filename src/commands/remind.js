@@ -15,6 +15,9 @@ module.exports.execute = async (command, utils) => {
         });
 
         const data = command.data.options[0];
+        const userID = command.user.id;
+        const user = await command.client.users.fetch(userID);
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         function parse(time) {
             const times = time.match(/\d+\s*\w+/g);
@@ -83,10 +86,8 @@ module.exports.execute = async (command, utils) => {
                         break;
                 }
 
-                const user = await command.client.users.fetch(command.user.id);
                 const channel = command.client.channels.cache.get(command.channelID);
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
-                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
                 let reminderID = '';
                 for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.floor(Math.random() * characters.length));
@@ -129,10 +130,8 @@ module.exports.execute = async (command, utils) => {
                         break;
                 }
 
-                const user = await command.client.users.fetch(command.user.id);
                 const channel = await user.createDM();
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
-                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
                 let reminderID = '';
                 for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.floor(Math.random() * characters.length));
@@ -159,7 +158,6 @@ module.exports.execute = async (command, utils) => {
             }
 
             case 'list': {
-                const user = await command.client.users.fetch(command.user.id);
                 const reminders = await conn.query('SELECT * FROM reminders WHERE userID=(?)', [user.id]);
 
                 const embed = new MessageEmbed()
@@ -191,7 +189,6 @@ module.exports.execute = async (command, utils) => {
 
             case 'delete': {
                 const reminderID = data.options[0].value.toUpperCase();
-                const user = await command.client.users.fetch(command.user.id);
 
                 if (reminderID === 'ALL') {
                     const reminders = await conn.query('SELECT * FROM reminders WHERE userID=(?)', [user.id]);
