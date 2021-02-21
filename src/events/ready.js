@@ -62,7 +62,6 @@ module.exports = async (client, utils, cache) => {
             cache.bump.set(bump.guildID, true);
         })
 
-        await conn.end();
         utils.logger.info(`Bot ready in ${client.guilds.cache.array().length} guilds`);
 
     } catch (err) {
