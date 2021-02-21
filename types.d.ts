@@ -1,15 +1,12 @@
 import { Client, GuildMember, Message, MessageEmbed, Snowflake, User, Collection } from 'discord.js';
 import { Interaction } from './utils';
+import { RedisClient } from 'redis';
 
 type Client = Client;
 type Message = Message;
 type args = string[];
 type error = Error;
-
-declare class Cache {
-    filter: Collection<Snowflake, string>;
-    bump: Collection<Snowflake, boolean>;
-}
+type Cache = RedisClient;
 
 declare class Utils {
     constants: Constants;

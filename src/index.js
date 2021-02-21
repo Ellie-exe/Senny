@@ -1,14 +1,12 @@
 const discord = require('discord.js');
 const utils = require('./utils');
+const redis = require('redis');
 
 let commands = require('./commands');
 let events = require('./events');
 
 const client = new discord.Client();
-const cache = {
-    filter: new discord.Collection(),
-    bump: new discord.Collection()
-}
+const cache = redis.createClient();
 
 client.ws.on('INTERACTION_CREATE', async data => {
     client.emit('interaction', new utils.Interaction(data, client, utils));

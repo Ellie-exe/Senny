@@ -11,8 +11,10 @@ module.exports = async (message, commands, utils, cache) => {
 
         if (message.author.bot) return;
 
-        const regex = cache.filter.get(message.guild.id);
-        const bump = cache.bump.get(message.guild.id);
+        let regex = undefined;
+        let bump = undefined;
+        cache.hget(message.guild.id, 'regex', function(err, value) {regex = value});
+        cache.hget(message.guild.id, 'bump', function(err, value) {bump = value});
 
         if (regex !== undefined) {
             const author = await message.guild.members.fetch(message.author.id);

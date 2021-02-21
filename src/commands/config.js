@@ -23,12 +23,12 @@ module.exports.execute = async (command, utils, cache) => {
         });
 
         switch (option) {
-            case 'mute': {
+            case 'admin': {
                 const roleID = command.data.options[0].options[0].value;
                 const role = guild.roles.cache.get(roleID);
 
-                await conn.query('INSERT INTO muteRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
-                command.send(`Success! The mute role is now set to: \`${role.name}\``, {type: 3, flags: 64});
+                await conn.query('INSERT INTO adminRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
+                command.send(`Success! The admin role is now set to: \`${role.name}\``, {type: 3, flags: 64});
 
                 await conn.end();
                 break;
@@ -45,12 +45,12 @@ module.exports.execute = async (command, utils, cache) => {
                 break;
             }
 
-            case 'admin': {
+            case 'mute': {
                 const roleID = command.data.options[0].options[0].value;
                 const role = guild.roles.cache.get(roleID);
 
-                await conn.query('INSERT INTO adminRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
-                command.send(`Success! The admin role is now set to: \`${role.name}\``, {type: 3, flags: 64});
+                await conn.query('INSERT INTO muteRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)', [guildID, roleID, roleID]);
+                command.send(`Success! The mute role is now set to: \`${role.name}\``, {type: 3, flags: 64});
 
                 await conn.end();
                 break;
@@ -64,7 +64,7 @@ module.exports.execute = async (command, utils, cache) => {
                         const regex = command.data.options[0].options[1].value;
 
                         await conn.query('INSERT INTO filters VALUES (?, ?) ON DUPLICATE KEY UPDATE regex=(?)', [guildID, regex, regex]);
-                        cache.filter.set(guildID, regex);
+                        cache.hmset(guildID, 'regex', regex);
                         
                         command.send(`Success! The filter has been set with the regex: \`${regex}\``, {type: 3, flags: 64});
                         
@@ -77,7 +77,7 @@ module.exports.execute = async (command, utils, cache) => {
                         if (regex.length === 0) throw new Error('You do not have a filter set');
 
                         await conn.query('DELETE FROM filters WHERE guildID=(?)', [guildID]);
-                        cache.filter.delete(guildID);
+                        cache.hdel(guildID, 'regex');
                         
                         command.send(`Success! The filter has been turned off`, {type: 3, flags: 64});
 
@@ -94,11 +94,11 @@ module.exports.execute = async (command, utils, cache) => {
 
                 switch (options) {
                     case 'on': {
-                        const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [guildID]);
+                        const bump = await conn.query('SELECT guildID FROM bumps WHERE guildID=(?)', [guildID]);
                         if (bump.length !== 0) throw new Error('Bump reminders are already on');
 
-                        await conn.query('INSERT INTO bumpReminders VALUES (?)', [guildID]);
-                        cache.bump.set(guildID, true);
+                        await conn.query('INSERT INTO bumps VALUES (?)', [guildID]);
+                        cache.hmset(guildID, 'bump', true);
                         
                         command.send(`Success! You will now be reminded to bump`, {type: 3, flags: 64});
 
@@ -107,11 +107,11 @@ module.exports.execute = async (command, utils, cache) => {
                     }
 
                     case 'off': {
-                        const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [guildID]);
+                        const bump = await conn.query('SELECT guildID FROM bumps WHERE guildID=(?)', [guildID]);
                         if (bump.length === 0) throw new Error('Bump reminders are already off');
 
-                        await conn.query('DELETE FROM filters WHERE guildID=(?)', [guildID]);
-                        cache.bump.delete(guildID);
+                        await conn.query('DELETE FROM bumps WHERE guildID=(?)', [guildID]);
+                        cache.hdel(guildID, 'bump');
 
                         command.send(`Success! You will no longer be reminded to bump`, {type: 3, flags: 64});
 
@@ -127,7 +127,7 @@ module.exports.execute = async (command, utils, cache) => {
                 const adminRole = await conn.query('SELECT roleID FROM adminRoles WHERE guildID=(?)', [guildID]);
                 const modRole = await conn.query('SELECT roleID FROM modRoles WHERE guildID=(?)', [guildID]);
                 const muteRole = await conn.query('SELECT roleID FROM muteRoles WHERE guildID=(?)', [guildID]);
-                const bump = await conn.query('SELECT guildID FROM bumpReminders WHERE guildID=(?)', [guildID]);
+                const bump = await conn.query('SELECT guildID FROM bumps WHERE guildID=(?)', [guildID]);
                 const regex = await conn.query('SELECT regex FROM filters WHERE guildID=(?)', [guildID]);
 
                 const embed = new MessageEmbed()
