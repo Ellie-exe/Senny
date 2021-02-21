@@ -33,7 +33,15 @@ module.exports = async (client, utils, cache) => {
         const filters = await conn.query('SELECT * FROM filters');
         const bumps = await conn.query('SELECT * FROM bumpReminders');
 
-        reminders.forEach(async reminder => {
+        await filters.forEach(async regex => {
+            cache.filter.set(regex.guildID, regex.regex);
+        });
+
+        await bumps.forEach(async bump => {
+            cache.bump.set(bump.guildID, true);
+        })
+
+        await reminders.forEach(async reminder => {
             const reminderID = reminder.reminderID;
             const channel = await client.channels.fetch(reminder.channelID);
             const user = await client.users.fetch(reminder.userID);
@@ -42,11 +50,18 @@ module.exports = async (client, utils, cache) => {
 
             schedule.scheduleJob(date, async () => {
                 try {
+                    const conn = await mariadb.createConnection({
+                        user: process.env.user,
+                        password: process.env.password,
+                        database: process.env.database
+                    });
+
                     const reminder = await conn.query('SELECT reminderID FROM reminders WHERE reminderID=(?)', [reminderID]);
                     if (reminder.length === 0) return;
 
                     await channel.send(`Hello ${user.toString()}! You asked me to remind you about: \`${text}\``);
                     await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
+                    await conn.end();
 
                 } catch (err) {
                     utils.logger.error(err);
@@ -54,14 +69,7 @@ module.exports = async (client, utils, cache) => {
             });
         });
 
-        filters.forEach(async regex => {
-            cache.filter.set(regex.guildID, regex.regex);
-        });
-
-        bumps.forEach(async bump => {
-            cache.bump.set(bump.guildID, true);
-        })
-
+        await conn.end();
         utils.logger.info(`Bot ready in ${client.guilds.cache.array().length} guilds`);
 
     } catch (err) {
