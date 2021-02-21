@@ -23,7 +23,7 @@ module.exports.execute = async (message, utils) => {
         let reminderID = '';
         for (let i = 0; i < 5; i++) reminderID += characters.charAt(Math.floor(Math.random() * characters.length));
 
-        await conn.query('INSERT INTO reminders VALUES (?, ?, ?, ?, ?)', [reminderID, user.id, channel.id, date, text]);
+        await conn.query('INSERT INTO reminders VALUES (?, ?, ?, ?, ?)', [reminderID, channel.id, user.id, date, text]);
         await message.channel.send(`Okay, I'll remind ${channel} about: \`!d bump\` at: \`${displayDate}\``);
 
         schedule.scheduleJob(date, async () => {
