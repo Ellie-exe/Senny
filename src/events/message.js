@@ -47,7 +47,7 @@ module.exports = async (message, commands, utils, cache) => {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: ${process.env.prefix}${command}`);
         }
 
-        commands[command].execute(message, args, utils);
+        commands[command].execute(message, args, utils, cache);
 
     } catch (err) {
         utils.logger.error(err);

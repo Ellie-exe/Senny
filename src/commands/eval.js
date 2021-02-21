@@ -3,8 +3,9 @@ const mariadb = require('mariadb');
  * @param {import('../../types').Message} message
  * @param {import('../../types').Args} args
  * @param {import('../../types').Utils} utils
+ * @param {import('../../types').Cache} cache
  */
-module.exports.execute = async (message, args, utils) => {
+module.exports.execute = async (message, args, utils, cache) => {
     try {
         if (!process.env.admins.includes(message.author.id)) throw new Error('Missing Permissions');
 
