@@ -46,8 +46,6 @@ module.exports = async (client, utils, cache) => {
             cache.hmset(bump.guildID, 'bump', true);
         });
 
-        cache.hgetall('660745210556448781', function(err, object) {utils.logger.debug(object)});
-
         await reminders.forEach(async reminder => {
             const reminderID = reminder.reminderID;
             const channel = await client.channels.fetch(reminder.channelID);
