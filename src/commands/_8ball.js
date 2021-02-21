@@ -1,8 +1,7 @@
 /**
  * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
  */
-module.exports.execute = async (command, utils) => {
+module.exports.execute = async (command) => {
     try {
         const responses = [
             'It is certain.',
@@ -27,10 +26,11 @@ module.exports.execute = async (command, utils) => {
             'Very doubtful.'
         ];
 
+        if (command.data.options[0].value.match(/[a-z]/gi) === null) throw new Error('Please ask an actual question');
+
         command.send(responses[Math.floor(Math.random() * responses.length)]);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

@@ -1,10 +1,7 @@
-const logger = require('@jakeyprime/logger');
-
 /**
  * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
  */
-module.exports.execute = async (command, utils) => {
+module.exports.execute = async (command) => {
     try {
         const value = command.data.options[0].value;
         const unit = command.data.options[1].value;
@@ -37,7 +34,6 @@ module.exports.execute = async (command, utils) => {
         command.send(`\`${value}${units}\` is \`${conversion}\``);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

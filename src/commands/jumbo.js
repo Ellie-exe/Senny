@@ -1,13 +1,14 @@
 const { MessageEmbed } = require('discord.js');
 /**
  * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
  */
-module.exports.execute = async (command, utils) => {
+module.exports.execute = async (command) => {
     try {
         const args = command.data.options[0].value;
         const emojiID = args.match(/\d/g).join('');
         const emoji = command.client.emojis.cache.get(emojiID);
+
+        if (emoji === undefined) throw new Error('I do not have access to that emoji');
 
         const embed = new MessageEmbed()
             .setAuthor(`${emoji.name} - Jumbo`, null, emoji.url)
@@ -17,7 +18,6 @@ module.exports.execute = async (command, utils) => {
         command.embed([embed]);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

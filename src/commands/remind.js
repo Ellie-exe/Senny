@@ -204,7 +204,7 @@ module.exports.execute = async (command, utils) => {
                 const reminder = await conn.query('SELECT * FROM reminders WHERE reminderID=(?)', [reminderID]);
 
                 if (reminder.length === 0) throw new Error('That reminder does not exist');
-                if (reminder[0].userID !== user.id) throw new Error('You cannot delete someone else\`s reminders');
+                if (reminder[0].userID !== user.id) throw new Error('You cannot delete someone else\'s reminders');
 
                 await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
                 command.send(`Okay, I've deleted the reminder: \`${reminderID}\``);
@@ -215,7 +215,6 @@ module.exports.execute = async (command, utils) => {
         }
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

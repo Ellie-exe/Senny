@@ -100,7 +100,6 @@ module.exports.execute = async (command, utils) => {
         }
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

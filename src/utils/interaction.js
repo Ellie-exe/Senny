@@ -35,9 +35,6 @@ module.exports = class Interaction {
 
         } catch (err) {
             this.utils.logger.error(err);
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
-                .catch(err => this.utils.logger.error(err));
         }
     }
 
@@ -57,9 +54,6 @@ module.exports = class Interaction {
 
         } catch (err) {
             this.utils.logger.error(err);
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
-                .catch(err => this.utils.logger.error(err));
         }
     }
 
@@ -76,9 +70,6 @@ module.exports = class Interaction {
 
         } catch (err) {
             this.utils.logger.error(err);
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
-                .catch(err => this.utils.logger.error(err));
         }
     }
 
@@ -91,9 +82,27 @@ module.exports = class Interaction {
 
         } catch (err) {
             this.utils.logger.error(err);
-            const channel = this.client.channels.cache.get(this.channelID);
-            channel.send(`${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``)
-                .catch(err => this.utils.logger.error(err));
+        }
+    }
+
+    async error(err, options = {type: 3, flags: 64}) {
+        try {
+            this.utils.logger.error(err);
+            await this.client.api
+                .interactions(this.id)(this.token)
+                .callback
+                .post({
+                    data: {
+                        type: options.type,
+                        data: {
+                            content: `${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``,
+                            flags: options.flags
+                        }
+                    }
+                });
+
+        } catch (err) {
+            this.utils.logger.error(err);
         }
     }
 }

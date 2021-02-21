@@ -2,9 +2,8 @@ const { MessageEmbed } = require('discord.js');
 const axios = require('axios');
 /**
  * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
  */
-module.exports.execute = async (command, utils) => {
+module.exports.execute = async (command) => {
     try {
         const data = await axios.get('https://api.chewey-bot.top/red-panda?auth=2d3aca1f-e0dc-4d23-acea-049f926ed38d');
         const link = data.data.data;
@@ -17,7 +16,6 @@ module.exports.execute = async (command, utils) => {
         command.embed([embed]);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

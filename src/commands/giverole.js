@@ -18,7 +18,6 @@ module.exports.execute = async (command, utils) => {
         command.send(`Success! \`${role.name}\` has been added to \`${member.displayName}\``);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

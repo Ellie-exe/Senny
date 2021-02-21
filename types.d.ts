@@ -41,6 +41,7 @@ declare class Interaction {
     send(content: any, options?: {type: number, flags: number}): Promise<Message>;
     embed(embed: MessageEmbed): Promise<Message>;
     edit(content: any): Promise<Message>;
+    error(content: Error, options?: {type: number, flags: number}): Promise<Message>;
 }
 
 declare class Constants {

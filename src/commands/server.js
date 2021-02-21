@@ -2,9 +2,8 @@ const { MessageEmbed } = require('discord.js');
 const dateFormat = require('dateformat');
 /**
  * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
  */
-module.exports.execute = async (command, utils) => {
+module.exports.execute = async (command) => {
     try {
         const guild = command.client.guilds.cache.get(command.guildID);
         const options = {format: 'png', dynamic: true, size: 4096};
@@ -189,7 +188,6 @@ module.exports.execute = async (command, utils) => {
         command.embed(embeds);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

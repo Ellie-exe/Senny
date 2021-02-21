@@ -1,9 +1,8 @@
 const { MessageEmbed } = require('discord.js');
 /**
  * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
  */
-module.exports.execute = async (command, utils) => {
+module.exports.execute = async (command) => {
     try {
         const guildID = command.guildID;
         const userID = command.data.options ? command.data.options[0].value : command.userID;
@@ -18,7 +17,6 @@ module.exports.execute = async (command, utils) => {
         command.embed([embed]);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {type: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };

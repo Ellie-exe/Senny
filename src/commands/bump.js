@@ -33,7 +33,6 @@ module.exports.execute = async (message, utils) => {
 
                 await channel.send(`Hello ${user.toString()}! You asked me to remind you about: \`${text}\``);
                 await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
-
                 await conn.end();
 
             } catch (err) {

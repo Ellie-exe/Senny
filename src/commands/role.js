@@ -2,9 +2,8 @@ const { MessageEmbed } = require('discord.js');
 const dateFormat = require('dateformat');
 /**
  * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
  */
-module.exports.execute = async (command, utils) => {
+module.exports.execute = async (command) => {
     try {
         const roleID = command.data.options[0].value;
         const role = command.client.guilds.cache.get(command.guildID).roles.cache.get(roleID);
@@ -73,7 +72,6 @@ module.exports.execute = async (command, utils) => {
         command.embed([embed]);
 
     } catch (err) {
-        command.send(`${utils.constants.emojis.redX} ${err.name}: \`${err.message}\``, {typs: 3, flags: 64});
-        utils.logger.error(err);
+        command.error(err);
     }
 };
