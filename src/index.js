@@ -1,6 +1,9 @@
 const discord = require('discord.js');
 const utils = require('./utils');
 const redis = require('redis');
+const { promisifyAll } = require('bluebird');
+
+promisifyAll(redis);
 
 let commands = require('./commands');
 let events = require('./events');

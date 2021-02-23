@@ -64,7 +64,7 @@ module.exports.execute = async (command, utils, cache) => {
                         const regex = command.data.options[0].options[1].value;
 
                         await conn.query('INSERT INTO filters VALUES (?, ?) ON DUPLICATE KEY UPDATE regex=(?)', [guildID, regex, regex]);
-                        cache.hmset(guildID, 'regex', regex);
+                        await cache.hmsetAsync(guildID, 'regex', regex);
                         
                         command.send(`Success! The filter has been set with the regex: \`${regex}\``, {type: 3, flags: 64});
                         
@@ -77,7 +77,7 @@ module.exports.execute = async (command, utils, cache) => {
                         if (regex.length === 0) throw new Error('You do not have a filter set');
 
                         await conn.query('DELETE FROM filters WHERE guildID=(?)', [guildID]);
-                        cache.hdel(guildID, 'regex');
+                        await cache.hdelAsync(guildID, 'regex');
                         
                         command.send(`Success! The filter has been turned off`, {type: 3, flags: 64});
 
@@ -98,7 +98,7 @@ module.exports.execute = async (command, utils, cache) => {
                         if (bump.length !== 0) throw new Error('Bump reminders are already on');
 
                         await conn.query('INSERT INTO bumps VALUES (?)', [guildID]);
-                        cache.hmset(guildID, 'bump', true);
+                        await cache.hmsetAsync(guildID, 'bump', true);
                         
                         command.send(`Success! You will now be reminded to bump`, {type: 3, flags: 64});
 
@@ -111,7 +111,7 @@ module.exports.execute = async (command, utils, cache) => {
                         if (bump.length === 0) throw new Error('Bump reminders are already off');
 
                         await conn.query('DELETE FROM bumps WHERE guildID=(?)', [guildID]);
-                        cache.hdel(guildID, 'bump');
+                        await cache.hdelAsync(guildID, 'bump');
 
                         command.send(`Success! You will no longer be reminded to bump`, {type: 3, flags: 64});
 

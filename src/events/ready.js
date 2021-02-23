@@ -30,20 +30,15 @@ module.exports = async (client, utils, cache) => {
         });
 
         const reminders = await conn.query('SELECT * FROM reminders');
-        const hypeRoles = await conn.query('SELECT * FROM hypeRoles');
         const filters = await conn.query('SELECT * FROM filters');
         const bumps = await conn.query('SELECT * FROM bumps');
 
-        await hypeRoles.forEach(async hypeRole => {
-            cache.hmset(hypeRole.guildID, 'hypeRole', true);
-        });
-
         await filters.forEach(async filter => {
-            cache.hmset(filter.guildID, 'regex', filter.regex);
+            await cache.hmsetAsync(filter.guildID, 'regex', filter.regex);
         });
 
         await bumps.forEach(async bump => {
-            cache.hmset(bump.guildID, 'bump', true);
+            await cache.hmsetAsync(bump.guildID, 'bump', true);
         });
 
         await reminders.forEach(async reminder => {

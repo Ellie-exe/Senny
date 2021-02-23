@@ -11,12 +11,10 @@ module.exports = async (message, commands, utils, cache) => {
 
         if (message.author.bot) return;
 
-        let regex = undefined;
-        let bump = undefined;
-        cache.hget(message.guild.id, 'regex', function(err, value) {regex = value});
-        cache.hget(message.guild.id, 'bump', function(err, value) {bump = value});
+        const regex = await cache.hgetAsync(message.guild.id, 'regex');
+        const bump = await cache.hgetAsync(message.guild.id, 'bump');
 
-        if (regex !== undefined) {
+        if (regex !== null) {
             const author = await message.guild.members.fetch(message.author.id);
             const guildID = message.guild.id;
 
@@ -32,7 +30,7 @@ module.exports = async (message, commands, utils, cache) => {
             }
         }
 
-        if (message.content.startsWith('!d bump') && bump !== undefined) {
+        if (message.content.startsWith('!d bump') && bump !== null) {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
             commands['bump'].execute(message, utils);
             return;
