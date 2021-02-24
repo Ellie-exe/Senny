@@ -1,5 +1,6 @@
-module.exports.message = require('./message');
+module.exports.funky = require('./funky');
 module.exports.interaction = require('./interaction');
+module.exports.message = require('./message');
 module.exports.ready = require('./ready');
 module.exports.shardError = require('./shardError');
 module.exports.shardReconnecting = require('./shardReconnecting');

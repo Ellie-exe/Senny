@@ -2,6 +2,7 @@ const discord = require('discord.js');
 const utils = require('./utils');
 const redis = require('redis');
 const { promisifyAll } = require('bluebird');
+const schedule = require('node-schedule');
 
 promisifyAll(redis);
 
@@ -10,6 +11,14 @@ let events = require('./events');
 
 const client = new discord.Client();
 const cache = redis.createClient();
+
+schedule.scheduleJob('0 0 0 * * 5', async () => {
+    events.funky(client, utils, 5);
+});
+
+schedule.scheduleJob('0 0 0 * * 6', async () => {
+    events.funky(client, utils, 6);
+});
 
 client.ws.on('INTERACTION_CREATE', async data => {
     client.emit('interaction', new utils.Interaction(data, client, utils));

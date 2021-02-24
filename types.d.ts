@@ -7,6 +7,7 @@ type Message = Message;
 type args = string[];
 type error = Error;
 type Cache = RedisClient;
+type Day = Number;
 
 declare class Utils {
     constants: Constants;
