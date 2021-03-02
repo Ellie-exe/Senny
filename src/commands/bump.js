@@ -11,8 +11,8 @@ module.exports.execute = async (message, utils) => {
         const user = message.author; // The command author
         const channel = message.channel; // The current channel
         const date = Date.now() + 7200000; // The current time plus 2 hours
-        const displayDate = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z'); // Format the date
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // The reminder ID chars
+        const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z'); // Format the date
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // The reminder ID chars
         const text = '!d bump'; // The reminder text to send
         
         let reminderID = ''; // The 5 letter reminder ID
