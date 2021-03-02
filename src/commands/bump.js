@@ -35,7 +35,7 @@ module.exports.execute = async (message, utils) => {
         await conn.query(sql, [reminderID, channel.id, user.id, date, text]);
         
         // Send the confirmation message
-        command.send(`${utils.constants.emojis.greenTick} __**Reminder set!**__ - \`${display}\`\n\`\`\`${text}\`\`\``);
+        message.channel.send(`${utils.constants.emojis.greenTick} __**Reminder set!**__ - \`${display}\`\n\`\`\`${text}\`\`\``);
 
         // Set the reminder
         schedule.scheduleJob(date, async () => {
