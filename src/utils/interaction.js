@@ -1,7 +1,8 @@
 module.exports = class Interaction {
     /**
+     * Represents an interaction object
      * @param {import('../../types').Interaction} interaction
-     * @param {import('../../types').Client} client
+     * @param {import('discord.js').Client} client
      * @param {import('../../types').Utils} utils
      */
     constructor(interaction, client, utils) {
@@ -18,6 +19,13 @@ module.exports = class Interaction {
         this.utils = utils;
     }
 
+    /**
+     * Sends a message in response to an interaction
+     * Flags allows the message to be ephemeral
+     * Type is for the different kinds of interaction responses
+     * @param {any} content
+     * @param {type: number, flags: number} options
+     */
     async send(content, options = {type: 4, flags: 0}) {
         try {
             await this.client.api
@@ -27,7 +35,7 @@ module.exports = class Interaction {
                     data: {
                         type: options.type,
                         data: {
-                            content: content,
+                            content: content, 
                             flags: options.flags
                         }
                     }
@@ -38,6 +46,12 @@ module.exports = class Interaction {
         }
     }
 
+    /**
+     * Sends an embed or set of embeds in response to an interaction
+     * Type is for the different kinds of interaction responses
+     * @param {any} content
+     * @param {type: number, flags: number} options
+     */
     async embed(embeds, options = {type: 4}) {
         try {
             await this.client.api
@@ -57,6 +71,10 @@ module.exports = class Interaction {
         }
     }
 
+    /**
+     * Edits an interaction response with new content
+     * @param {any} content 
+     */
     async edit(content) {
         try {
             await this.client.api
@@ -73,6 +91,9 @@ module.exports = class Interaction {
         }
     }
 
+    /**
+     * Deletes an interaction response
+     */
     async delete() {
         try {
             await this.client.api
@@ -85,6 +106,11 @@ module.exports = class Interaction {
         }
     }
 
+    /**
+     * Logs an error and sends it as an ephemeral message
+     * @param {Error} err 
+     * @param {type: number, flags: number} options 
+     */
     async error(err, options = {type: 3, flags: 64}) {
         try {
             this.utils.logger.error(err);
@@ -105,4 +131,4 @@ module.exports = class Interaction {
             this.utils.logger.error(err);
         }
     }
-}
+};

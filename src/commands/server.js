@@ -1,18 +1,21 @@
 const { MessageEmbed } = require('discord.js');
 const dateFormat = require('dateformat');
 /**
+ * Displays server information
  * @param {import('../../types').Interaction} command
  */
 module.exports.execute = async (command) => {
     try {
-        const guild = command.client.guilds.cache.get(command.guildID);
-        const options = {format: 'png', dynamic: true, size: 4096};
+        const guild = command.client.guilds.cache.get(command.guildID); // The guild the command was run in
+        const options = {format: 'png', dynamic: true, size: 4096}; // Image URL options
 
+        // Map raw names to formatted ones
         const notificationNames = {
             ALL: 'All Messages',
             MENTIONS: 'Only @mentions'
         };
 
+        // Map raw names to formatted ones
         const verificationNames = {
             NONE: 'None',
             LOW: 'Low',
@@ -21,12 +24,14 @@ module.exports.execute = async (command) => {
             VERY_HIGH: 'Highest'
         };
 
+        // Map raw names to formatted ones
         const filterNames = {
             DISABLED: 'Don\'t scan any media content.',
             MEMBERS_WITHOUT_ROLES: 'Scan media content from members without a role.',
             ALL_MEMBERS: 'Scan media content from all members.'
         };
 
+        // Default all counters
         let totalChannels = 0;
         let textChannels = 0;
         let voiceChannels = 0;
@@ -34,28 +39,35 @@ module.exports.execute = async (command) => {
         let announcementChannels = 0;
         let storeChannels = 0;
 
+        // For every channel in the guild
         guild.channels.cache.forEach(channel => {
+            // Check the channel's type
             switch (channel.type) {
+                // If it's a text channel, incriment that counter
                 case 'text':
                     textChannels++;
                     totalChannels++;
                     break;
 
+                // If it's a voice channel, incriment that counter
                 case 'voice':
                     voiceChannels++;
                     totalChannels++;
                     break;
 
+                // If it's a category channel, incriment that counter
                 case 'category':
                     categoryChannels++;
                     totalChannels++;
                     break;
 
+                // If it's a news channel, incriment that counter
                 case 'news':
                     announcementChannels++;
                     totalChannels++;
                     break;
 
+                // If it's a store channel, incriment that counter
                 case 'store':
                     storeChannels++;
                     totalChannels++;
@@ -63,6 +75,7 @@ module.exports.execute = async (command) => {
             }
         });
 
+        // Default all counters
         let onlineMembers = 0;
         let idleMembers = 0;
         let dndMembers = 0;
@@ -70,36 +83,48 @@ module.exports.execute = async (command) => {
         let numMembers = 0;
         let numBots = 0;
 
+        // For every member in the guild
         guild.members.cache.array().forEach(member => {
+            // Check the member's status
             switch (member.user.presence.status) {
+                // If they're online, incriment that counter
                 case 'online':
                     onlineMembers++;
                     break;
 
+                // If they're idle, incriment that counter
                 case 'idle':
                     idleMembers++;
                     break;
 
+                // If they're do not desturb, incriment that counter
                 case 'dnd':
                     dndMembers++;
                     break;
 
+                // If they're offline, incriment that counter
                 case 'offline':
                     offlineMembers++;
                     break;
             }
 
+            // Check if the member is a bot
             switch (member.user.bot) {
+                // If they are not a bot
                 case false:
+                    // Incriment the member counter
                     numMembers++;
                     break;
 
+                // If they are a bot
                 case true:
+                    // Incriment the bot counter
                     numBots++;
                     break;
             }
         });
 
+        // Map raw names to formatted ones
         const featrueNames = {
             ANIMATED_ICON: 'Animated Icon',
             BANNER: 'Banner',
@@ -120,11 +145,15 @@ module.exports.execute = async (command) => {
             MEMBER_VERIFICATION_GATE_ENABLED: 'Member Verification Gate Enabled'
         };
 
-        let features = [];
+        let features = []; // List of the guild's features
+
+        // For every feature the guild has, format it and add it to the list
         guild.features.length === 0 ? features.push('None') : guild.features.forEach(f => features.push(featrueNames[f]));
 
+        // Get the guild's icon, if no icon is set then use the discord icon
         const icon = guild.iconURL(options) || 'https://ellie.is.gay/1eUNml2tV';
 
+        // Create the main embed without images
         const embed1 = new MessageEmbed()
             .setURL('https://ellie.is.gay')
             .setAuthor(`${guild.name} - Information`, null, icon)
@@ -170,24 +199,33 @@ module.exports.execute = async (command) => {
             .setColor(process.env.color)
             .setThumbnail(icon);
 
-        let embeds = [embed1];
+        let embeds = [embed1]; // List of embeds to send
 
+        // If the guild has both a banner and a splash
         if (guild.splashURL() !== null && guild.bannerURL() !== null) {
+            // Add the splash to the first embed
             embed1.setImage(guild.splashURL(options));
 
+            // Create a new embed with the same url
             const embed2 = new MessageEmbed()
                 .setURL('https://ellie.is.gay')
                 .setImage(guild.bannerURL(options));
 
+            // Add new embed to the list
             embeds.push(embed2);
 
+        // If the guild has either a banner or a splash
         } else if (guild.splashURL() !== null || guild.bannerURL() !== null) {
+            // Add the banner or splash to the embed
             embed1.setImage(guild.splashURL(options) || guild.bannerURL(options));
         }
 
+        // Send the embeds, because both embeds have the same url the two images will be in one embed
+        // This is possible because under the hood slash commands are webhooks
         command.embed(embeds);
 
     } catch (err) {
+        // Log any errors
         command.error(err);
     }
 };

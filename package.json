@@ -31,5 +31,8 @@
     "request": "^2.88.2",
     "requests": "^0.3.0",
     "snowflake-util": "^1.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.5.0"
   }
 }

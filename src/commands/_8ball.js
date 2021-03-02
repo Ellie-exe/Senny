@@ -1,8 +1,10 @@
 /**
+ * Sends a random classic 8ball response to a question
  * @param {import('../../types').Interaction} command
  */
 module.exports.execute = async (command) => {
     try {
+        // List of classic 8ball responses
         const responses = [
             'It is certain.',
             'It is decidedly so.',
@@ -26,11 +28,14 @@ module.exports.execute = async (command) => {
             'Very doubtful.'
         ];
 
+        // Check the question for words, can't ask a question without words
         if (command.data.options[0].value.match(/[a-z]/gi) === null) throw new Error('Please ask an actual question');
 
+        // Pick and send a random response
         command.send(responses[Math.floor(Math.random() * responses.length)]);
 
     } catch (err) {
+        // Log any errors
         command.error(err);
     }
 };

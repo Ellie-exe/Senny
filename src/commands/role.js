@@ -1,13 +1,16 @@
 const { MessageEmbed } = require('discord.js');
 const dateFormat = require('dateformat');
 /**
+ * Displays role information
  * @param {import('../../types').Interaction} command
  */
 module.exports.execute = async (command) => {
     try {
+        // Get the role
         const roleID = command.data.options[0].value;
         const role = command.client.guilds.cache.get(command.guildID).roles.cache.get(roleID);
 
+        // Map raw names to formatted ones
         const permNames = {
             ADMINISTRATOR: 'Administrator',
             CREATE_INSTANT_INVITE: 'Create Invite',
@@ -42,17 +45,25 @@ module.exports.execute = async (command) => {
             MANAGE_EMOJIS: 'Manage Emojis',
         };
 
-        let perms = [];
+        let perms = []; // List of the role's perms
+
+        // Check if the role has admin
         switch (role.permissions.has('ADMINISTRATOR')) {
+            // If it does have admin
             case true:
+                // Add admin to the list and nothing else
+                // Everything else is implied with admin
                 perms.push('Administrator');
                 break;
 
+            // If the role doesn't have admin
             case false:
+                // Format each perm and add it to the list
                 role.permissions.toArray().forEach(p => perms.push(permNames[p]));
                 break;
         }
 
+        // Create the embed
         const embed = new MessageEmbed()
             .setAuthor(`${role.name} - Info`)
             .setDescription(
@@ -69,9 +80,11 @@ module.exports.execute = async (command) => {
             )
             .setColor(process.env.color);
 
+        // Send the embed
         command.embed([embed]);
 
     } catch (err) {
+        // Log any errors
         command.error(err);
     }
 };

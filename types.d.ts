@@ -1,13 +1,5 @@
-import { Client, GuildMember, Message, MessageEmbed, Snowflake, User, Collection } from 'discord.js';
+import { Client, GuildMember, Message, MessageEmbed, Snowflake, User } from 'discord.js';
 import { Interaction } from './utils';
-import { RedisClient } from 'redis';
-
-type Client = Client;
-type Message = Message;
-type args = string[];
-type error = Error;
-type Cache = RedisClient;
-type Day = Number;
 
 declare class Utils {
     constants: Constants;
