@@ -25,9 +25,9 @@ schedule.scheduleJob('0 0 0 * * 6', async () => {
     events.funky(client, utils, 6);
 });
 
-// Fires every time someone joins a server
-client.on('guildMemberAdd', member => {
-    events.guildMemberAdd(member, utils);
+// Fires every time a member is updated in the guild
+client.on('guildMemberUpdate', (oldMember, newMember) => {
+    events.guildMemberUpdate(oldMember, newMember, utils);
 });
 
 // Listen for the interaction event from the gateway and emit a new event with an interaction object

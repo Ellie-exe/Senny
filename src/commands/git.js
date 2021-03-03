@@ -104,7 +104,7 @@ module.exports.execute = async (message, args, utils) => {
                 if (args[0] === 'all') args.splice(0, 1, '.');
 
                 // Execute the command
-                exec(`git restore ${args.join(' ')}`, async (err) => {
+                exec(`git restore --staged ${args.join(' ')}`, async (err) => {
                     // If the command errors
                     if (err) {
                         // Create an embed
