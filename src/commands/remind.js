@@ -25,7 +25,7 @@ module.exports.execute = async (command, utils) => {
 
         /**
          * Converts a duration string into milliseconds
-         * @param {string} time 
+         * @param {string} time
          */
         function parse(time) {
             // Split the duration apart into individual times
@@ -119,7 +119,7 @@ module.exports.execute = async (command, utils) => {
                         date = Date.parse(time);
                         break;
                 }
-                
+
                 // Format the date to look better
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
 
@@ -184,7 +184,7 @@ module.exports.execute = async (command, utils) => {
                         date = Date.parse(time);
                         break;
                 }
-                
+
                 // Format the date to look better
                 const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
 
