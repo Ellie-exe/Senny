@@ -1,6 +1,6 @@
 /**
  * Sends a random classic 8ball response to a question
- * @param {import('../../types').Interaction} command
+ * @param {import('../utils').Interaction} command
  */
 module.exports.execute = async (command) => {
     try {

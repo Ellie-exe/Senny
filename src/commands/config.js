@@ -2,8 +2,8 @@ const { MessageEmbed } = require('discord.js');
 const mariadb = require('mariadb');
 /**
  * Config per guild settings
- * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils').Interaction} command
+ * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
  */
 module.exports.execute = async (command, utils, cache) => {

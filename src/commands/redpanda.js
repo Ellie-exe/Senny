@@ -2,7 +2,7 @@ const { MessageEmbed } = require('discord.js');
 const axios = require('axios');
 /**
  * Sends a cute red panda image
- * @param {import('../../types').Interaction} command
+ * @param {import('../utils').Interaction} command
  */
 module.exports.execute = async (command) => {
     try {

@@ -1,7 +1,7 @@
 /**
  * Fires every time the bot recieves an interaction
- * @param {import('../../types').Interaction} interaction
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils').Interaction} interaction
+ * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
  */
 module.exports = async (interaction, commands, utils, cache) => {

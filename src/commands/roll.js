@@ -1,6 +1,6 @@
 /**
  * Rolls a dice in normal or NdN format
- * @param {import('../../types').Interaction} command
+ * @param {import('../utils').Interaction} command
  */
 module.exports.execute = async (command) => {
     try {

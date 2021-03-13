@@ -3,7 +3,7 @@ const mariadb = require('mariadb');
 /**
  * Fires when the bot is ready
  * @param {import('discord.js').Client} client
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
  */
 module.exports = async (client, utils, cache) => {

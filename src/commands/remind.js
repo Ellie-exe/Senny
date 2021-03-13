@@ -4,8 +4,8 @@ const dateFormat = require('dateformat');
 const mariadb = require('mariadb');
 /**
  * Reminds a user in either a channel or DMs
- * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils').Interaction} command
+ * @param {import('../utils')} utils
  */
 module.exports.execute = async (command, utils) => {
     try {

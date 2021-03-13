@@ -3,7 +3,7 @@ const mariadb = require('mariadb');
  * Runs eval code
  * @param {import('discord.js').Message} message
  * @param {string[]} args
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
  */
 module.exports.execute = async (message, args, utils, cache) => {

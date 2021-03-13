@@ -1,6 +1,6 @@
 /**
  * Returns the bot's latency
- * @param {import('../../types').Interaction} command
+ * @param {import('../utils').Interaction} command
  */
 module.exports.execute = async (command) => {
     try {

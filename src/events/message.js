@@ -2,7 +2,7 @@ const parseRegex = require('regex-parser');
 /**
  * Fires every time a message is sent
  * @param {import('discord.js').Message} message
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
  */
 module.exports = async (message, commands, utils, cache) => {

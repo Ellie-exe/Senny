@@ -1,7 +1,7 @@
 /**
  * Kick a member from the guild
- * @param {import('../../types').Interaction} command
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils').Interaction} command
+ * @param {import('../utils')} utils
  */
 module.exports.execute = async (command, utils) => {
     try {

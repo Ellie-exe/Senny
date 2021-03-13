@@ -1,7 +1,7 @@
 /**
  * Opens and closes the Funky Monkey Friday channels in The Mighty Jungle
  * @param {import('discord.js').Client} client
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils')} utils
  * @param {number} day
  */
 module.exports = async (client, utils, day) => {

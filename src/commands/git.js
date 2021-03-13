@@ -4,7 +4,7 @@ const { exec } = require('child_process');
  * Dev version control commands
  * @param {import('discord.js').Message} message
  * @param {string[]} args
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils')} utils
  */
 module.exports.execute = async (message, args, utils) => {
     try {

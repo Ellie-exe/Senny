@@ -2,7 +2,7 @@
  * Fires every time a member is updated in the guild
  * @param {import('discord.js').GuildMember} oldMember
  * @param {import('discord.js').GuildMember} newMember
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils')} utils
  */
 module.exports = async (oldMember, newMember, utils) => {
     try {

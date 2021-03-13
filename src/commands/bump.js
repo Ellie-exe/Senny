@@ -4,7 +4,7 @@ const mariadb = require('mariadb');
 /**
  * Reminds a user to bump after 2 hours
  * @param {import('discord.js').Message} message
- * @param {import('../../types').Utils} utils
+ * @param {import('../utils')} utils
  */
 module.exports.execute = async (message, utils) => {
     try {

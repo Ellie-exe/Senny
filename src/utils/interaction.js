@@ -1,9 +1,9 @@
 module.exports = class Interaction {
     /**
      * Represents an interaction object
-     * @param {import('../../types').Interaction} interaction
+     * @param {import('../utils').Interaction} interaction
      * @param {import('discord.js').Client} client
-     * @param {import('../../types').Utils} utils
+     * @param {import('../utils')} utils
      */
     constructor(interaction, client, utils) {
         this.token = interaction.token;
@@ -24,7 +24,7 @@ module.exports = class Interaction {
      * Flags allows the message to be ephemeral
      * Type is for the different kinds of interaction responses
      * @param {any} content
-     * @param {type: number, flags: number} options
+     * @param {{type: number, flags: number}} options
      */
     async send(content, options = {type: 4, flags: 0}) {
         try {
@@ -50,7 +50,7 @@ module.exports = class Interaction {
      * Sends an embed or set of embeds in response to an interaction
      * Type is for the different kinds of interaction responses
      * @param {any} content
-     * @param {type: number, flags: number} options
+     * @param {{type: number}} options
      */
     async embed(embeds, options = {type: 4}) {
         try {
@@ -109,7 +109,7 @@ module.exports = class Interaction {
     /**
      * Logs an error and sends it as an ephemeral message
      * @param {Error} err 
-     * @param {type: number, flags: number} options 
+     * @param {{type: number, flags: number}} options 
      */
     async error(err, options = {type: 3, flags: 64}) {
         try {
