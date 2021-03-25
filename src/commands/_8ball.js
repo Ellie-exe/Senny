@@ -31,9 +31,12 @@ module.exports = {
 
             // Check the question for words, can't ask a question without words
             if (command.data.options[0].value.match(/[a-z]/gi) === null) throw new Error('Please ask an actual question');
+            
+            const question = command.data.options[0].value;
+            const response = responses[Math.floor(Math.random() * responses.length)]
 
             // Pick and send a random response
-            command.send(responses[Math.floor(Math.random() * responses.length)]);
+            command.send(`**Question:** ${question}\n**Response:** ${response}`);
 
         } catch (err) {
             // Log any errors

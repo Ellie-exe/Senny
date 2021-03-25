@@ -12,8 +12,11 @@ module.exports = {
             let choices = options.split(/ +/);
             if (options.includes(',')) choices = options.split(/\s*,\s*/);
 
+            const choiceList = choices.join(', ');
+            const choice = choices[Math.floor(Math.random() * choices.length)]
+
             // Pick and send a random choice from the list
-            command.send(choices[Math.floor(Math.random() * choices.length)]);
+            command.send(`**Options:** ${choiceList}\n**Choice:** ${choice}`);
 
         } catch (err) {
             // Log any errors
