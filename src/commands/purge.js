@@ -13,7 +13,7 @@ module.exports = {
 
             // Fetch the current guild, channel, and author
             const guild = await command.client.guilds.fetch(guildID);
-            const channel = await guild.channels.fetch(channelID);
+            const channel = guild.channels.cache.get(channelID);
             const author = await guild.members.fetch(authorID);
 
             // Check the author's permissions
