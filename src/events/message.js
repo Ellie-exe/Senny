@@ -5,7 +5,7 @@ const parseRegex = require('regex-parser');
  * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
  */
-module.exports = async (message, commands, utils, cache) => {
+module.exports = async (message, dev, utils, cache) => {
     try {
         // Split the message up by greedy spaces, then separate the command and args into separate lists
         const args = message.content.slice(process.env.prefix.length).trim().split(/ +/);
@@ -51,13 +51,13 @@ module.exports = async (message, commands, utils, cache) => {
         if (message.content.startsWith('!d bump') && bump !== null) {
             // If everything checks out then log and execute the command like normal
             utils.logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
-            commands['bump'].execute(message, utils);
+            dev['bump'].execute(message, utils);
             return;
         }
 
         // Check to make sure the message is a command
         // That's down here because the filter and bump reminder command are not listed as commands
-        if (!message.content.startsWith(process.env.prefix) || commands[command] === undefined) return;
+        if (!message.content.startsWith(process.env.prefix) || dev[command] === undefined) return;
 
         let log = `${process.env.prefix}${command}`; // The command used
 
@@ -67,7 +67,7 @@ module.exports = async (message, commands, utils, cache) => {
 
         // Finally execute the command
         // These should only be dev commands as all user facing commands are slash commands
-        commands[command].execute(message, args, utils, cache);
+        dev[command].execute(message, args, utils, cache);
 
     } catch (err) {
         // Log the error but don't send it in chat, each dev command has it's own chat errors

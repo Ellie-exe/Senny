@@ -1,16 +1,12 @@
 module.exports._8ball = require('./_8ball');
 module.exports.avatar = require('./avatar');
 module.exports.ban = require('./ban');
-module.exports.bump = require('./bump');
 module.exports.choose = require('./choose');
 module.exports.config = require('./config');
 module.exports.convert = require('./convert');
 module.exports.create = require('./create');
 module.exports.delete = require('./delete');
-module.exports.dev = require('./dev');
 module.exports.edit = require('./edit');
-module.exports.eval = require('./eval');
-module.exports.git = require('./git');
 module.exports.giverole = require('./giverole');
 module.exports.jumbo = require('./jumbo');
 module.exports.kick = require('./kick');

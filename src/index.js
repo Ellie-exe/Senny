@@ -10,6 +10,7 @@ promisifyAll(redis);
 // Load all commands and events so that they can be called later
 let commands = require('./commands');
 let events = require('./events');
+let dev = require('./dev');
 
 // Create new discord and redis clients
 const client = new discord.Client();
@@ -42,11 +43,13 @@ client.on('interaction', interaction => {
 
 // Fires every time a message is sent
 client.on('message', messsage => {
-    events.message(messsage, commands, utils, cache);
+    events.message(messsage, dev, utils, cache);
 });
 
 // Fires when the bot is ready
-client.on('ready', () => {
+client.on('ready', async () => {
+    // Sync all slash commands first
+    await utils.sync(commands, client);
     events.ready(client, utils, cache);
 });
 
@@ -66,7 +69,7 @@ process.on('unhandledRejection', err => {
 });
 
 // The reload function has to be here because you cannot reload a command from inside a command
-module.exports.reload = function reload() {
+module.exports.reload = async function reload() {
     // Delete each command from the cache
     for (const command in commands) {
         delete require.cache[require.resolve(`./commands/${command}`)];
@@ -84,6 +87,18 @@ module.exports.reload = function reload() {
     // Delete the entire events cache as well and reload it
     delete require.cache[require.resolve('./events')];
     events = require('./events');
+
+    // Delete cach dev command from the cache
+    for (const command in dev) {
+        delete require.cache[require.resolve(`./dev/${command}`)];
+    }
+
+    // Delete the entire dev command cache as well and reload it
+    delete require.cache[require.resolve('./dev')];
+    events = require('./dev');
+
+    // Sync all slash commands
+    await utils.sync(commands, client);
 };
 
 // Connect this code with discord and the bot account
