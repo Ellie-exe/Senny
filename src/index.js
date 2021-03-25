@@ -1,10 +1,10 @@
 const discord = require('discord.js');
 const utils = require('./utils');
 const redis = require('redis');
-const { promisifyAll } = require('bluebird');
 const schedule = require('node-schedule');
+const { promisifyAll } = require('bluebird');
 
-// Put redis in promie mode, this makes getting hash values easier
+// Put redis in promise mode, this makes getting hash values easier
 promisifyAll(redis);
 
 // Load all commands and events so that they can be called later
@@ -79,6 +79,15 @@ module.exports.reload = async function reload() {
     delete require.cache[require.resolve('./commands')];
     commands = require('./commands');
 
+    // Delete cach dev command from the cache
+    for (const command in dev) {
+        delete require.cache[require.resolve(`./dev/${command}`)];
+    }
+
+    // Delete the entire dev command cache as well and reload it
+    delete require.cache[require.resolve('./dev')];
+    dev = require('./dev');
+
     // Delete cach event from the cache
     for (const event in events) {
         delete require.cache[require.resolve(`./events/${event}`)];
@@ -87,15 +96,6 @@ module.exports.reload = async function reload() {
     // Delete the entire events cache as well and reload it
     delete require.cache[require.resolve('./events')];
     events = require('./events');
-
-    // Delete cach dev command from the cache
-    for (const command in dev) {
-        delete require.cache[require.resolve(`./dev/${command}`)];
-    }
-
-    // Delete the entire dev command cache as well and reload it
-    delete require.cache[require.resolve('./dev')];
-    events = require('./dev');
 
     // Sync all slash commands
     await utils.sync(commands, client);

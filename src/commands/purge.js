@@ -23,7 +23,7 @@ module.exports = {
 
             // Delete the specified number of channels and send an ephemeral confirmation message
             await channel.bulkDelete(amount);
-            command.send(`${amount} messages have been deleted`, {type: 3, flags: 64});
+            command.send(`${amount} messages have been deleted`, 64);
 
         } catch (err) {
             // Log any errors

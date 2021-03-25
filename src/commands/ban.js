@@ -42,7 +42,7 @@ module.exports = {
 
                     // Whether to send the message as ephemeral or not
                     case 'silent':
-                        silent = {type: 3, flags: 64};
+                        silent = 64;
                         break;
                 }
             }

@@ -41,7 +41,7 @@ module.exports = {
                     // Add the role to the database and send an ephemeral confirmation message
                     const sql = 'INSERT INTO adminRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)';
                     await conn.query(sql, [guildID, roleID, roleID]);
-                    command.send(`Success! The admin role is now set to: \`${role.name}\``, {type: 3, flags: 64});
+                    command.send(`Success! The admin role is now set to: \`${role.name}\``, 64);
                     break;
                 }
 
@@ -54,7 +54,7 @@ module.exports = {
                     // Add the role to the database and send an ephemeral confirmation message
                     const sql = 'INSERT INTO modRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)';
                     await conn.query(sql, [guildID, roleID, roleID]);
-                    command.send(`Success! The mod role is now set to: \`${role.name}\``, {type: 3, flags: 64});
+                    command.send(`Success! The mod role is now set to: \`${role.name}\``, 64);
                     break;
                 }
 
@@ -67,7 +67,7 @@ module.exports = {
                     // Add the role to the database and send an ephemeral confirmation message
                     const sql = 'INSERT INTO muteRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)'
                     await conn.query(sql, [guildID, roleID, roleID]);
-                    command.send(`Success! The mute role is now set to: \`${role.name}\``, {type: 3, flags: 64});
+                    command.send(`Success! The mute role is now set to: \`${role.name}\``, 64);
                     break;
                 }
 
@@ -89,7 +89,7 @@ module.exports = {
                             await cache.hmsetAsync(guildID, 'regex', regex);
                             
                             // Send an ephemeral confirmation message
-                            command.send(`Success! The filter has been set with the regex: \`${regex}\``, {type: 3, flags: 64});
+                            command.send(`Success! The filter has been set with the regex: \`${regex}\``, 64);
                             break;
                         }
 
@@ -104,7 +104,7 @@ module.exports = {
                             await cache.hdelAsync(guildID, 'regex');
                             
                             // Send an ephemeral confirmation message
-                            command.send(`Success! The filter has been turned off`, {type: 3, flags: 64});
+                            command.send(`Success! The filter has been turned off`, 64);
                             break;
                         }
                     }
@@ -130,7 +130,7 @@ module.exports = {
                             await cache.hmsetAsync(guildID, 'bump', true);
                             
                             // Send an ephemeral confirmation message
-                            command.send(`Success! You will now be reminded to bump`, {type: 3, flags: 64});
+                            command.send(`Success! You will now be reminded to bump`, 64);
                             break;
                         }
 
@@ -145,7 +145,7 @@ module.exports = {
                             await cache.hdelAsync(guildID, 'bump');
 
                             // Send an ephemeral confirmation message
-                            command.send(`Success! You will no longer be reminded to bump`, {type: 3, flags: 64});
+                            command.send(`Success! You will no longer be reminded to bump`, 64);
                             break;
                         }
                     }

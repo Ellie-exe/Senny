@@ -20,23 +20,46 @@ module.exports = class Interaction {
     }
 
     /**
-     * Sends a message in response to an interaction
-     * Flags allows the message to be ephemeral
-     * Type is for the different kinds of interaction responses
-     * @param {any} content
-     * @param {{type: number, flags: number}} options
+     * ACKs the ping while deferring the response
+     * @param {number} flags 
      */
-    async send(content, options = {type: 4, flags: 0}) {
+    async defer(flags = 0) {
         try {
             await this.client.api
                 .interactions(this.id)(this.token)
                 .callback
                 .post({
                     data: {
-                        type: options.type,
+                        type: 5,
+                        data: {
+                            flags: flags
+                        }
+                    }
+                });
+
+        } catch (err) {
+            this.utils.logger.error(err);
+        }
+    }
+
+    /**
+     * Sends a message in response to an interaction
+     * Flags allows the message to be ephemeral
+     * Type is for the different kinds of interaction responses
+     * @param {any} content
+     * @param {number} flags
+     */
+    async send(content, flags = 0) {
+        try {
+            await this.client.api
+                .interactions(this.id)(this.token)
+                .callback
+                .post({
+                    data: {
+                        type: 4,
                         data: {
                             content: content, 
-                            flags: options.flags
+                            flags: flags
                         }
                     }
                 });
@@ -50,16 +73,15 @@ module.exports = class Interaction {
      * Sends an embed or set of embeds in response to an interaction
      * Type is for the different kinds of interaction responses
      * @param {any} content
-     * @param {{type: number}} options
      */
-    async embed(embeds, options = {type: 4}) {
+    async embed(embeds) {
         try {
             await this.client.api
                 .interactions(this.id)(this.token)
                 .callback
                 .post({
                     data: {
-                        type: options.type,
+                        type: 4,
                         data: {
                             embeds: embeds
                         }
@@ -78,7 +100,7 @@ module.exports = class Interaction {
     async edit(content) {
         try {
             await this.client.api
-                .webhooks((await this.client.fetchApplication()).id)(this.token)
+                .webhooks(this.client.user.id)(this.token)
                 .messages('@original')
                 .patch({
                     data: {
@@ -97,7 +119,7 @@ module.exports = class Interaction {
     async delete() {
         try {
             await this.client.api
-                .webhooks((await this.client.fetchApplication()).id)(this.token)
+                .webhooks(this.client.user.id)(this.token)
                 .messages('@original')
                 .delete();
 
@@ -109,9 +131,9 @@ module.exports = class Interaction {
     /**
      * Logs an error and sends it as an ephemeral message
      * @param {Error} err 
-     * @param {{type: number, flags: number}} options 
+     * @param {number} flags 
      */
-    async error(err, options = {type: 3, flags: 64}) {
+    async error(err, flags = 64) {
         try {
             this.utils.logger.error(err);
             await this.client.api
@@ -119,10 +141,10 @@ module.exports = class Interaction {
                 .callback
                 .post({
                     data: {
-                        type: options.type,
+                        type: 4,
                         data: {
                             content: `${this.utils.constants.emojis.redX} ${err.name}: \`${err.message}\``,
-                            flags: options.flags
+                            flags: flags
                         }
                     }
                 });
