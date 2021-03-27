@@ -15,7 +15,7 @@ module.exports = {
             }
 
             await member.roles.remove(role);
-            await command.send(`**Success!** \`${role}\` has been removed from \`${member.displayName}\``, 64);
+            await command.send(`**Success!** ${role} has been removed from ${member.toString()}`, 64);
 
         } catch (err) {
             await command.error(err);

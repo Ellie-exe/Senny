@@ -15,7 +15,7 @@ module.exports = {
             }
 
             await member.roles.add(role);
-            await command.send(`**Success!** \`${role}\` has been given to \`${member.displayName}\``, 64);
+            await command.send(`**Success!** ${role} has been given to ${member.toString()}`, 64);
 
         } catch (err) {
             await command.error(err);
