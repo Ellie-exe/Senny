@@ -21,6 +21,10 @@ schedule.scheduleJob('0 0 0 * * 6', async () => {
     events.funky(client, utils, 6);
 });
 
+client.on('guildMemberAdd', member => {
+    events.guildMemberAdd(member, utils);
+});
+
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     events.guildMemberUpdate(oldMember, newMember, utils);
 });

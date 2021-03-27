@@ -8,18 +8,8 @@ module.exports = async (oldMember, newMember, utils) => {
     try {
         if (newMember.guild.id !== '573272766149558272') return;
 
-        if (oldMember.pending === true && newMember.pending === false) {
-            switch (newMember.user.bot) {
-                case true: {
-                    await newMember.roles.add('578189625575604224');
-                    break;
-                }
-
-                case false: {
-                    await newMember.roles.add('578211559390576640');
-                    break;
-                }
-            }
+        if (oldMember.pending && !newMember.pending && !newMember.user.bot) {
+            await newMember.roles.add('578211559390576640');
 
             newMember.user.flags?.toArray().forEach(async flag => {
                 switch (flag) {
