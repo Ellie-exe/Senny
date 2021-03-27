@@ -1,39 +1,30 @@
 module.exports = {
     /**
-     * Choose a random option from a list of options
      * @param {import('../utils').Interaction} command
      */
     async execute(command) {
         try {
-            // The list of options to choose from
             const options = command.data.options[0].value;
+            const choices = options.split(options.includes(',') ? /\s*,\s*/ : / +/);
 
-            // Split the options by space, or if the options contain a comma, split by comma
-            let choices = options.split(/ +/);
-            if (options.includes(',')) choices = options.split(/\s*,\s*/);
+            const choice = choices[Math.floor(Math.random() * choices.length)];
 
-            const choiceList = choices.join(', ');
-            const choice = choices[Math.floor(Math.random() * choices.length)]
-
-            // Pick and send a random choice from the list
-            command.send(`**Options:** ${choiceList}\n**Choice:** ${choice}`);
+            await command.send(`**Options:** ${choices.join(', ')}\n**Choice:** ${choice}`);
 
         } catch (err) {
-            // Log any errors
-            command.error(err);
+            await command.error(err);
         }
     },
 
-    // The data to register the command
-    json: {
+    data: {
         name: 'choose',
-        description: 'Get a random choice from a list',
+        description: 'Picks a random choice',
         options: [
             {
                 name: 'choices',
-                description: 'The list of choices to choose from',
-                type: 3,
-                required: true
+                description: 'List of choices',
+                required: true,
+                type: 3
             }
         ]
     }

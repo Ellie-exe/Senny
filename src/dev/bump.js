@@ -10,58 +10,48 @@ module.exports = {
      */
     async execute(message, utils) {
         try {
-            const user = message.author; // The command author
-            const channel = message.channel; // The current channel
-            const date = Date.now() + 7200000; // The current time plus 2 hours
-            const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z'); // Format the date
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // The reminder ID chars
-            const text = '!d bump'; // The reminder text to send
+            const user = message.author;
+            const channel = message.channel;
+            const date = Date.now() + 7200000;
+            const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const text = '!d bump';
             
-            let reminderID = ''; // The 5 letter reminder ID
+            let reminderID = '';
 
-            // Connect to the database
             const conn = await mariadb.createConnection({
                 user: process.env.user,
                 password: process.env.password,
                 database: process.env.database
             });
 
-            // Generate 5 random letters for the reminder ID
             for (let i = 0; i < 5; i++) {
                 const num = Math.floor(Math.random() * chars.length);
                 reminderID += chars.charAt(num);
             }
 
-            // Insert the reminder into the database
             const sql = 'INSERT INTO reminders VALUES (?, ?, ?, ?, ?)';
             await conn.query(sql, [reminderID, channel.id, user.id, date, text]);
                 
-            // Send the confirmation message
             message.channel.send(`${utils.constants.emojis.greenTick} __**Reminder set!**__ - \`${display}\`\n\`\`\`${text}\`\`\``);
 
-            // Set the reminder
             schedule.scheduleJob(date, async () => {
                 try {
-                    // Check the database to make sure the user didn't delete the reminder
                     const sql = 'SELECT reminderID FROM reminders WHERE reminderID=(?)';
                     const reminder = await conn.query(sql, [reminderID]);
-                    if (reminder.length === 0) return; // If they dud delete it then stop here
+                    if (reminder.length === 0) return;
 
-                    // If they didn't delete it then send the reminder
                     await channel.send(`__**Reminder!**__ - ${user.toString()}\n\`\`\`${text}\`\`\``);
 
-                    // Delete the reminder from the database and end this connection
                     await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
                     await conn.end();
 
                 } catch (err) {
-                    // Log any errors
                     utils.logger.error(err);
                 }
             });
 
         } catch (err) {
-            // Log any errors
             utils.logger.error(err);
         }
     }

@@ -1,90 +1,60 @@
 module.exports = {
     /**
-     * Delete a role or channel
      * @param {import('../utils').Interaction} command
      * @param {import('../utils')} utils
      */
     async execute(command, utils) {
         try {
-            const guildID = command.guildID; // The current guild
-            const authorID = command.authorID; // The command author
-            const type = command.data.options[0].name; // Either role or channel
+            const guildID = command.guildID;
+            const options = command.data.options[0];
             
-            // Fetch the current guild and author
-            const guild = await command.client.guilds.fetch(guildID);
-            const author = await guild.members.fetch(authorID);
+            const guild = command.client.guilds.cache.get(guildID);
+            const author = await guild.members.fetch(command.authorID);
 
-            // Check the type of thing to delete
-            switch (type) {
-                // Delete a role
+            switch (options.name) {
                 case 'role': {
-                    // Check the author's permissions
                     if (await utils.check(author, guildID, {permissions: ['MANAGE_ROLES'], roles: ['admin']}) === false) {
                         throw new Error('Missing Permissions');
                     }
 
-                    // Get the role and delete it
-                    const role = guild.roles.cache.get(options[0].value);
+                    const role = guild.roles.cache.get(options.value);
                     await role.delete();
 
-                    // Send a confirmation message
-                    command.send(`Success! \`${role.name}\` has been deleted`);
+                    await command.send(`**Success!** \`${role.name}\` has been deleted`, 64);
                     break;
                 }
 
-                // Delete a channel
                 case 'channel': {
-                    // Check the author's permissions
                     if (await utils.check(author, guildID, {permissions: ['MANAGE_CHANNELS'], roles: ['admin']}) === false) {
                         throw new Error('Missing Permissions');
                     }
 
-                    // Get the channel and delete it
-                    const channel = guild.channels.cache.get(options[0].value);
+                    const channel = guild.channels.cache.get(options.value);
                     await channel.delete();
 
-                    // Send a confirmation message
-                    command.send(`Success! \`${channel.name}\` has been deleted`);
+                    await command.send(`**Success!** \`${channel.name}\` has been deleted`, 64);
                     break;
                 }
             }
 
         } catch (err) {
-            // Log any errors
-            command.error(err);
+            await command.error(err);
         }
     },
 
-    // The data to register the command
-    json: {
+    data: {
         name: 'delete',
         description: 'Delete a role or channel',
         options: [
             {
                 name: 'role',
                 description: 'Delete a role',
-                type: 1,
-                options: [
-                    {
-                        name: 'role',
-                        description: 'The role to delete',
-                        type: 8, 
-                        required: true
-                    }
-                ]
+                type: 8
             },
             {
                 name: 'channel',
                 description: 'Delete a channel',
-                type: 1,
-                options: [
-                    {
-                        name: 'channel',
-                        description: 'The channel to delete',
-                        type: 7,
-                        required: true
-                    }
-                ]
+                type: 7
             }
         ]
     }

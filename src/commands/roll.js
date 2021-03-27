@@ -1,68 +1,56 @@
 module.exports = {
     /**
-     * Rolls a dice in normal or NdN format
      * @param {import('../utils').Interaction} command
      */
     async execute(command) {
         try {
-            const dice = command.data.options[0].value; // User input
+            const dice = command.data.options[0].value;
 
-            // If user uses NdN format
             if (dice.includes('d')) {
-                // Separate modifier and sides
                 const die = dice.split('d');
                 const num = die[0];
                 const sides = die[1];
 
-                // Make sure the dice are valid
                 if (num < 0 || sides < 0) throw new Error('Cannot roll negative dice');
                 if (num === 0 || sides === 0) throw new Error('Cannot roll zero dice');
                 if (num % 1 !== 0 || sides % 1 !== 0) throw new Error('Cannot roll partial dice');
 
-                const rolls = []; // List of all rolls
-                let total = 0; // Sum of all rolls
+                const rolls = [];
+                let total = 0;
 
-                // Roll the die the specified number of times
                 for (let i = 0; i < num; i++) {
                     const roll = Math.floor(Math.random() * sides + 1);
 
-                    rolls.push(roll); // Add the roll to the list of rolls
-                    total += roll; // Add the roll value to the total
+                    rolls.push(roll);
+                    total += roll;
                 }
 
-                // Send the total and the list of rolls
-                command.send(`${total} \`[${rolls.join(', ')}]\``);
+                await command.send(`${total} \`[${rolls.join(', ')}]\``);
 
-            // If the user does not use NdN format
             } else {
-                // Generate a random number between 1 and the number of sides
                 const roll = Math.floor(Math.random() * dice + 1);
 
-                // Make sure the die is valid
                 if (dice < 0) throw new Error('Cannot roll a negative die');
                 if (dice === 0) throw new Error('Cannot roll zero die');
                 if (dice % 1 !== 0) throw new Error('Cannot roll a partial die');
 
-                // Send the roll
-                command.send(roll);
+                await command.send(roll);
             }
 
         } catch (err) {
-            // Log any errors
-            command.error(err);
+            await command.error(err);
         }
     },
 
-    // The data to register the command
-    json: {
+    data: {
         name: 'roll',
         description: 'Roll a dice',
         options: [
             {
                 name: 'sides',
-                description: 'The size of the dice to roll (supports NdN format)',
-                type: 3,
-                required: true
+                description: 'Size of dice (supports NdN format)',
+                required: true,
+                type: 3
             }
         ]
     }

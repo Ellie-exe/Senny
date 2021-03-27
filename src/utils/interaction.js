@@ -15,6 +15,8 @@ module.exports = class Interaction {
         this.channelID = interaction.channel_id;
         this.authorID = interaction.member.user.id;
         this.userID = interaction.member.user.id;
+        this.command = interaction.data.name;
+        this.args = interaction.data.options;
         this.client = client;
         this.utils = utils;
     }

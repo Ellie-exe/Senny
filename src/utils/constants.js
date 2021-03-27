@@ -1,4 +1,4 @@
-// Constants are a class for easy access and manipulation
+
 module.exports = new class Constants {
     constructor() {
         this.colors = {

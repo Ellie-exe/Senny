@@ -1,11 +1,9 @@
 module.exports = {
     /**
-     * Sends a random classic 8ball response to a question
      * @param {import('../utils').Interaction} command
      */
     async execute(command) {
         try {
-            // List of classic 8ball responses
             const responses = [
                 'It is certain.',
                 'It is decidedly so.',
@@ -29,31 +27,25 @@ module.exports = {
                 'Very doubtful.'
             ];
 
-            // Check the question for words, can't ask a question without words
-            if (command.data.options[0].value.match(/[a-z]/gi) === null) throw new Error('Please ask an actual question');
-            
             const question = command.data.options[0].value;
             const response = responses[Math.floor(Math.random() * responses.length)]
 
-            // Pick and send a random response
-            command.send(`**Question:** ${question}\n**Response:** ${response}`);
+            await command.send(`**Question:** ${question}\n**Response:** ${response}`);
 
         } catch (err) {
-            // Log any errors
-            command.error(err);
+            await command.error(err);
         }
     },
 
-    // The data to register the command
-    json: {
+    data: {
         name: '8ball',
         description: 'Ask the Magic 8-ball a question',
         options: [
             {
                 name: 'question',
-                description: 'Type your question',
-                type: 3,
-                required: true
+                description: 'Question to ask',
+                required: true,
+                type: 3
             }
         ]
     }

@@ -1,18 +1,15 @@
-const { MessageEmbed } = require('discord.js');
 const dateFormat = require('dateformat');
 
 module.exports = {
     /**
-     * Displays role information
      * @param {import('../utils').Interaction} command
+     * @param {import('../utils')} utils
      */
-    async execute(command) {
+    async execute(command, utils) {
         try {
-            // Get the role
             const roleID = command.data.options[0].value;
             const role = command.client.guilds.cache.get(command.guildID).roles.cache.get(roleID);
 
-            // Map raw names to formatted ones
             const permNames = {
                 ADMINISTRATOR: 'Administrator',
                 CREATE_INSTANT_INVITE: 'Create Invite',
@@ -47,26 +44,19 @@ module.exports = {
                 MANAGE_EMOJIS: 'Manage Emojis',
             };
 
-            let perms = []; // List of the role's perms
+            let perms = [];
 
-            // Check if the role has admin
             switch (role.permissions.has('ADMINISTRATOR')) {
-                // If it does have admin
                 case true:
-                    // Add admin to the list and nothing else
-                    // Everything else is implied with admin
                     perms.push('Administrator');
                     break;
 
-                // If the role doesn't have admin
                 case false:
-                    // Format each perm and add it to the list
                     role.permissions.toArray().forEach(p => perms.push(permNames[p]));
                     break;
             }
 
-            // Create the embed
-            const embed = new MessageEmbed()
+            const embed = new utils.MessageEmbed()
                 .setAuthor(`${role.name} - Info`)
                 .setDescription(
                     `Name: \`${role.name}\`\n`+
@@ -82,25 +72,22 @@ module.exports = {
                 )
                 .setColor(process.env.color);
 
-            // Send the embed
-            command.embed([embed]);
+            await command.embed([embed]);
 
         } catch (err) {
-            // Log any errors
-            command.error(err);
+            await command.error(err);
         }
     },
 
-    // The data to register the command
-    json: {
+    data: {
         name: 'role',
-        description: 'Get info on a role',
+        description: 'Get a role\'s info',
         options: [
             {
                 name: 'role',
-                description: 'The role to get info on',
-                type: 8,
-                required: true
+                description: 'Role to get',
+                required: true,
+                type: 8
             }
         ]
     }
