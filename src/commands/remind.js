@@ -1,6 +1,5 @@
 const schedule = require('node-schedule');
 const dateFormat = require('dateformat');
-const mariadb = require('mariadb');
 
 module.exports = {
     /**
@@ -9,17 +8,14 @@ module.exports = {
      */
     async execute(command, utils) {
         try {
-            const conn = await mariadb.createConnection({
-                user: process.env.user,
-                password: process.env.password,
-                database: process.env.database
-            });
+            const database = new utils.database();
 
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             const data = command.data.options[0];
 
             const userID = command.authorID;
             const user = await command.client.users.fetch(userID);
+            const guild = command.client.guilds.cache.get(command.guildID);
 
             /**
              * @param {string} time
@@ -99,28 +95,38 @@ module.exports = {
                     }
 
                     const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
+                    const channel = guild.channels.cache.get(channelID);
 
-                    const channel = await command.client.channels.fetch(channelID);
+                    await database
+                        .insert('reminders')
+                        .values(reminderID, channelID, userID, date, text)
+                        .query(async (err) => {
+                            if (err) await database.error(err);
+                            await command.send(`Okay! I'll remind you here about \`${text}\` at \`${display}\``);
+                        });
 
-                    const sql = 'INSERT INTO reminders VALUES (?, ?, ?, ?, ?)';
-                    await conn.query(sql, [reminderID, channelID, userID, date, text]);
-
-                    command.send(`${utils.constants.emojis.greenTick} __**Reminder set!**__ - \`${display}\`\n\`\`\`${text}\`\`\``);
+                    const messageID = await command.messageID();
+                    const message = channel.messages.cache.get(messageID);
+                    utils.logger.debug(message);
 
                     schedule.scheduleJob(date, async () => {
-                        try {
-                            const sql = 'SELECT reminderID FROM reminders WHERE reminderID=(?)';
-                            const reminder = await conn.query(sql, [reminderID]);
-                            if (reminder.length === 0) return;
+                        await database
+                            .select('reminderID')
+                            .from('reminders')
+                            .where('reminderID', reminderID)
+                            .query(async (err, res) => {
+                                if (err) throw err;
+                                if (res.length === 0) return;
 
-                            await channel.send(`__**Reminder!**__ - ${user.toString()}\n\`\`\`${text}\`\`\``);
+                                await database
+                                    .delete('reminders')
+                                    .where('reminderID', reminderID)
+                                    .query(async (err) => {
+                                        if (err) throw err;
+                                        await message.reply(`Hello ${user.toString()}! You asked me to remind you about \`${text}\``);
+                                    });
 
-                            await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
-                            await conn.end();
-
-                        } catch (err) {
-                            utils.logger.error(err);
-                        }
+                            }).catch(async (err) => {utils.logger.error(err)});
                     });
 
                     break;
@@ -154,58 +160,73 @@ module.exports = {
                     const channel = await user.createDM();
                     const channelID = channel.id;
 
-                    const sql = 'INSERT INTO reminders VALUES (?, ?, ?, ?, ?)';
-                    await conn.query(sql, [reminderID, channelID, userID, date, text]);
-
-                    command.send(`${utils.constants.emojis.greenTick} __**Reminder set!**__ - \`${display}\`\n\`\`\`${text}\`\`\``);
+                    await database
+                        .insert('reminders')
+                        .values(reminderID, channelID, userID, date, text)
+                        .query(async (err) => {
+                            if (err) await database.error(err);
+                            await command.send(`Okay! I'll remind you in DMs about \`${text}\` at \`${display}\``);
+                        });
 
                     schedule.scheduleJob(date, async () => {
-                        try {
-                            const sql = 'SELECT reminderID FROM reminders WHERE reminderID=(?)';
-                            const reminder = await conn.query(sql, [reminderID]);
-                            if (reminder.length === 0) return;
+                        await database
+                            .select('reminderID')
+                            .from('reminders')
+                            .where('reminderID', reminderID)
+                            .query(async (err, res) => {
+                                if (err) throw err;
+                                if (res.length === 0) return;
 
-                            await channel.send(`__**Reminder!**__ - ${user.toString()}\n\`\`\`${text}\`\`\``);
+                                await database
+                                    .delete('reminders')
+                                    .where('reminderID', reminderID)
+                                    .query(async (err) => {
+                                        if (err) throw err;
+                                        await channel.send(`Hello ${user.username}! You asked me to remind you about \`${text}\``);
+                                    });
 
-                            await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
-                            await conn.end();
-
-                        } catch (err) {
-                            utils.logger.error(err);
-                        }
+                            }).catch(async (err) => {utils.logger.error(err)});
                     });
 
                     break;
                 }
 
                 case 'list': {
-                    const reminders = await conn.query('SELECT * FROM reminders WHERE userID=(?)', [userID]);
+                    await database
+                        .select('*')
+                        .from('reminders')
+                        .where('userID', userID)
+                        .query(async (err, res) => {
+                            if (err) throw err;
 
-                    const embed = new utils.MessageEmbed()
-                        .setAuthor(`${user.tag} - Reminders`)
-                        .setColor(process.env.color);
+                            const embed = new utils.MessageEmbed()
+                                .setAuthor(`${user.tag} - Reminders`)
+                                .setColor(process.env.color);
 
-                    if (reminders.length === 0) {
-                        embed.setDescription('You have no reminders');
+                            if (res.length === 0) {
+                                embed.setDescription('You have no reminders');
+                            
+                            } else {
+                                res.forEach(async (reminder) => {
+                                    const date = reminder.date;
+                                    const text = reminder.text;
+        
+                                    const channelID = reminder.channelID;
+                                    const channel = await command.client.channels.fetch(channelID);
+        
+                                    embed.addField(
+                                        `Reminder [\`${reminder.reminderID}\`]`,
+                                        `Destination: ${channel}\n`+
+                                        `Time: \`${dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
+                                        `Text: \`${text}\``
+                                    );
+                                });
+                            }
 
-                    } else {
-                        reminders.forEach(async reminder => {
-                            const date = reminder.date;
-                            const text = reminder.text;
+                            await command.embed([embed]);
+                        
+                        }).catch(async (err) => {utils.logger.error(err)});
 
-                            const channelID = reminder.channelID;
-                            const channel = await command.client.channels.fetch(channelID);
-
-                            embed.addField(
-                                `Reminder [\`${reminder.reminderID}\`]`,
-                                `Destination: ${channel}\n`+
-                                `Time: \`${dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
-                                `Text: \`${text}\``
-                            );
-                        });
-                    }
-
-                    command.embed([embed]);
                     break;
                 }
 
@@ -213,34 +234,52 @@ module.exports = {
                     const reminderID = data.options[0].value.toUpperCase();
 
                     if (reminderID === 'ALL') {
-                        const reminders = await conn.query('SELECT * FROM reminders WHERE userID=(?)', [userID]);
-                        if (reminders.length === 0) throw new Error('You have no reminders to delete');
+                        await new utils.database()
+                            .select('*')
+                            .from('reminders')
+                            .where('userID', userID)
+                            .query(async (err, res) => {
+                                if (err) throw err;
+                                if (res.length === 0) throw Error('You have no reminders to delete');
 
-                        reminders.forEach(async reminder => {
-                            await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminder.reminderID]);
-                        });
+                                res.forEach(async (reminder) => {
+                                    await new utils.database()
+                                        .delete('reminders')
+                                        .where('reminderID', reminder.reminderID)
+                                        .query(async (err) => {if (err) throw err});
+                                });
 
-                        command.send(`${utils.constants.emojis.greenTick} __**Reminders deleted!**__ - \`All\``);
+                                await command.send('Okay! I\'ll delete all your reminders');
+                            
+                            }).catch(async (err) => {utils.logger.error(err)});
+                    
+                    } else {
+                        await new utils.database()
+                            .select('*')
+                            .from('reminders')
+                            .where('reminderID', reminderID)
+                            .query(async (err, res) => {
+                                if (err) throw err;
+                                if (res.length === 0) throw new Error('That reminder does not exist');
+                                if (res[0].userID !== userID) throw new Error('You cannot delete someone else\'s reminders');
 
-                        await conn.end();
-                        return;
+                                await new utils.database()
+                                    .delete('reminders')
+                                    .where('reminderID', reminderID)
+                                    .query(async (err) => {
+                                        if (err) throw err;
+                                        await command.send(`Okay! I\'ll delete your reminder \`${reminderID}\``);
+                                    });
+                            
+                            }).catch(async (err) => {utils.logger.error(err)});
                     }
 
-                    const reminder = await conn.query('SELECT * FROM reminders WHERE reminderID=(?)', [reminderID]);
-
-                    if (reminder.length === 0) throw new Error('That reminder does not exist');
-                    if (reminder[0].userID !== user.id) throw new Error('You cannot delete someone else\'s reminders');
-
-                    await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
-                    command.send(`${utils.constants.emojis.greenTick} __**Reminder deleted!**__ - \`${reminderID}\``);
-
-                    await conn.end();
                     break;
                 }
             }
 
         } catch (err) {
-            command.error(err);
+            await command.error(err);
         }
     },
 

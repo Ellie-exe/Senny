@@ -1,10 +1,8 @@
 const schedule = require('node-schedule');
 const dateFormat = require('dateformat');
-const mariadb = require('mariadb');
 
 module.exports = {
     /**
-     * Reminds a user to bump after 2 hours
      * @param {import('discord.js').Message} message
      * @param {import('../utils')} utils
      */
@@ -19,36 +17,38 @@ module.exports = {
             
             let reminderID = '';
 
-            const conn = await mariadb.createConnection({
-                user: process.env.user,
-                password: process.env.password,
-                database: process.env.database
-            });
+            const database = new utils.database();
 
             for (let i = 0; i < 5; i++) {
                 const num = Math.floor(Math.random() * chars.length);
                 reminderID += chars.charAt(num);
             }
 
-            const sql = 'INSERT INTO reminders VALUES (?, ?, ?, ?, ?)';
-            await conn.query(sql, [reminderID, channel.id, user.id, date, text]);
-                
-            message.channel.send(`${utils.constants.emojis.greenTick} __**Reminder set!**__ - \`${display}\`\n\`\`\`${text}\`\`\``);
+            await database
+                .insert('reminders')
+                .values(reminderID, channel.id, user.id, date, text)
+                .query(async (err) => {
+                    if (err) await database.error(err);
+                    await command.send(`Okay! I'll remind you here about \`${text}\` at \`${display}\``);
+                });
 
             schedule.scheduleJob(date, async () => {
-                try {
-                    const sql = 'SELECT reminderID FROM reminders WHERE reminderID=(?)';
-                    const reminder = await conn.query(sql, [reminderID]);
-                    if (reminder.length === 0) return;
+                await database
+                    .select('reminderID')
+                    .from('reminders')
+                    .where('reminderID', reminderID)
+                    .query(async (err, res) => {
+                        if (err) throw err;
+                        if (res.length === 0) return;
 
-                    await channel.send(`__**Reminder!**__ - ${user.toString()}\n\`\`\`${text}\`\`\``);
-
-                    await conn.query('DELETE FROM reminders WHERE reminderID=(?)', [reminderID]);
-                    await conn.end();
-
-                } catch (err) {
-                    utils.logger.error(err);
-                }
+                        await database
+                            .delete('reminders')
+                            .where('reminderID', reminderID)
+                            .query(async (err) => {
+                                if (err) throw err;
+                                await channel.send(`Hello ${user.toString()}! You asked me to remind you about \`${text}\``);
+                            });
+                    });
             });
 
         } catch (err) {

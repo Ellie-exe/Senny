@@ -6,6 +6,7 @@ module.exports = {
      */
     async execute(message, args, utils) {
         try {
+            await message.channel.send('Hello!');
 
         } catch (err) {
             await message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));

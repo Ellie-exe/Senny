@@ -1,9 +1,7 @@
-const { MessageEmbed } = require('discord.js');
 const { exec } = require('child_process');
 
 module.exports = {
     /**
-     * Developer commands
      * @param {import('discord.js').Message} message
      * @param {string[]} args
      * @param {import('../utils')} utils
@@ -35,7 +33,7 @@ module.exports = {
                 case 'update': {
                     exec('npm i', async (err, stdout, stderr) => {
                         if (err) {
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Error')
                                 .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -45,12 +43,12 @@ module.exports = {
                             return;
                         }
 
-                        const embed = new MessageEmbed()
+                        const embed = new utils.MessageEmbed()
                             .setTitle('Packages Updated')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
 
-                        message.channel.send(embed).catch(err => {utils.logger.error(err)});
+                        await message.channel.send(embed).catch(err => {utils.logger.error(err)});
                     });
 
                     break;
@@ -58,7 +56,7 @@ module.exports = {
             }
 
         } catch (err) {
-            message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
+            await message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
             utils.logger.error(err);
         }
     }

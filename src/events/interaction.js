@@ -1,5 +1,4 @@
 /**
- * Fires every time the bot recieves an interaction
  * @param {import('../utils').Interaction} interaction
  * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
@@ -17,10 +16,10 @@ module.exports = async (interaction, commands, utils, cache) => {
 
         if (command.name.match(/^\d/) !== null) {
             commands['_' + command.name].execute(interaction, utils);
-            return;
+        
+        } else {
+            commands[command.name].execute(interaction, utils, cache);
         }
-
-        commands[command.name].execute(interaction, utils, cache);
 
     } catch (err) {
         interaction.error(err);

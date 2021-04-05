@@ -1,5 +1,3 @@
-const mariadb = require('mariadb');
-
 module.exports = {
     /**
      * @param {import('../utils').Interaction} command
@@ -18,21 +16,22 @@ module.exports = {
                 throw new Error('Missing Permissions');
             }
 
-            const conn = await mariadb.createConnection({
-                user: process.env.user,
-                password: process.env.password,
-                database: process.env.database
-            });
+            const database = new utils.database();
 
             switch (option) {
                 case 'admin': {
                     const roleID = command.data.options[0].options[0].value;
                     const role = guild.roles.cache.get(roleID);
 
-                    const sql = 'INSERT INTO adminRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)';
-                    await conn.query(sql, [guildID, roleID, roleID]);
+                    await database
+                        .insert('adminRoles')
+                        .values(guildID, roleID)
+                        .onDupe({roleID: roleID})
+                        .query(async (err) => {
+                            if (err) throw err;
+                            await command.send(`**Success!** The admin role has been set to ${role}`, 64);
+                        });
 
-                    await command.send(`**Success!** The admin role has been set to ${role}`, 64);
                     break;
                 }
 
@@ -40,10 +39,15 @@ module.exports = {
                     const roleID = command.data.options[0].options[0].value;
                     const role = guild.roles.cache.get(roleID);
 
-                    const sql = 'INSERT INTO modRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)';
-                    await conn.query(sql, [guildID, roleID, roleID]);
-                    
-                    await command.send(`**Success!** The mod role has been set to ${role}`, 64);
+                    await database
+                        .insert('modRoles')
+                        .values(guildID, roleID)
+                        .onDupe({roleID: roleID})
+                        .query(async (err) => {
+                            if (err) throw err;
+                            await command.send(`**Success!** The mod role has been set to ${role}`, 64);
+                        });
+
                     break;
                 }
 
@@ -51,10 +55,15 @@ module.exports = {
                     const roleID = command.data.options[0].options[0].value;
                     const role = guild.roles.cache.get(roleID);
 
-                    const sql = 'INSERT INTO muteRoles VALUES (?, ?) ON DUPLICATE KEY UPDATE roleID=(?)'
-                    await conn.query(sql, [guildID, roleID, roleID]);
-                    
-                    await command.send(`**Success!** The mute role has been set to ${role}`, 64);
+                    await database
+                        .insert('muteRoles')
+                        .values(guildID, roleID)
+                        .onDupe({roleID: roleID})
+                        .query(async (err) => {
+                            if (err) throw err;
+                            await command.send(`**Success!** The mute role has been set to ${role}`, 64);
+                        });
+
                     break;
                 }
 
@@ -65,22 +74,38 @@ module.exports = {
                         case 'on': {
                             const regex = command.data.options[0].options[0].options[0].value;
 
-                            const sql = 'INSERT INTO filters VALUES (?, ?) ON DUPLICATE KEY UPDATE regex=(?)';
-                            await conn.query(sql, [guildID, regex, regex]);
                             await cache.hmsetAsync(guildID, 'regex', regex);
+                            await database
+                                .insert('filters')
+                                .values(guildID, regex)
+                                .onDupe({regex: regex})
+                                .query(async (err) => {
+                                    if (err) throw err;
+                                    await command.send(`**Success!** The filter has been set to ${regex}`, 64);
+                                });
 
-                            await command.send(`**Success!** The filter has been set to ${regex}`, 64);
                             break;
                         }
 
                         case 'off': {
-                            const regex = await conn.query('SELECT regex FROM filters WHERE guildID=(?)', [guildID]);
-                            if (regex.length === 0) throw new Error('You do not have a filter set');
+                            await database
+                                .select('regex')
+                                .from('filters')
+                                .where('guildID', guildID)
+                                .query(async (err, res) => {
+                                    if (err) throw err;
+                                    if (res.length === 0) throw Error('You do not have a filter set');
 
-                            await conn.query('DELETE FROM filters WHERE guildID=(?)', [guildID]);
-                            await cache.hdelAsync(guildID, 'regex');
+                                    await cache.hdelAsync(guildID, 'regex');
+                                    await database
+                                        .delete('filters')
+                                        .where('guildID', guildID)
+                                        .query(async (err) => {
+                                            if (err) throw err;
+                                            await command.send(`**Success!** The filter has been turned off`, 64);
+                                        });
+                                });
 
-                            await command.send(`**Success!** The filter has been turned off`, 64);
                             break;
                         }
                     }
@@ -93,24 +118,46 @@ module.exports = {
 
                     switch (toggle) {
                         case 'on': {
-                            const bump = await conn.query('SELECT guildID FROM bumps WHERE guildID=(?)', [guildID]);
-                            if (bump.length !== 0) throw new Error('Bump reminders are already on');
+                            await new utils.database()
+                                .select('guildID')
+                                .from('bumps')
+                                .where('guildID', guildID)
+                                .query(async (err, res) => {
+                                    if (err) throw err;
+                                    if (res.length !== 0) throw new Error('Bump reminders are already on');
 
-                            await conn.query('INSERT INTO bumps VALUES (?)', [guildID]);
-                            await cache.hmsetAsync(guildID, 'bump', true);
+                                    await cache.hmsetAsync(guildID, 'bump', true);
+                                    await new utils.database()
+                                        .insert('bumps')
+                                        .values(guildID)
+                                        .query(async (err) => {
+                                            if (err) throw err;
+                                            await command.send(`**Success!** Bump reminders have been turned on`, 64);
+                                        });
+                                });
 
-                            await command.send(`**Success!** Bump reminders have been turned on`, 64);
                             break;
                         }
 
                         case 'off': {
-                            const bump = await conn.query('SELECT guildID FROM bumps WHERE guildID=(?)', [guildID]);
-                            if (bump.length === 0) throw new Error('Bump reminders are already off');
+                            await database
+                                .select('guildID')
+                                .from('bumps')
+                                .where('guildID', guildID)
+                                .query(async (err, res) => {
+                                    if (err) throw err;
+                                    if (res.length === 0) throw Error('Bump reminders are already off');
 
-                            await conn.query('DELETE FROM bumps WHERE guildID=(?)', [guildID]);
-                            await cache.hdelAsync(guildID, 'bump');
+                                    await cache.hdelAsync(guildID, 'bump');
+                                    await database
+                                        .delete('bumps')
+                                        .where('guildID', guildID)
+                                        .query(async (err) => {
+                                            if (err) throw err;
+                                            await command.send(`**Success!** Bump reminders have been turned off`, 64);
+                                        });
+                                });
 
-                            await command.send(`**Success!** Bump reminders have been turned off`, 64);
                             break;
                         }
                     }
@@ -119,20 +166,65 @@ module.exports = {
                 }
 
                 case 'view': {
-                    const adminRole = await conn.query('SELECT roleID FROM adminRoles WHERE guildID=(?)', [guildID]);
-                    const modRole = await conn.query('SELECT roleID FROM modRoles WHERE guildID=(?)', [guildID]);
-                    const muteRole = await conn.query('SELECT roleID FROM muteRoles WHERE guildID=(?)', [guildID]);
-                    const bump = await conn.query('SELECT guildID FROM bumps WHERE guildID=(?)', [guildID]);
-                    const regex = await conn.query('SELECT regex FROM filters WHERE guildID=(?)', [guildID]);
+                    let adminRole = 'Not Set';
+                    let modRole = 'Not Set';
+                    let muteRole = 'Not Set';
+                    let bump = 'Off';
+                    let regex = 'Off';
+
+                    await database
+                        .select('roleID')
+                        .from('adminRoles')
+                        .where('guildID', guildID)
+                        .query(async (err, res) => {
+                            if (err) throw err;
+                            if (res.length > 0) adminRole = guild.roles.cache.get(res[0].roleID);
+                        });
+
+                    await database
+                        .select('roleID')
+                        .from('modRoles')
+                        .where('guildID', guildID)
+                        .query(async (err, res) => {
+                            if (err) throw err;
+                            if (res.length > 0) modRole = guild.roles.cache.get(res[0].roleID);
+                        });
+
+                    await database
+                        .select('roleID')
+                        .from('muteRoles')
+                        .where('guildID', guildID)
+                        .query(async (err, res) => {
+                            if (err) throw err;
+                            if (res.length > 0) muteRole = guild.roles.cache.get(res[0].roleID);
+                        });
+
+                    await database
+                        .select('guildID')
+                        .from('bumps')
+                        .where('guildID', guildID)
+                        .query(async (err, res) => {
+                            if (err) throw err;
+                            if (res.length > 0) bump = 'On';
+                        });
+
+                    await database
+                        .select('regex')
+                        .from('filters')
+                        .where('guildID', guildID)
+                        .query(async (err, res) => {
+                            if (err) throw err;
+                            if (res.length > 0) regex = `\`\`\`${res[0].regex}\`\`\``;
+                        });
 
                     const embed = new utils.MessageEmbed()
                         .setAuthor(`${guild.name} - Config`)
                         .setDescription(
-                            `Admin Role: ${adminRole.length === 0 ? '`Not Set`' : guild.roles.cache.get(adminRole[0].roleID)}\n`+
-                            `Mod Role: ${modRole.length === 0 ? '`Not Set`' : guild.roles.cache.get(modRole[0].roleID)}\n`+
-                            `Mute Role: ${muteRole.length === 0 ? '`Not Set`' : guild.roles.cache.get(muteRole[0].roleID)}\n`+
-                            `Bump Reminder: ${bump.length === 0 ? '`Off`' : '`On`'}\n`+
-                            `Filter: ${regex.length === 0 ? '`Off`' : `\`\`\`${regex[0].regex}\`\`\``}`
+                            `Admin Role: ${adminRole}\n`+
+                            `Mod Role: ${modRole}\n`+
+                            `Mute Role: ${muteRole}\n`+
+                            `Bump Reminder: ${bump}\n`+
+                            `Filter: ${regex}`
                         )
                         .setColor(process.env.color);
 
@@ -140,8 +232,6 @@ module.exports = {
                     break;
                 }
             }
-
-        await conn.end();
 
         } catch (err) {
             await command.error(err);

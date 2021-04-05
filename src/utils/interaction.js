@@ -1,6 +1,5 @@
 module.exports = class Interaction {
     /**
-     * Represents an interaction object
      * @param {import('../utils').Interaction} interaction
      * @param {import('discord.js').Client} client
      * @param {import('../utils')} utils
@@ -22,7 +21,6 @@ module.exports = class Interaction {
     }
 
     /**
-     * ACKs the ping while deferring the response
      * @param {number} flags 
      */
     async defer(flags = 0) {
@@ -45,9 +43,6 @@ module.exports = class Interaction {
     }
 
     /**
-     * Sends a message in response to an interaction
-     * Flags allows the message to be ephemeral
-     * Type is for the different kinds of interaction responses
      * @param {any} content
      * @param {number} flags
      */
@@ -72,8 +67,6 @@ module.exports = class Interaction {
     }
 
     /**
-     * Sends an embed or set of embeds in response to an interaction
-     * Type is for the different kinds of interaction responses
      * @param {any} content
      */
     async embed(embeds) {
@@ -96,7 +89,6 @@ module.exports = class Interaction {
     }
 
     /**
-     * Edits an interaction response with new content
      * @param {any} content 
      */
     async edit(content) {
@@ -115,9 +107,20 @@ module.exports = class Interaction {
         }
     }
 
-    /**
-     * Deletes an interaction response
-     */
+     async messageID() {
+        try {
+            const message = await this.client.api
+                .webhooks(this.client.user.id)(this.token)
+                .messages('@original')
+                .patch({data: {}});
+
+            return message.id;
+
+        } catch (err) {
+            this.utils.logger.error(err);
+        }
+    }
+
     async delete() {
         try {
             await this.client.api
@@ -131,7 +134,6 @@ module.exports = class Interaction {
     }
 
     /**
-     * Logs an error and sends it as an ephemeral message
      * @param {Error} err 
      * @param {number} flags 
      */

@@ -2,7 +2,6 @@ const mariadb = require('mariadb');
 
 module.exports = {
     /**
-     * Runs eval code
      * @param {import('discord.js').Message} message
      * @param {string[]} args
      * @param {import('../utils')} utils
@@ -27,7 +26,7 @@ module.exports = {
             await message.channel.send(evaled, {code: 'xl', split: true});
 
         } catch (err) {
-            message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
+            await message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
             utils.logger.error(err);
         }
     }

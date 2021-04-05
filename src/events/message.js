@@ -1,6 +1,5 @@
 const parseRegex = require('regex-parser');
 /**
- * Fires every time a message is sent
  * @param {import('discord.js').Message} message
  * @param {import('../utils')} utils
  * @param {import('redis').RedisClient} cache
@@ -34,17 +33,17 @@ module.exports = async (message, dev, utils, cache) => {
         if (message.content.startsWith('!d bump') && bump !== null) {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
             dev['bump'].execute(message, utils);
-            return;
+
+        } else {
+            if (!message.content.startsWith(process.env.prefix) || dev[command] === undefined) return;
+
+            let log = `${process.env.prefix}${command}`;
+
+            if (command === 'dev' || command === 'git') log += ` ${args[0]}`;
+            utils.logger.info(`${message.channel.id} ${message.author.tag}: ${log}`);
+
+            dev[command].execute(message, args, utils, cache);
         }
-
-        if (!message.content.startsWith(process.env.prefix) || dev[command] === undefined) return;
-
-        let log = `${process.env.prefix}${command}`;
-
-        if (command === 'dev' || command === 'git') log += ` ${args[0]}`;
-        utils.logger.info(`${message.channel.id} ${message.author.tag}: ${log}`);
-
-        dev[command].execute(message, args, utils, cache);
 
     } catch (err) {
         utils.logger.error(err);

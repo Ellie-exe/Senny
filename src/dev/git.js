@@ -1,9 +1,7 @@
-const { MessageEmbed } = require('discord.js');
 const { exec } = require('child_process');
 
 module.exports = {
     /**
-     * Dev version control commands
      * @param {import('discord.js').Message} message
      * @param {string[]} args
      * @param {import('../utils')} utils
@@ -17,7 +15,7 @@ module.exports = {
                 case 'status': {
                     exec('git status', async (err, stdout, stderr) => {
                         if (err) {
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Error')
                                 .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -27,7 +25,7 @@ module.exports = {
                             return;
                         }
 
-                        const embed = new MessageEmbed()
+                        const embed = new utils.MessageEmbed()
                             .setTitle('Git Status')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
@@ -43,7 +41,7 @@ module.exports = {
 
                     exec(`git add ${args.join(' ')}`, async (err) => {
                         if (err) {
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Error')
                                 .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -55,7 +53,7 @@ module.exports = {
                         
                         exec('git status', async (err, stdout, stderr) => {
                             if (err) {
-                                const embed = new MessageEmbed()
+                                const embed = new utils.MessageEmbed()
                                     .setTitle('Error')
                                     .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                     .setColor(process.env.color);
@@ -65,7 +63,7 @@ module.exports = {
                                 return;
                             }
 
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Changes Staged')
                                 .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -83,7 +81,7 @@ module.exports = {
 
                     exec(`git restore --staged ${args.join(' ')}`, async (err) => {
                         if (err) {
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Error')
                                 .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -95,7 +93,7 @@ module.exports = {
 
                         exec('git status', async (err, stdout, stderr) => {
                             if (err) {
-                                const embed = new MessageEmbed()
+                                const embed = new utils.MessageEmbed()
                                     .setTitle('Error')
                                     .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                     .setColor(process.env.color);
@@ -105,7 +103,7 @@ module.exports = {
                                 return;
                             }
                             
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Changes Unstaged')
                                 .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -120,7 +118,7 @@ module.exports = {
                 case 'commit': {
                     exec(`git commit -m "${args.join(' ')}"`, async (err, stdout, stderr) => {
                         if (err) {
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Error')
                                 .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -130,7 +128,7 @@ module.exports = {
                             return;
                         }
 
-                        const embed = new MessageEmbed()
+                        const embed = new utils.MessageEmbed()
                             .setTitle('Git Committed')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
@@ -144,7 +142,7 @@ module.exports = {
                 case 'push': {
                     exec('git push origin master', async (err, stdout, stderr) => {
                         if (err) {
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Error')
                                 .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -154,7 +152,7 @@ module.exports = {
                             return;
                         }
 
-                        const embed = new MessageEmbed()
+                        const embed = new utils.MessageEmbed()
                             .setTitle('Git Pushed')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
@@ -168,7 +166,7 @@ module.exports = {
                 case 'pull': {
                     exec('git pull origin master', async (err, stdout, stderr) => {
                         if (err) {
-                            const embed = new MessageEmbed()
+                            const embed = new utils.MessageEmbed()
                                 .setTitle('Error')
                                 .setDescription(`\`\`\`\n${err}\n\`\`\``)
                                 .setColor(process.env.color);
@@ -178,7 +176,7 @@ module.exports = {
                             return;
                         }
                         
-                        const embed = new MessageEmbed()
+                        const embed = new utils.MessageEmbed()
                             .setTitle('Git Pulled')
                             .setDescription(`\`\`\`\n${stdout}\n${stderr}\n\`\`\``)
                             .setColor(process.env.color);
@@ -191,7 +189,7 @@ module.exports = {
             }
 
         } catch (err) {
-            message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
+            await message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));
             utils.logger.error(err);
         }
     }

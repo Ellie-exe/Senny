@@ -1,6 +1,5 @@
-const mariadb = require('mariadb');
+const utils = require('../utils');
 /**
- * Checks if a member has certain permissions or roles
  * @param {import('discord.js').GuildMember} member
  * @param {import('discord.js').Snowflake} guildID
  * @param {{
@@ -9,36 +8,44 @@ const mariadb = require('mariadb');
  * }} options
  */
 module.exports = async (member, guildID, options = {perms: [], roles: []}) => {
-    const conn = await mariadb.createConnection({
-        user: process.env.user,
-        password: process.env.password,
-        database: process.env.database
-    });
+    try {
+        const database = new utils.database();
 
-    let check = false;
+        let check = false;
 
-    if (options.roles.includes('admin')) {
-        const sql = 'SELECT roleID FROM adminRoles WHERE guildID=(?)';
-        const adminRole = await conn.query(sql, [guildID]);
-        if (adminRole.length === 0) return;
-        
-        if (member.roles.cache.has(adminRole[0].roleID)) check = true;
+        if (options.roles.includes('admin')) {
+            await database
+                .select('roleID')
+                .from('adminRoles')
+                .where('guildID', guildID)
+                .query(async (err, res) => {
+                    if (err) throw err;
+                    if (res.length === 0) return;
+                    if (member.roles.cache.has(res[0].roleID)) check = true;
+                });
+        }
+
+        if (options.roles.includes('mod')) {
+            await database
+                .select('roleID')
+                .from('modRoles')
+                .where('guildID', guildID)
+                .query(async (err, res) => {
+                    if (err) throw err;
+                    if (res.length === 0) return;
+                    if (member.roles.cache.has(res[0].roleID)) check = true;
+                });
+        }
+
+        for (const perm in options.perms) {
+            if (member.hasPermission(options.perms[perm]) === true) check = true;
+        }
+
+        if (process.env.admins.includes(member.user.id)) check = true;
+
+        return check;
+
+    } catch (err) {
+        utils.logger.error(err);
     }
-
-    if (options.roles.includes('mod')) {
-        const sql = 'SELECT roleID FROM modRoles WHERE guildID=(?)';
-        const modRole = await conn.query(sql, [guildID]);
-        if (modRole.length === 0) return;
-
-        if (member.roles.cache.has(modRole[0].roleID)) check = true;
-    }
-
-    for (const perm in options.perms) {
-        if (member.hasPermission(options.perms[perm]) === true) check = true;
-    }
-
-    if (process.env.admins.includes(member.user.id)) check = true;
-
-    await conn.end();
-    return check;
 };

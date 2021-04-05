@@ -1,5 +1,4 @@
 /**
- * Fires every time a member is updated in the guild
  * @param {import('discord.js').GuildMember} oldMember
  * @param {import('discord.js').GuildMember} newMember
  * @param {import('../utils')} utils
@@ -25,6 +24,16 @@ module.exports = async (oldMember, newMember, utils) => {
 
                     case 'HOUSE_BRILLIANCE': {
                         await newMember.roles.add('582359819047010324');
+                        break;
+                    }
+
+                    case 'HYPESQUAD_EVENTS': {
+                        await newMember.roles.add('579840192463241241');
+                        break;
+                    }
+
+                    case 'EARLY_VERIFIED_BOT_DEVELOPER': {
+                        await newMember.roles.add('828680835531669544');
                         break;
                     }
                 }
