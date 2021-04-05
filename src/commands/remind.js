@@ -105,10 +105,6 @@ module.exports = {
                             await command.send(`Okay! I'll remind you here about \`${text}\` at \`${display}\``);
                         });
 
-                    const messageID = await command.messageID();
-                    const message = channel.messages.cache.get(messageID);
-                    utils.logger.debug(message);
-
                     schedule.scheduleJob(date, async () => {
                         await database
                             .select('reminderID')
@@ -123,7 +119,7 @@ module.exports = {
                                     .where('reminderID', reminderID)
                                     .query(async (err) => {
                                         if (err) throw err;
-                                        await message.reply(`Hello ${user.toString()}! You asked me to remind you about \`${text}\``);
+                                        await channel.send(`Hello ${user.toString()}! You asked me to remind you about \`${text}\``);
                                     });
 
                             }).catch(async (err) => {utils.logger.error(err)});

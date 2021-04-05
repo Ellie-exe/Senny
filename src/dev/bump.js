@@ -29,7 +29,7 @@ module.exports = {
                 .values(reminderID, channel.id, user.id, date, text)
                 .query(async (err) => {
                     if (err) await database.error(err);
-                    await command.send(`Okay! I'll remind you here about \`${text}\` at \`${display}\``);
+                    await channel.send(`Okay! I'll remind you here about \`${text}\` at \`${display}\``);
                 });
 
             schedule.scheduleJob(date, async () => {
