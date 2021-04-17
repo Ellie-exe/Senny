@@ -1,5 +1,3 @@
-const dateFormat = require('dateformat');
-
 module.exports = {
     /**
      * @param {import('../utils').Interaction} command
@@ -31,7 +29,7 @@ module.exports = {
 
             const join = guild.members.cache.map(m => m.joinedTimestamp).sort((a, b) => a - b).indexOf(member.joinedTimestamp) + 1;
 
-            const boost = member.premiumSince ? `Since ${dateFormat(member.premiumSince, 'mmmm d, yyyy "at" h:MM TT Z')}` : 'No';
+            const boost = member.premiumSince ? `Since ${utils.format(member.premiumSince)}` : 'No';
 
             const icon = member.user.avatarURL() ? `[\`Link\`](${member.user.avatarURL(options)})` : '`None`';
 
@@ -209,8 +207,8 @@ module.exports = {
                     `Nick: \`${member.nickname || 'None'}\`\n`+
                     `Bot: \`${member.user.bot ? 'True' : 'False'}\`\n`+
                     `Status: ${statusIcon[member.user.presence.status]}\`${statusText[member.user.presence.status]}\`\n`+
-                    `Created: \`${dateFormat(member.user.createdAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
-                    `Joined: \`${dateFormat(member.joinedAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
+                    `Created: \`${utils.format(member.user.createdAt)}\`\n`+
+                    `Joined: \`${utils.format(member.joinedAt)}\`\n`+
                     `Activity: ${activities}\n`+
                     `Join Position: \`${join}\`\n`+
                     `Color: \`${member.displayHexColor}\`\n`+

@@ -1,4 +1,5 @@
 const mariadb = require('mariadb');
+const discord = require('discord.js');
 
 module.exports = {
     /**
@@ -17,13 +18,16 @@ module.exports = {
                 database: process.env.database
             });
 
-            let code = args.join(' ');
-            if (args.includes('await')) code = `(async () => {${args.join(' ')}})()`;
+            let code = message.content.match(/(?<=```js\n).*(?=\n```)/s)[0];
+            if (code.includes('await')) code = `(async () => {\n    ${code.replace(/\n/g, '\n    ')}\n\n})();`;
 
-            let evaled = eval(code);
-            if (typeof evaled !== 'string') evaled = require('util').inspect(evaled);
+            let output = await eval(code);
 
-            await message.channel.send(evaled, {code: 'xl', split: true});
+            if (output instanceof Promise) await output;
+            if (typeof output === 'function') result = output.toString();
+            if (typeof output !== 'string') result = require('util').inspect(output, {depth: 0});
+
+            await message.channel.send(result, {code: 'xl', split: true});
 
         } catch (err) {
             await message.channel.send(err, {code: 'xl', split: true}).catch(err => utils.logger.error(err));

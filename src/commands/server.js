@@ -1,5 +1,3 @@
-const dateFormat = require('dateformat');
-
 module.exports = {
     /**
      * @param {import('../utils').Interaction} command
@@ -135,8 +133,8 @@ module.exports = {
                     `Owner: ${guild.owner}\n`+
                     `System Channel: ${guild.systemChannel || '`None`'}\n`+
                     `ID: \`${guild.id}\`\n`+
-                    `Created: \`${dateFormat(guild.createdAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
-                    `Bot Joined: \`${dateFormat(guild.joinedAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
+                    `Created: \`${utils.format(guild.createdAt)}\`\n`+
+                    `Bot Joined: \`${utils.format(guild.joinedAt)}\`\n`+
                     `Region: \`${guild.region}\`\n`+
                     `Partnered: \`${guild.partnered ? 'Yes' : 'No'}\`\n`+
                     `Verified: \`${guild.verified ? 'Yes' : 'No'}\`\n\n`+

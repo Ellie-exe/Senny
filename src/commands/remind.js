@@ -1,5 +1,4 @@
 const schedule = require('node-schedule');
-const dateFormat = require('dateformat');
 
 module.exports = {
     /**
@@ -75,6 +74,7 @@ module.exports = {
                     const time = data.options[1].value;
                     const text = data.options[2].value;
                     const channelID = command.channelID;
+                    const channel = guild.channels.cache.get(channelID);
 
                     let date;
                     let reminderID = '';
@@ -94,15 +94,12 @@ module.exports = {
                             break;
                     }
 
-                    const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
-                    const channel = guild.channels.cache.get(channelID);
-
                     await database
                         .insert('reminders')
                         .values(reminderID, channelID, userID, date, text)
                         .query(async (err) => {
                             if (err) await database.error(err);
-                            await command.send(`Okay! I'll remind you here about \`${text}\` at \`${display}\``);
+                            await command.send(`Okay! I'll remind you here about \`${text}\` at \`${utils.format(date)}\``);
                         });
 
                     schedule.scheduleJob(date, async () => {
@@ -132,6 +129,8 @@ module.exports = {
                     const type = data.options[0].value;
                     const time = data.options[1].value;
                     const text = data.options[2].value;
+                    const channel = await user.createDM();
+                    const channelID = channel.id;
 
                     let date;
                     let reminderID = '';
@@ -151,17 +150,12 @@ module.exports = {
                             break;
                     }
 
-                    const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
-
-                    const channel = await user.createDM();
-                    const channelID = channel.id;
-
                     await database
                         .insert('reminders')
                         .values(reminderID, channelID, userID, date, text)
                         .query(async (err) => {
                             if (err) await database.error(err);
-                            await command.send(`Okay! I'll remind you in DMs about \`${text}\` at \`${display}\``);
+                            await command.send(`Okay! I'll remind you in DMs about \`${text}\` at \`${utils.format(date)}\``);
                         });
 
                     schedule.scheduleJob(date, async () => {
@@ -213,7 +207,7 @@ module.exports = {
                                     embed.addField(
                                         `Reminder [\`${reminder.reminderID}\`]`,
                                         `Destination: ${channel}\n`+
-                                        `Time: \`${dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
+                                        `Time: \`${utils.format(date)}\`\n`+
                                         `Text: \`${text}\``
                                     );
                                 });

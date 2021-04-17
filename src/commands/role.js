@@ -1,5 +1,3 @@
-const dateFormat = require('dateformat');
-
 module.exports = {
     /**
      * @param {import('../utils').Interaction} command
@@ -61,7 +59,7 @@ module.exports = {
                 .setDescription(
                     `Name: \`${role.name}\`\n`+
                     `ID: \`${role.id}\`\n`+
-                    `Created: \`${dateFormat(role.createdAt, 'mmmm d, yyyy "at" h:MM TT Z')}\`\n`+
+                    `Created: \`${utils.format(role.createdAt)}\`\n`+
                     `Hoisted: \`${role.hoist ? 'Yes' : 'No'}\`\n`+
                     `Managed: \`${role.managed ? 'yes' : 'No'}\`\n`+
                     `Mentionable: \`${role.mentionable ? 'Yes' : 'No'}\`\n`+

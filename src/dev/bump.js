@@ -1,5 +1,4 @@
 const schedule = require('node-schedule');
-const dateFormat = require('dateformat');
 
 module.exports = {
     /**
@@ -11,7 +10,6 @@ module.exports = {
             const user = message.author;
             const channel = message.channel;
             const date = Date.now() + 7200000;
-            const display = dateFormat(date, 'mmmm d, yyyy "at" h:MM TT Z');
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             const text = '!d bump';
             
@@ -29,7 +27,7 @@ module.exports = {
                 .values(reminderID, channel.id, user.id, date, text)
                 .query(async (err) => {
                     if (err) await database.error(err);
-                    await channel.send(`Okay! I'll remind you here about \`${text}\` at \`${display}\``);
+                    await channel.send(`Okay! I'll remind you here about \`${text}\` at \`${utils.format(date)}\``);
                 });
 
             schedule.scheduleJob(date, async () => {
