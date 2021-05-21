@@ -20,7 +20,7 @@
     "dateformat": "^4.5.1",
     "discord.js": "github:discordjs/discord.js#c4c817116f868cedb4ec20bcbf90b9b3d382621e",
     "enmap": "^5.8.5",
-    "knex": "^0.95.5",
+    "knex": "^0.95.6",
     "lodash": "^4.17.21",
     "logger": "0.0.1",
     "luxon": "^1.27.0",
