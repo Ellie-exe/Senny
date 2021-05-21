@@ -5,21 +5,33 @@
  */
 module.exports = async (client, utils, day) => {
     try {
-        const guild = await client.guilds.cache.get('376505103923806219');
-        const category = await guild.channels.cache.get('772074946791866390');
-        const channel = await guild.channels.cache.get('738161372029911050');
-        const role = await guild.roles.cache.get('716069629591814275');
+        const guild = client.guilds.cache.get('376505103923806219');
+        const category = guild.channels.cache.get('772074946791866390');
+        const channel = guild.channels.cache.get('738161372029911050');
+        const role = guild.roles.cache.get('716069629591814275');
+
+        const announcements = [
+            `Happy funky monkey Friday ${role}`,
+            `It's time to get funky ${role}`,
+            `${role} you know what time it is :D`,
+            `${role} it's funky time!`,
+            `${role} do you know what day it is? It's funky monkey Friday!`,
+            `Let's get our funk on ${role}`,
+            `${role} TGIF let's get funky!`
+        ];
 
         switch (day) {
             case 5: {
-                category.updateOverwrite(role, {VIEW_CHANNEL: true});
-                channel.updateOverwrite(role, {VIEW_CHANNEL: true});
+                await category.updateOverwrite(role, { VIEW_CHANNEL: true });
+                await channel.updateOverwrite(role, { VIEW_CHANNEL: true });
+
+                await channel.send(announcements[Math.floor(Math.random() * announcements.length)]);
                 break;
             }
 
             case 6: {
-                channel.updateOverwrite(role, {VIEW_CHANNEL: false});
-                category.updateOverwrite(role, {VIEW_CHANNEL: false});
+                await channel.updateOverwrite(role, { VIEW_CHANNEL: false });
+                await category.updateOverwrite(role, { VIEW_CHANNEL: false });
                 break;
             }
         }
