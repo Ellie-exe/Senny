@@ -34,6 +34,10 @@ module.exports = async (message, dev, utils, cache) => {
             utils.logger.info(`${message.channel.id} ${message.author.tag}: !d bump`);
             dev['bump'].execute(message, utils);
 
+        } else if (message.content.startsWith('/spray')) {
+            utils.logger.info(`${message.channel.id} ${message.author.tag}: /spray`);
+            dev['spray'].execute(message, args, utils);
+
         } else {
             if (!message.content.startsWith(process.env.prefix) || dev[command] === undefined) return;
 

@@ -30,6 +30,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 });
 
 client.ws.on('INTERACTION_CREATE', async data => {
+    if (data.type === 3) return;
     client.emit('interaction', new utils.Interaction(data, client, utils));
 });
 
