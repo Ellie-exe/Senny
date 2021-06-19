@@ -99,7 +99,7 @@ module.exports = {
                         .values(reminderID, channelID, userID, date, text)
                         .query(async (err) => {
                             if (err) await database.error(err);
-                            await command.send(`Okay! I'll remind you here about \`${text}\` at \`${utils.format(date)}\``);
+                            await command.send(`Okay! I'll remind you here about \`${text}\` <t:${Math.round(date / 1000)}:R>`);
                         });
 
                     schedule.scheduleJob(date, async () => {
@@ -155,7 +155,7 @@ module.exports = {
                         .values(reminderID, channelID, userID, date, text)
                         .query(async (err) => {
                             if (err) await database.error(err);
-                            await command.send(`Okay! I'll remind you in DMs about \`${text}\` at \`${utils.format(date)}\``);
+                            await command.send(`Okay! I'll remind you in DMs about \`${text}\` <t:${Math.round(date / 1000)}:R>`);
                         });
 
                     schedule.scheduleJob(date, async () => {
@@ -207,7 +207,7 @@ module.exports = {
                                     embed.addField(
                                         `Reminder [\`${reminder.reminderID}\`]`,
                                         `Destination: ${channel}\n`+
-                                        `Time: \`${utils.format(date)}\`\n`+
+                                        `Time: <t:${Math.round(date / 1000)}:R>\n`+
                                         `Text: \`${text}\``
                                     );
                                 });
