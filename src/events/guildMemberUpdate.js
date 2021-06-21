@@ -11,13 +11,18 @@ module.exports = async (oldMember, newMember, utils) => {
             const channel = newMember.guild.channels.cache.get('573272766611193867');
             await newMember.roles.add('578211559390576640');
 
-            await channel.send(
+            const message = await channel.send(
+                `Welcome to **RedNet**! Be sure to read the rules in <#578226946786459649>, `+
+                `grab yourself some roles in <#781959946635444255>, and introduce yourself in <#647970191090909185>! `+
+                `If you have any questions, feel free to ask! We hope you have a great time here!\n`+
+                `https://ellie.hep.gg/welcome.gif`
+            );
+
+            await message.edit(
                 `Welcome to **RedNet**, ${newMember}! Be sure to read the rules in <#578226946786459649>, `+
                 `grab yourself some roles in <#781959946635444255>, and introduce yourself in <#647970191090909185>! `+
                 `If you have any questions, feel free to ask! We hope you have a great time here!\n`+
-                `https://ellie.hep.gg/welcome.gif`,
-                
-                {allowedMentions: {parse: []}}
+                `https://ellie.hep.gg/welcome.gif`
             );
 
             newMember.user.flags?.toArray().forEach(async flag => {
