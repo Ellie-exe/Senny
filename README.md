@@ -23,10 +23,3 @@ Why, with an invite link of course!
 ## Warning!
 
 Senny is highly unfinished, and will likely never reach a "finished" state.
-
-### Things left to do include:
-- [ ] Host Senny's code
-- [ ] Add a proper config
-- [ ] Add more info commands
-- [ ] Add more utility commands
-- [ ] Add more moderation commands
