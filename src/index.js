@@ -84,4 +84,4 @@ module.exports.reload = async function reload() {
     await utils.sync(commands, client);
 };
 
-client.login(process.env.token);
+client.login(process.env.token)
