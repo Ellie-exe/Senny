@@ -1,19 +1,15 @@
 module.exports = {
     name: 'interactionCreate',
+    /** @param {import('discord.js/typings').CommandInteraction} interaction */
     async execute(interaction) {
-        // logger.info(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.`);
-        logger.info(`${interaction.channelId} ${interaction.user.tag}: /${interaction.commandName}`);
-        if (!interaction.isCommand()) return;
-
-        const command = client.commands.get(interaction.commandName);
-
-        if (!command) return;
-
         try {
+            const command = client.commands.get(interaction.commandName);
+
+            logger.info(`${interaction.channelId} ${interaction.user.tag}: /${interaction.commandName}`);
             await command.execute(interaction);
-        } catch (error) {
-            logger.error(error);
-            await interaction.reply({content: 'There was an error while executing this command!', ephemeral: true});
+
+        } catch (err) {
+            logger.error(err);
         }
-    },
+    }
 };
