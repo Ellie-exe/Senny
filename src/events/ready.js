@@ -2,59 +2,33 @@ module.exports = {
     name: 'ready',
     async execute() {
         try {
-            client.application.commands.fetch()
-                .then(async currentCommands => {
-                    client.commands.each(async command => {
-                        const currentCommand = currentCommands.find(c => c.name === command.data.name);
-                        const keys = Object.keys(command.data);
+            const commands = await client.application.commands.fetch();
 
-                        if (!currentCommand) {
-                            await client.application.commands.create(command.data.toJSON());
+            client.commands.each(async cmd => {
+                for (const data of cmd.data) {
+                    const command = commands.find(c => c.name === data.name && c.type === data.type);
 
-                        } else {
-                            /** @returns boolean */
-                            function arrayMatch(options, currentOptions) {
-                                for (const option of options) {
-                                    const currentOption = currentOptions.find(o => o.name === option.name);
-                                    const optionKeys = Object.keys(option);
+                    if (command === undefined) {
+                        await client.application.commands.create(data);
+                        logger.debug(`Created ${data.type} Command: ${data.name}`);
 
-                                    for (const key of optionKeys) {
-                                        const value = option[key];
-                                        const currentValue = currentOption[key];
+                    } else if (!command.equals(data)) {
+                        await command.edit(data);
+                        logger.debug(`Updated ${data.type} Command: ${data.name}`);
+                    }
+                }
+            });
 
-                                        if (Array.isArray(value)) {
-                                            if (!arrayMatch(value, currentValue)) return false;
+            commands.each(async command => {
+                const data = client.commands.find(c => c.data.find(d => d.name === command.name && d.type === command.type));
 
-                                        } else {
-                                            if (key === 'required' && !value && !currentValue) continue;
-                                            if (value !== currentValue) return false;
-                                        }
-                                    }
-                                }
+                if (data === undefined) {
+                    await command.delete();
+                    logger.debug(`Deleted ${command.type} Command: ${command.name}`);
+                }
+            });
 
-                                return true;
-                            }
-
-                            for (const key of keys) {
-                                const value = command.data[key];
-                                const currentValue = currentCommand[key];
-
-                                if (Array.isArray(value)) {
-                                    if (arrayMatch(value, currentValue)) continue;
-
-                                } else if (value === currentValue) continue;
-
-                                return await currentCommand.edit(command.data.toJSON());
-                            }
-                        }
-                    });
-
-                    currentCommands.each(async currentCommand => {
-                        if (!client.commands[currentCommand.name]) {
-                            await currentCommand.delete();
-                        }
-                    });
-                });
+            logger.info(`Ready to serve ${client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0)} users in ${client.guilds.cache.size} servers.`);
 
         } catch (err) {
             logger.error(err);
