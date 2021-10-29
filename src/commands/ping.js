@@ -1,8 +1,4 @@
 module.exports = {
-    data: new SlashCommand()
-        .setName('png')
-        .setDescription('Get the bot\'s ping'),
-
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
@@ -12,5 +8,13 @@ module.exports = {
         } catch (err) {
             logger.error(err);
         }
-    }
+    },
+
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: 'ping',
+            description: 'Get the bot\'s ping'
+        }
+    ]
 };

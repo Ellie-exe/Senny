@@ -2,10 +2,8 @@ module.exports = {
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
-            const user = command.options.getUser('user') || command.user;
-            const avatar = user.displayAvatarURL({format: 'png', dynamic: true, size: 4096});
-
-            await command.reply(avatar);
+            const user = command.options.getMember('user') || command.member;
+            await command.reply(`${user.id}: ${user.user.tag}`);
 
         } catch (err) {
             logger.error(err);
@@ -15,19 +13,19 @@ module.exports = {
     data: [
         {
             type: 'CHAT_INPUT',
-            name: 'avatar',
-            description: 'Get a user\'s avatar',
+            name: 'info',
+            description: 'Get a user\'s info',
             options: [
                 {
                     type: 'USER',
                     name: 'user',
-                    description: 'The user to get an avatar from'
+                    description: 'The user to get info on'
                 }
             ]
         },
         {
             type: 'USER',
-            name: 'avatar'
+            name: 'info'
         }
     ]
 };
