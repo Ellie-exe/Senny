@@ -13,7 +13,7 @@ module.exports = {
     data: [
         {
             type: 'CHAT_INPUT',
-            name: 'info',
+            name: 'user',
             description: 'Get a user\'s info',
             options: [
                 {
@@ -25,7 +25,7 @@ module.exports = {
         },
         {
             type: 'USER',
-            name: 'info'
+            name: 'user'
         }
     ]
 };

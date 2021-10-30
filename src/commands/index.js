@@ -1,5 +1,6 @@
 module.exports = {
+    _8ball: require('./8ball'),
     avatar: require('./avatar'),
-    info: require('./info'),
-    ping: require('./ping')
+    ping: require('./ping'),
+    user: require('./user')
 };
