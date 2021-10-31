@@ -6,39 +6,17 @@ module.exports = {
             const unit = command.options.getString('unit');
             const newUnit = command.options.getString('convert');
 
-            let newValue;
+            const conversions = {
+                'FC': `**${value}°F** is **${Math.round((value - 32) * 5 / 9)}°C**`,
+                'CF': `**${value}°C** is **${Math.round((value * 9 / 5) + 32)}°F**`,
+                'incm': `**${value} in** is **${Math.round(value * 2.54)} cm**`,
+                'inft': `**${value} in** is **${Math.floor(value / 12)} ft${(value % 12) === 0 ? '' : ` ${value % 12} in`}**`,
+                'ftin': `**${value} ft** is **${Math.round(value * 12)} in**`,
+                'cmin': `**${value} cm** is **${Math.round(value / 2.54)} in**`,
+                'cmft': `**${value} cm** is **${Math.floor((value / 2.54) / 12)} ft${((value / 2.54) % 12) === 0 ? '' : ` ${Math.round((value / 2.54) % 12)} in`}**`
+            };
 
-            switch (unit + newUnit) {
-                case '°F°C':
-                    newValue = `${Math.round((value - 32) * 5 / 9)}°C`;
-                    break;
-
-                case '°C°F':
-                    newValue = `${Math.round((value * 9 / 5) + 32)}°F`;
-                    break;
-
-                case ' inft':
-                    newValue = `${Math.floor(value / 12)} ft${(value % 12) === 0 ? '' : ` ${value % 12} in`}`;
-                    break;
-
-                case ' ftin':
-                    newValue = `${Math.round(value * 12)} in`;
-                    break;
-
-                case ' incm':
-                    newValue = `${Math.round(value * 2.54)} cm`;
-                    break;
-
-                case ' cmin':
-                    newValue = `${Math.round(value / 2.54)} in`;
-                    break;
-
-                default:
-                    await command.reply('Invalid unit or conversion');
-                    return Promise.reject(Error('Invalid unit or conversion'));
-            }
-
-            await command.reply(`**Input:** \`${value}${unit}\`\n**Output:** \`${newValue}\``);
+            await command.reply(conversions[unit + newUnit] || 'Invalid conversion');
 
         } catch (err) {
             logger.error(err);
@@ -65,23 +43,23 @@ module.exports = {
                     choices: [
                         {
                             name: 'fahrenheit',
-                            value: '°F'
+                            value: 'F'
                         },
                         {
                             name: 'celsius',
-                            value: '°C'
+                            value: 'C'
                         },
                         {
                             name: 'inches',
-                            value: ' in'
+                            value: 'in'
                         },
                         {
                             name: 'feet',
-                            value: ' ft'
+                            value: 'ft'
                         },
                         {
                             name: 'centimeters',
-                            value: ' cm'
+                            value: 'cm'
                         }
                     ]
                 },
@@ -93,11 +71,11 @@ module.exports = {
                     choices: [
                         {
                             name: 'fahrenheit',
-                            value: '°F'
+                            value: 'F'
                         },
                         {
                             name: 'celsius',
-                            value: '°C'
+                            value: 'C'
                         },
                         {
                             name: 'inches',
