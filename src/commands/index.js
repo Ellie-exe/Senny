@@ -3,6 +3,7 @@ module.exports = {
     avatar: require('./avatar'),
     choose: require('./choose'),
     convert: require('./convert'),
+    jumbo: require('./jumbo'),
     ping: require('./ping'),
     user: require('./user')
 };
