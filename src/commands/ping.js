@@ -3,7 +3,7 @@ module.exports = {
     async execute(command) {
         try {
             const sent = await command.reply({content: 'Pinging...', fetchReply: true});
-            await command.editReply(`Pong! Took ${sent.createdTimestamp - command.createdTimestamp}ms`);
+            await command.editReply(`Pong! Took **${sent.createdTimestamp - command.createdTimestamp} ms**`);
 
         } catch (err) {
             logger.error(err);
