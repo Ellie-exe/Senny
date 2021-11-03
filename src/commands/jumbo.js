@@ -2,7 +2,7 @@ module.exports = {
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
-            const emojiID = command.options.getString('emote').match(/(?<=:)\d+(?=>)/);
+            const emojiID = command.options.getString('emoji').match(/(?<=:)\d+(?=>)/)[0];
             const emoji = command.client.emojis.cache.get(emojiID);
 
             if (emoji === undefined) await command.reply('Invalid emote');
