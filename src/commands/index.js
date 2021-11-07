@@ -5,5 +5,6 @@ module.exports = {
     convert: require('./convert'),
     jumbo: require('./jumbo'),
     ping: require('./ping'),
+    redpanda: require('./redpanda'),
     user: require('./user')
 };
