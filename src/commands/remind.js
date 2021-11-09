@@ -191,9 +191,7 @@ module.exports = {
                             name: 'channel',
                             description: 'The channel to send the reminder to',
                             required: true,
-                            channel_types: [
-                                'GUILD_TEXT'
-                            ]
+                            channel_types: [0]
                         },
                         {
                             type: 'STRING',
