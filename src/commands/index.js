@@ -6,5 +6,6 @@ module.exports = {
     jumbo: require('./jumbo'),
     ping: require('./ping'),
     redpanda: require('./redpanda'),
+    remind: require('./remind'),
     user: require('./user')
 };
