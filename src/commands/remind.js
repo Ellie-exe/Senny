@@ -134,8 +134,11 @@ module.exports = {
 
                 } else {
                     reminders.forEach(reminder => {
-                        const channel = client.channels.cache.get(reminder.channelId);
                         const time = `<t:${Math.round(reminder.time / 1000)}:R>`;
+
+                        let channel;
+                        if (reminder.channelId === reminder.userId) channel = client.users.cache.get(reminder.channelId);
+                        else channel = client.channels.cache.get(reminder.channelId);
 
                         embed.addField(
                             `${reminder.message}`,
