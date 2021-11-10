@@ -185,8 +185,8 @@ module.exports = {
                             type: 'CHANNEL',
                             name: 'channel',
                             description: 'The channel to send the reminder to',
-                            required: true,
-                            channel_types: [0]
+                            channel_types: [0],
+                            required: true
                         },
                         {
                             type: 'STRING',
