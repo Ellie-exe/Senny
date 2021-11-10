@@ -5,7 +5,8 @@ module.exports = {
             const schedule = require('node-schedule');
 
             const Reminders = sequelize.define('reminders', {
-                reminderId: DataTypes.STRING(10),
+                reminderId: {type: DataTypes.STRING(10), primaryKey: true},
+                authorId: DataTypes.STRING(20),
                 channelId: DataTypes.STRING(20),
                 userId: DataTypes.STRING(20),
                 time: DataTypes.BIGINT({length: 20}),
@@ -56,18 +57,9 @@ module.exports = {
             if (subcommand === 'channel' || subcommand === 'user') {
                 const time = command.options.getString('time');
                 const msg = command.options.getString('message');
+                const channel = command.options.getChannel('channel');
+                const user = command.options.getUser('user');
                 const reminderId = newId(5);
-
-                let channel;
-                let location;
-                if (subcommand === 'channel') {
-                    channel = command.options.getChannel('channel');
-                    location = channel.toString();
-
-                } else {
-                    channel = command.options.getUser('user');
-                    location = 'you';
-                }
 
                 let timestamp = Date.parse(time);
                 if (isNaN(timestamp)) {
@@ -81,9 +73,11 @@ module.exports = {
                 const end = `<t:${Math.round(timestamp / 1000)}:R>`;
                 const now = `<t:${Math.round(Date.now() / 1000)}:R>`;
 
-                let destination = channel.toString();
+                const location = channel?.toString() || 'you';
+
+                let destination = channel?.toString() || user?.toString();
                 let invoker = command.user.toString();
-                if (channel.id === command.user.id) {
+                if (user?.id === command.user.id) {
                     invoker = 'You';
                     destination = 'you';
                 }
@@ -92,8 +86,9 @@ module.exports = {
 
                 await Reminders.create({
                     reminderId: reminderId,
-                    channelId: channel.id,
-                    userId: command.user.id,
+                    authorId: command.user.id,
+                    channelId: channel?.id,
+                    userId: user?.id,
                     time: timestamp,
                     message: message
                 });
@@ -104,15 +99,13 @@ module.exports = {
 
                         if (reminder) {
                             const user = client.users.cache.get(reminder.userId);
+                            const channel = client.channels.cache.get(reminder.channelId) || await user?.createDM();
 
-                            let channel;
-                            if (reminder.channelId === user.id) channel = await user.createDM();
-                            else channel = client.channels.cache.get(reminder.channelId);
+                            await reminder.destroy();
 
                             if (!channel) throw new Error(`Reminder ${reminder.reminderId} not sent: channel not found`);
 
                             await channel.send(reminder.message);
-                            await reminder.destroy();
                         }
 
                     } catch (err) {
@@ -120,10 +113,10 @@ module.exports = {
                     }
                 });
 
-                await command.reply(`Okay! I'll remind ${destination} about "${msg}" ${end}`);
+                await command.reply(`Okay ${command.user.toString()}! I'll remind ${destination} about "${msg}" ${end}`);
 
             } else if (subcommand === 'list') {
-                const reminders = await Reminders.findAll({where: {userId: command.user.id}});
+                const reminders = await Reminders.findAll({where: {authorId: command.user.id}});
 
                 const embed = new discord.MessageEmbed()
                     .setAuthor(`Reminders for ${command.user.username}`)
@@ -136,13 +129,15 @@ module.exports = {
                     reminders.forEach(reminder => {
                         const time = `<t:${Math.round(reminder.time / 1000)}:R>`;
 
-                        let channel;
-                        if (reminder.channelId === reminder.userId) channel = client.users.cache.get(reminder.channelId);
-                        else channel = client.channels.cache.get(reminder.channelId);
+                        const channel = client.channels.cache.get(reminder.channelId) || client.users.cache.get(reminder.userId);
+
+                        const start = reminder.message.indexOf('"');
+                        const end = reminder.message.lastIndexOf('"');
+                        const msg = reminder.message.substring(start + 1, end);
 
                         embed.addField(
-                            `${reminder.message}`,
-                            `${channel.toString()} ${time} ${reminder.reminderId}`
+                            `${msg}`,
+                            `\`${reminder.reminderId}\` ${time} ${channel.toString()}`
                         );
                     });
                 }
@@ -153,7 +148,7 @@ module.exports = {
                 const reminderId = command.options.getString('id').toLowerCase();
 
                 if (reminderId === 'all') {
-                    const rows = await Reminders.destroy({where: {userId: command.user.id}});
+                    const rows = await Reminders.destroy({where: {authorId: command.user.id}});
 
                     if (!rows) return await command.reply('You have no reminders to delete');
 
@@ -163,7 +158,7 @@ module.exports = {
                     const reminder = await Reminders.findOne({where: {reminderId: reminderId}});
 
                     if (!reminder) return await command.reply('Reminder not found');
-                    if (reminder.userId !== command.user.id) return await command.reply('You cannot delete this reminder');
+                    if (reminder.authorId !== command.user.id) return await command.reply('You cannot delete this reminder');
 
                     await reminder.destroy();
                     await command.reply('Reminder deleted');
