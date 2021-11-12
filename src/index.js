@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const logger = require('@jakeyprime/logger');
 const discord = require('discord.js');
 
-const client = new discord.Client({intents: [discord.Intents.FLAGS.GUILDS]});
+const client = new discord.Client({intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_PRESENCES']});
 
 const sequelize = new Sequelize('senny', process.env.USERNAME, process.env.PASSWORD, {
     host: 'localhost',
