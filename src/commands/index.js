@@ -7,5 +7,8 @@ module.exports = {
     ping: require('./ping'),
     redpanda: require('./redpanda'),
     remind: require('./remind'),
+    role: require('./role'),
+    roll: require('./roll'),
+    server: require('./server'),
     user: require('./user')
 };
