@@ -82,7 +82,7 @@ module.exports = {
                     destination = 'you';
                 }
 
-                const message = `Hello! ${invoker} asked me to remind ${location} about "${msg}" ${now}`;
+                const message = `Hello! ${invoker} asked me to remind ${location} about **"${msg}"** ${now}`;
 
                 await Reminders.create({
                     reminderId: reminderId,
@@ -113,7 +113,7 @@ module.exports = {
                     }
                 });
 
-                await command.reply(`Okay ${command.user.toString()}! I'll remind ${destination} about "${msg}" ${end}`);
+                await command.reply(`Okay ${command.user.toString()}! I'll remind ${destination} about **"${msg}"** ${end}`);
 
             } else if (subcommand === 'list') {
                 const reminders = await Reminders.findAll({where: {authorId: command.user.id}});

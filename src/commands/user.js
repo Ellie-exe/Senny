@@ -6,9 +6,9 @@ module.exports = {
             const member = command.guild.members.cache.get(user.id);
 
             const embed = new discord.MessageEmbed()
-                .setColor(0x2F3136)
                 .setThumbnail(user.displayAvatarURL({dynamic: true}))
                 .setAuthor(`${user.tag}`, user.displayAvatarURL({dynamic: true}))
+                .setColor(0x2F3136)
                 .addField(
                     'About',
                     `Mention: ${user.toString()}\n` +
@@ -73,7 +73,7 @@ module.exports = {
                     )
                     .addField(
                         `Permissions`,
-                        `${perms.join(', ')}`
+                        `${perms.length ? perms.join(', ') : 'None'}`
                     );
             }
 

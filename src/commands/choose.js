@@ -6,7 +6,7 @@ module.exports = {
             const choices = list.split(list.includes(',') ? /\s*,\s*/ : / +/);
             const choice = choices[Math.floor(Math.random() * choices.length)];
 
-            await command.reply(`Given: **${choices.join(', ')}**\nMy Choice: **${choice}**`);
+            await command.reply(`Between **"${choices.join(', ')}"** I choose **${choice}**`);
 
         } catch (err) {
             logger.error(err);

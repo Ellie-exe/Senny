@@ -28,7 +28,7 @@ module.exports = {
             const question = command.options.getString('question');
             const response = responses[Math.floor(Math.random() * responses.length)]
 
-            await command.reply(`You asked: **${question}**\nMy response: **${response}**`);
+            await command.reply(`You asked **"${question}"** and the Magic 8-ball says: **${response}**`);
 
         } catch (err) {
             logger.error(err);
