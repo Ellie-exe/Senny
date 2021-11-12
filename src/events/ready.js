@@ -28,7 +28,7 @@ module.exports = {
                 }
             });
 
-            logger.info(`Ready to serve ${client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0)} users in ${client.guilds.cache.size} servers.`);
+            logger.info(`Ready to serve ${client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0)} users in ${client.guilds.cache.size} servers`);
 
         } catch (err) {
             logger.error(err);
