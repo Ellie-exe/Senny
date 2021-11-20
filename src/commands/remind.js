@@ -103,7 +103,8 @@ module.exports = {
 
                             await reminder.destroy();
 
-                            if (!channel) throw new Error(`Reminder ${reminder.reminderId} not sent: channel not found`);
+                            const data = JSON.stringify(reminder.toJSON(), null, 4);
+                            if (!channel) throw new Error(`Reminder not sent: ${data}`);
 
                             await channel.send(reminder.message);
                         }

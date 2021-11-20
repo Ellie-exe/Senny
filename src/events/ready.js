@@ -1,8 +1,39 @@
+const schedule = require('node-schedule');
 module.exports = {
     name: 'ready',
     async execute() {
         try {
             const commands = await client.application.commands.fetch();
+
+            const Reminders = sequelize.define('reminders', {
+                reminderId: {type: DataTypes.STRING(10), primaryKey: true},
+                authorId: DataTypes.STRING(20),
+                channelId: DataTypes.STRING(20),
+                userId: DataTypes.STRING(20),
+                time: DataTypes.BIGINT({length: 20}),
+                message: DataTypes.TEXT
+            });
+
+            const reminders = await Reminders.findAll();
+
+            reminders.forEach(reminder => {
+                schedule.scheduleJob(reminder.time, async () => {
+                    try {
+                        const user = client.users.cache.get(reminder.userId);
+                        const channel = client.channels.cache.get(reminder.channelId) || await user?.createDM();
+
+                        await reminder.destroy();
+
+                        const data = JSON.stringify(reminder.toJSON(), null, 4);
+                        if (!channel) throw new Error(`Reminder not sent: ${data}`);
+
+                        await channel.send(reminder.message);
+
+                    } catch (err) {
+                        logger.error(err);
+                    }
+                });
+            });
 
             client.commands.each(async cmd => {
                 for (const data of cmd.data) {
