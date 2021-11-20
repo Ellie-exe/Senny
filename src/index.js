@@ -3,7 +3,6 @@ const logger = require('@jakeyprime/logger');
 const discord = require('discord.js');
 
 const client = new discord.Client({intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_PRESENCES']});
-
 const sequelize = new Sequelize('senny', process.env.USERNAME, process.env.PASSWORD, {
     host: 'localhost',
     dialect: 'mariadb'
