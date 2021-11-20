@@ -2,11 +2,11 @@ module.exports = {
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
+            await command.deferReply({fetchReply: true});
+
             const options = {format: 'png', dynamic: true, size: 4096};
             const guild = command.guild;
             const owner = await guild.fetchOwner();
-            const members = await guild.members.fetch();
-            const channels = await guild.channels.fetch();
 
             const notificationNames = {
                 ALL_MESSAGES: 'All Messages',
@@ -34,7 +34,7 @@ module.exports = {
                 ALL_MEMBERS: 'Scan content from all members'
             };
 
-            const featrueNames = {
+            const featureNames = {
                 ANIMATED_ICON: 'Animated Icon',
                 BANNER: 'Banner',
                 COMMERCE: 'Commerce',
@@ -61,7 +61,7 @@ module.exports = {
             };
 
             let features = [];
-            guild.features.forEach(f => {if (featrueNames[f]) features.push(featrueNames[f])});
+            guild.features.forEach(f => {if (featureNames[f]) features.push(featureNames[f])});
 
             let totalChannels = 0;
             let textChannels = 0;
@@ -197,7 +197,7 @@ module.exports = {
                     `${features.length ? features.join(', ') : 'None'}`
                 );
 
-            await command.reply({embeds: [embed]});
+            await command.editReply({embeds: [embed]});
 
         } catch (err) {
             logger.error(err);
