@@ -65,7 +65,7 @@ module.exports = {
 
                 const sortedRoles = member.roles.cache.sort((a, b) => b.position - a.position);
 
-                embed.setColor(member.displayHexColor)
+                embed.setColor(member.displayHexColor) // TODO: See if accent color works now
                     .setThumbnail(member.displayAvatarURL({dynamic: true}))
                     .addField(
                         `Roles [${member.roles.cache.size}]`,
@@ -101,5 +101,9 @@ module.exports = {
             type: 'USER',
             name: 'user'
         }
-    ]
+    ],
+
+    flags: {
+        developer: false
+    }
 };

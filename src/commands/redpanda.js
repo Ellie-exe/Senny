@@ -18,5 +18,9 @@ module.exports = {
             name: 'redpanda',
             description: 'Get a random red panda image'
         }
-    ]
+    ],
+
+    flags: {
+        developer: false
+    }
 };

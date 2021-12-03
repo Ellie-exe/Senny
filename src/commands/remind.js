@@ -4,6 +4,9 @@ module.exports = {
         try {
             const schedule = require('node-schedule');
 
+            // TODO: Add a way to make reminders repeat
+            // TODO: Sanitize the message
+
             const Reminders = sequelize.define('reminders', {
                 reminderId: {type: DataTypes.STRING(10), primaryKey: true},
                 authorId: DataTypes.STRING(20),
@@ -248,5 +251,9 @@ module.exports = {
                 }
             ]
         }
-    ]
+    ],
+
+    flags: {
+        developer: false
+    }
 };

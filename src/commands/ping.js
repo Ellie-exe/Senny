@@ -16,5 +16,9 @@ module.exports = {
             name: 'ping',
             description: 'Get the bot\'s ping'
         }
-    ]
+    ],
+
+    flags: {
+        developer: false
+    }
 };

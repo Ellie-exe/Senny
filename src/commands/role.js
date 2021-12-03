@@ -91,5 +91,9 @@ module.exports = {
                 }
             ]
         }
-    ]
+    ],
+
+    flags: {
+        developer: false
+    }
 };

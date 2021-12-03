@@ -5,6 +5,8 @@ module.exports = {
             const user = command.options.getUser('user') || command.user;
             const avatar = user.displayAvatarURL({format: 'png', dynamic: true, size: 4096});
 
+            // TODO: Add support for banners
+
             await command.reply(avatar);
 
         } catch (err) {
@@ -29,5 +31,9 @@ module.exports = {
             type: 'USER',
             name: 'avatar'
         }
-    ]
+    ],
+
+    flags: {
+        developer: false
+    }
 };

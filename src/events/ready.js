@@ -1,9 +1,9 @@
-const schedule = require('node-schedule');
+
 module.exports = {
     name: 'ready',
     async execute() {
         try {
-            const commands = await client.application.commands.fetch();
+            const schedule = require('node-schedule');
 
             const Reminders = sequelize.define('reminders', {
                 reminderId: {type: DataTypes.STRING(10), primaryKey: true},
@@ -35,7 +35,11 @@ module.exports = {
                 });
             });
 
+            const commands = await client.application.commands.fetch();
+
             client.commands.each(async cmd => {
+                if (cmd.flags.developer) return;
+
                 for (const data of cmd.data) {
                     const command = commands.find(c => c.name === data.name && c.type === data.type);
 

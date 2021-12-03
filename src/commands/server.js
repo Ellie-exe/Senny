@@ -2,7 +2,7 @@ module.exports = {
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
-            await command.deferReply({fetchReply: true});
+            await command.deferReply();
 
             const options = {format: 'png', dynamic: true, size: 4096};
             const guild = command.guild;
@@ -210,5 +210,9 @@ module.exports = {
             name: 'server',
             description: 'Get info on the server'
         }
-    ]
+    ],
+
+    flags: {
+        developer: false
+    }
 };
