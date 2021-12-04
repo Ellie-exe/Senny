@@ -11,7 +11,7 @@ module.exports = {
                 {type: 'WATCHING', name: `${client.guilds.cache.size} Guilds`}
             ];
 
-            let counter = -1;
+            let counter = 0;
             client.user.setActivity(activity[0].name, {type: activity[0].type});
 
             setInterval(async () => {
