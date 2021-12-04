@@ -16,6 +16,8 @@ module.exports = {
                 message: DataTypes.TEXT
             });
 
+            await Reminders.sync();
+
             /** @param {int} length */
             const newId = (length) => {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
