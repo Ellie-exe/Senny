@@ -4,6 +4,22 @@ module.exports = {
         try {
             const schedule = require('node-schedule');
 
+            const activity = [
+                {type: 'LISTENING', name: '/'},
+                {type: 'WATCHING', name: 'over Bongo'},
+                {type: 'PLAYING', name: 'with the API'},
+                {type: 'WATCHING', name: `${client.guilds.cache.size} Guilds`}
+            ];
+
+            let counter = 0;
+            client.user.setActivity(activity[0].name, {type: activity[0].type});
+
+            setInterval(async () => {
+                (counter === 3) ? counter = 0 : counter++;
+                client.user.setActivity(activity[counter].name, {type: activity[counter].type});
+
+            }, 30000);
+
             const Reminders = sequelize.define('reminders', {
                 reminderId: {type: DataTypes.STRING(10), primaryKey: true},
                 authorId: DataTypes.STRING(20),
