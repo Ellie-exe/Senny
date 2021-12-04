@@ -9,7 +9,7 @@ module.exports = {
             exec('npm i', async (err, stdout, stderr) => {
                 if (err) return await command.reply(`\`\`\`ps\n${err}\n\`\`\``);
 
-                await command.reply(`\`\`\`ps\n${stdout}\n${stderr}\n\`\`\``);
+                await command.editReply(`\`\`\`ps\n${stdout}\n${stderr}\n\`\`\``);
             });
 
         } catch (err) {
