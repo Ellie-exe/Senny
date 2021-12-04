@@ -1,12 +1,8 @@
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     * @param {import('../utils')} utils
-     */
-    async execute(command, utils) {
+    /** @param {import('discord.js/typings').CommandInteraction} command */
+    async execute(command) {
         try {
-            const roleID = command.data.options[0].value;
-            const role = command.client.guilds.cache.get(command.guildID).roles.cache.get(roleID);
+            const role = command.options.getRole('role');
 
             const permNames = {
                 ADMINISTRATOR: 'Administrator',
@@ -39,54 +35,65 @@ module.exports = {
                 MANAGE_NICKNAMES: 'Manage Nicknames',
                 MANAGE_ROLES: 'Manage Roles',
                 MANAGE_WEBHOOKS: 'Manage Webhooks',
-                MANAGE_EMOJIS: 'Manage Emojis',
+                MANAGE_EMOJIS_AND_STICKERS: 'Manage Emojis and Stickers',
+                USE_APPLICATION_COMMANDS: 'Use Application Commands',
+                REQUEST_TO_SPEAK: 'Request to Speak',
+                MANAGE_THREADS: 'Manage Threads',
+                CREATE_PUBLIC_THREADS: 'Create Public Threads',
+                CREATE_PRIVATE_THREADS: 'Create Private Threads',
+                USE_EXTERNAL_STICKERS: 'Use External Stickers',
+                SEND_MESSAGES_IN_THREADS: 'Send Messages in Threads',
+                START_EMBEDDED_ACTIVITIES: 'Start Activities'
             };
 
             let perms = [];
+            if (role.permissions.has('ADMINISTRATOR')) perms.push('Administrator');
+            else role.permissions.toArray().forEach(p => {if (permNames[p]) perms.push(permNames[p])});
 
-            switch (role.permissions.has('ADMINISTRATOR')) {
-                case true:
-                    perms.push('Administrator');
-                    break;
-
-                case false:
-                    role.permissions.toArray().forEach(p => perms.push(permNames[p]));
-                    break;
-            }
-
-            const embed = new utils.MessageEmbed()
-                .setAuthor(`${role.name} - Info`)
-                .setDescription(
-                    `Name: \`${role.name}\`\n`+
-                    `ID: \`${role.id}\`\n`+
-                    `Created: \`${utils.format(role.createdAt)}\`\n`+
-                    `Hoisted: \`${role.hoist ? 'Yes' : 'No'}\`\n`+
-                    `Managed: \`${role.managed ? 'yes' : 'No'}\`\n`+
-                    `Mentionable: \`${role.mentionable ? 'Yes' : 'No'}\`\n`+
-                    `Position: \`${role.position}\`\n`+
-                    `Members: \`${role.members.array().length}\`\n`+
-                    `Color: \`${role.hexColor}\`\n`+
-                    `Permissions: \`${perms.join(', ')}\``
+            const embed = new discord.MessageEmbed()
+                .setAuthor(`${role.name}`, role?.iconURL({format: 'png'}))
+                .setColor(role.hexColor)
+                .addField(
+                    'About',
+                    `Mention: ${role.toString()}\n` +
+                    `Created: <t:${Math.round(role.createdTimestamp / 1000)}:R>\n` +
+                    `Mentionable: **${role.mentionable ? 'Yes' : 'No'}**\n` +
+                    `Managed: **${role.managed ? 'Yes' : 'No'}**\n` +
+                    `Hoisted: **${role.hoist ? 'Yes' : 'No'}**\n` +
+                    `Position: **${role.position}**\n` +
+                    `Members: **${role.members.size}**\n` +
+                    `Color: **${role.hexColor}**`
                 )
-                .setColor(process.env.color);
+                .addField(
+                    'Permissions',
+                    `${perms.length ? perms.join(', ') : 'None'}`
+                );
+                
 
-            await command.embed([embed]);
+            await command.reply({embeds: [embed]});
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: 'role',
-        description: 'Get a role\'s info',
-        options: [
-            {
-                name: 'role',
-                description: 'Role to get',
-                required: true,
-                type: 8
-            }
-        ]
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: 'role',
+            description: 'Get info on a role',
+            options: [
+                {
+                    type: 'ROLE',
+                    name: 'role',
+                    description: 'The role to get info on',
+                    required: true       
+                }
+            ]
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

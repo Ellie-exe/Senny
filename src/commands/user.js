@@ -1,242 +1,109 @@
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     * @param {import('../utils')} utils
-     */
-    async execute(command, utils) {
+    /** @param {import('discord.js/typings').CommandInteraction} command */
+    async execute(command) {
         try {
-            const options = {format: 'png', dynamic: true, size: 4096};
+            const user = command.options.getUser('user') || command.user;
+            const member = command.guild.members.cache.get(user.id);
 
-            const guildID = command.guildID;
-            const guild = command.client.guilds.cache.get(guildID);
+            const embed = new discord.MessageEmbed()
+                .setThumbnail(user.displayAvatarURL({dynamic: true}))
+                .setAuthor(`${user.tag}`, user.displayAvatarURL({dynamic: true}))
+                .setColor(0x2F3136)
+                .addField(
+                    'About',
+                    `Mention: ${user.toString()}\n` +
+                    `Created: <t:${Math.round(user.createdTimestamp / 1000)}:R>\n` +
+                    `${member ? `Joined: <t:${Math.round(member.joinedTimestamp / 1000)}:R>` : ''}`
+                );
 
-            const memberID = command.data.options ? command.data.options[0].value : command.userID;
-            const member = await command.client.guilds.cache.get(guildID).members.fetch(memberID);
+            if (member) {
+                const permNames = {
+                    ADMINISTRATOR: 'Administrator',
+                    CREATE_INSTANT_INVITE: 'Create Invite',
+                    KICK_MEMBERS: 'Kick Members',
+                    BAN_MEMBERS: 'Ban Members',
+                    MANAGE_CHANNELS: 'Manage Channels',
+                    MANAGE_GUILD: 'Manage Server',
+                    ADD_REACTIONS: 'Add Reactions',
+                    VIEW_AUDIT_LOG: 'View Audit Log',
+                    PRIORITY_SPEAKER: 'Priority Speaker',
+                    STREAM: 'Video',
+                    VIEW_CHANNEL: 'View Channels',
+                    SEND_MESSAGES: 'Send Messages',
+                    SEND_TTS_MESSAGES: 'Send Text-to-Speak Messages',
+                    MANAGE_MESSAGES: 'Manage Messages',
+                    EMBED_LINKS: 'Embed Links',
+                    ATTACH_FILES: 'Attach Files',
+                    READ_MESSAGE_HISTORY: 'Read Message History',
+                    MENTION_EVERYONE: 'Mention @everyone, @here, and All Roles',
+                    USE_EXTERNAL_EMOJIS: 'Use External Emoji',
+                    VIEW_GUILD_INSIGHTS: 'View Server Insights',
+                    CONNECT: 'Connect',
+                    SPEAK: 'Speak',
+                    MUTE_MEMBERS: 'Mute Members',
+                    DEAFEN_MEMBERS: 'Deafen Members',
+                    MOVE_MEMBERS: 'Move Members',
+                    USE_VAD: 'Use Voice Activity',
+                    CHANGE_NICKNAME: 'Change Nickname',
+                    MANAGE_NICKNAMES: 'Manage Nicknames',
+                    MANAGE_ROLES: 'Manage Roles',
+                    MANAGE_WEBHOOKS: 'Manage Webhooks',
+                    MANAGE_EMOJIS_AND_STICKERS: 'Manage Emojis and Stickers',
+                    USE_APPLICATION_COMMANDS: 'Use Application Commands',
+                    REQUEST_TO_SPEAK: 'Request to Speak',
+                    MANAGE_THREADS: 'Manage Threads',
+                    CREATE_PUBLIC_THREADS: 'Create Public Threads',
+                    CREATE_PRIVATE_THREADS: 'Create Private Threads',
+                    USE_EXTERNAL_STICKERS: 'Use External Stickers',
+                    SEND_MESSAGES_IN_THREADS: 'Send Messages in Threads',
+                    START_EMBEDDED_ACTIVITIES: 'Start Activities'
+                };
 
-            const statusIcon = {
-                online: '<:online:718302081399783573>',
-                idle: '<:idle:718302096096624741>',
-                dnd: '<:dnd:718302130695438346>',
-                offline: '<:offline:718302145698594838>'
-            };
+                let perms = [];
+                if (member.permissions.has('ADMINISTRATOR')) perms.push('Administrator');
+                else member.permissions.toArray().forEach(p => {if (permNames[p]) perms.push(permNames[p])});
 
-            const statusText = {
-                online: 'Online',
-                idle: 'Idle',
-                dnd: 'Busy',
-                offline: 'Offline'
-            };
+                const sortedRoles = member.roles.cache.sort((a, b) => b.position - a.position);
 
-            const join = guild.members.cache.map(m => m.joinedTimestamp).sort((a, b) => a - b).indexOf(member.joinedTimestamp) + 1;
-
-            const boost = member.premiumSince ? `Since ${utils.format(member.premiumSince)}` : 'No';
-
-            const icon = member.user.avatarURL() ? `[\`Link\`](${member.user.avatarURL(options)})` : '`None`';
-
-            let activities = '\n';
-            member.presence.activities.length === 0 ? activities = '`None`\n' : member.presence.activities.forEach(activity => {
-                switch (activity.type) {
-                    case 'COMPETING': {
-                        activities += `\nCompeting in **${activity.name}**\n`;
-                        break;
-                    }
-
-                    case 'CUSTOM_STATUS': {
-                        activities += `\n${activity.emoji || ''} ${activity.state || ''}\n`;
-                        break;
-                    }
-
-                    case 'LISTENING': {
-                        if (activity.name !== 'Spotify') {
-                            activities += `\nListening to **${activity.name}**\n`;
-
-                        } else {
-                            activities +=
-                                `\nListening to **${activity.name}**`+
-                                `\n**[${activity.details}](https://open.spotify.com/track/${activity.syncID})**`+
-                                `\nBy ${activity.state}`+
-                                `\nOn ${activity.assets.largeText}\n`;
-                        }
-
-                        break;
-                    }
-
-                    case 'PLAYING': {
-                        let duration = '';
-
-                        if (activity.timestamps) {
-                            const time = activity.timestamps;
-                            const ms = time.end === null ? Date.now() - Date.parse(time.start) : Date.parse(time.end) - Date.now();
-                            const type = time.end === null ? 'elapsed' : 'left';
-
-                            if (ms > 0) {
-                                let h;
-                                let m;
-                                let s;
-
-                                h = Math.floor(ms / 1000 / 60 / 60);
-                                m = Math.floor((ms / 1000 / 60 / 60 - h) * 60);
-                                s = Math.floor(((ms / 1000 / 60 / 60 - h) * 60 - m) * 60);
-
-                                h < 10 ? h = '0' + h : h = h;
-                                m < 10 ? m = '0' + m : m = m;
-                                s < 10 ? s = '0' + s : s = s;
-
-                                h === '00' ? duration = `\n${m}:${s} ${type}` : duration = `\n${h}:${m}:${s} ${type}`;
-
-                            } else {
-                                duration = '\n00:00 left';
-                            }
-                        }
-
-                        let party = '';
-                        switch (!activity.party?.size) {
-                            case false: {
-                                party = `(${activity.party.size[0]} of ${activity.party.size[1]})`;
-                                break;
-                            }
-                        }
-
-                        activities +=
-                            `\nPlaying: **${activity.name}**`+
-                            `${activity.details ? `\n${activity.details}` : ''}`+
-                            `${activity.state ? `\n${activity.state}` : ''} ${party}`+
-                            `${duration}\n`;
-
-                        break;
-                    }
-
-                    case 'STREAMING': {
-                        activities +=
-                            `\nLive on **${activity.name}**`+
-                            `\n**[${activity.details}](${activity.url})**`+
-                            `\nPlaying ${activity.state}\n`;
-
-                        break;
-                    }
-
-                    case 'WATCHING': {
-                        activities += `\nWatching **${activity.name}**\n`;
-                        break;
-                    }
-                }
-            });
-
-            const roles = member.roles.cache.sort((a, b) => b.position - a.position).array();
-
-            const flagNames = {
-                DISCORD_EMPLOYEE: 'Discord Employee',
-                PARTNERED_SERVER_OWNER: 'Partnered Server Owner',
-                HYPESQUAD_EVENTS: 'HypeSquad Events',
-                BUGHUNTER_LEVEL_1: 'Discord Bug Hunter Level 1',
-                HOUSE_BRAVERY: 'HypeSquad Bravery',
-                HOUSE_BRILLIANCE: 'HypeSquad Billiance',
-                HOUSE_BALANCE: 'HypeSquad Balance',
-                EARLY_SUPPORTER: 'Early Supporter',
-                TEAM_USER: 'Team User',
-                SYSTEM: 'System',
-                BUGHUNTER_LEVEL_2: 'Discord Bug Hunter Level 2',
-                VERIFIED_BOT: 'Verified Bot',
-                EARLY_VERIFIED_BOT_DEVELOPER: 'Early Verified Bot Developer'
+                embed.setColor(member.displayHexColor) // TODO: See if accent color works now
+                    .setThumbnail(member.displayAvatarURL({dynamic: true}))
+                    .addField(
+                        `Roles [${member.roles.cache.size}]`,
+                        `${sortedRoles.map(r => r.toString()).join(' ')}`
+                    )
+                    .addField(
+                        `Permissions`,
+                        `${perms.length ? perms.join(', ') : 'None'}`
+                    );
             }
 
-            let flags = [];
-            switch (member.user.flags?.equals(0)) {
-                case undefined:
-                    flags.push('None');
-                    break;
-
-                case true:
-                    flags.push('None');
-                    break;
-
-                default:
-                    member.user.flags.toArray().forEach(flag => flags.push(flagNames[flag]));
-            }
-
-            const permNames = {
-                ADMINISTRATOR: 'Administrator',
-                CREATE_INSTANT_INVITE: 'Create Invite',
-                KICK_MEMBERS: 'Kick Members',
-                BAN_MEMBERS: 'Ban Members',
-                MANAGE_CHANNELS: 'Manage Channels',
-                MANAGE_GUILD: 'Manage Server',
-                ADD_REACTIONS: 'Add Reactions',
-                VIEW_AUDIT_LOG: 'View Audit Log',
-                PRIORITY_SPEAKER: 'Priority Speaker',
-                STREAM: 'Video',
-                VIEW_CHANNEL: 'View Channels',
-                SEND_MESSAGES: 'Send Messages',
-                SEND_TTS_MESSAGES: 'Send Text-to-Speak Messages',
-                MANAGE_MESSAGES: 'Manage Messages',
-                EMBED_LINKS: 'Embed Links',
-                ATTACH_FILES: 'Attach Files',
-                READ_MESSAGE_HISTORY: 'Read Message History',
-                MENTION_EVERYONE: 'Mention @everyone, @here, and All Roles',
-                USE_EXTERNAL_EMOJIS: 'Use External Emoji',
-                VIEW_GUILD_INSIGHTS: 'View Server Insights',
-                CONNECT: 'Connect',
-                SPEAK: 'Speak',
-                MUTE_MEMBERS: 'Mute Members',
-                DEAFEN_MEMBERS: 'Deafen Members',
-                MOVE_MEMBERS: 'Move Members',
-                USE_VAD: 'Use Voice Activity',
-                CHANGE_NICKNAME: 'Change Nickname',
-                MANAGE_NICKNAMES: 'Manage Nicknames',
-                MANAGE_ROLES: 'Manage Roles',
-                MANAGE_WEBHOOKS: 'Manage Webhooks',
-                MANAGE_EMOJIS: 'Manage Emojis',
-            };
-
-            let perms = [];
-            switch (member.hasPermission('ADMINISTRATOR')) {
-                case true:
-                    perms.push('Administrator');
-                    break;
-
-                case false:
-                    member.permissions.toArray().forEach(p => perms.push(permNames[p]));
-                    break;
-            }
-
-            const embed = new utils.MessageEmbed()
-                .setAuthor(`${member.user.tag} - Information`, null, member.user.avatarURL())
-                .setDescription(
-                    `Profile: ${member.toString()}\n`+
-                    `ID: \`${member.id}\`\n`+
-                    `Nick: \`${member.nickname || 'None'}\`\n`+
-                    `Bot: \`${member.user.bot ? 'True' : 'False'}\`\n`+
-                    `Status: ${statusIcon[member.user.presence.status]}\`${statusText[member.user.presence.status]}\`\n`+
-                    `Created: \`${utils.format(member.user.createdAt)}\`\n`+
-                    `Joined: \`${utils.format(member.joinedAt)}\`\n`+
-                    `Activity: ${activities}\n`+
-                    `Join Position: \`${join}\`\n`+
-                    `Color: \`${member.displayHexColor}\`\n`+
-                    `Booster: \`${boost}\`\n`+
-                    `Icon: ${icon}\n\n`+
-                    `Roles: ${roles.join(', ')}\n\n`+
-                    `Flags: \`${flags.join(', ')}\`\n\n`+
-                    `Permissions: \`${perms.join(', ')}\``
-                )
-                .setColor(process.env.color)
-                .setThumbnail(member.user.displayAvatarURL(options));
-
-            await command.embed([embed]);
+            await command.reply({embeds: [embed]});
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: 'user',
-        description: 'Get a user\'s info',
-        options: [
-            {
-                name: 'user',
-                description: 'User to get',
-                type: 6
-            }
-        ]
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: 'user',
+            description: 'Get a user\'s info',
+            options: [
+                {
+                    type: 'USER',
+                    name: 'user',
+                    description: 'The user to get info on'
+                }
+            ]
+        },
+        {
+            type: 'USER',
+            name: 'user'
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

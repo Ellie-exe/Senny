@@ -1,16 +1,16 @@
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     * @param {import('../utils')} utils
-     */
-    async execute(command, utils) {
+    /** @param {import('discord.js/typings').CommandInteraction} command */
+    async execute(command) {
         try {
-            const guild = command.client.guilds.cache.get(command.guildID);
+            await command.deferReply();
+
             const options = {format: 'png', dynamic: true, size: 4096};
+            const guild = command.guild;
+            const owner = await guild.fetchOwner();
 
             const notificationNames = {
-                ALL: 'All Messages',
-                MENTIONS: 'Only @mentions'
+                ALL_MESSAGES: 'All Messages',
+                ONLY_MENTIONS: 'Only @mentions'
             };
 
             const verificationNames = {
@@ -21,42 +21,84 @@ module.exports = {
                 VERY_HIGH: 'Highest'
             };
 
-            const filterNames = {
-                DISABLED: 'Don\'t scan any media content.',
-                MEMBERS_WITHOUT_ROLES: 'Scan media content from members without a role.',
-                ALL_MEMBERS: 'Scan media content from all members.'
+            const premiumTierNames = {
+                NONE: 'None',
+                TIER_1: 'Tier 1',
+                TIER_2: 'Tier 2',
+                TIER_3: 'Tier 3'
             };
+
+            const filterNames = {
+                DISABLED: 'Don\'t scan any content',
+                MEMBERS_WITHOUT_ROLES: 'Scan content from members without a role',
+                ALL_MEMBERS: 'Scan content from all members'
+            };
+
+            const featureNames = {
+                ANIMATED_ICON: 'Animated Icon',
+                BANNER: 'Banner',
+                COMMERCE: 'Commerce',
+                COMMUNITY: 'Community',
+                DISCOVERABLE: 'Discoverable',
+                FEATURABLE: 'Featurable',
+                INVITE_SPLASH: 'Invite Splash',
+                NEWS: 'News',
+                PARTNERED: 'Partnered',
+                VANITY_URL: 'Vanity URL',
+                VERIFIED: 'Verified',
+                VIP_REGIONS: 'VIP Regions',
+                WELCOME_SCREEN_ENABLED: 'Welcome Screen Enabled',
+                TICKETED_EVENTS_ENABLED: 'Ticketed Events Enabled',
+                MONETIZATION_ENABLED: 'Monetization Enabled',
+                MORE_STICKERS: 'More Stickers',
+                THREE_DAY_ARCHIVE: '3 Day Archive',
+                SEVEN_DAY_ARCHIVE: '1 Week Archive',
+                PRIVATE_THREADS: 'Private Threads',
+                ROLE_ICONS: 'Role Icons',
+                PREVIEW_ENABLED: 'Preview Enabled',
+                ENABLED_DISCOVERABLE_BEFORE: 'Enabled Discoverable Before',
+                MEMBER_VERIFICATION_GATE_ENABLED: 'Member Verification Gate Enabled'
+            };
+
+            let features = [];
+            guild.features.forEach(f => {if (featureNames[f]) features.push(featureNames[f])});
 
             let totalChannels = 0;
             let textChannels = 0;
             let voiceChannels = 0;
+            let stageChannels = 0;
             let categoryChannels = 0;
             let announcementChannels = 0;
             let storeChannels = 0;
 
-            guild.channels.cache.forEach(channel => {
+            guild.channels.cache.each(channel => {
                 switch (channel.type) {
-                    case 'text':
+                    case 'GUILD_TEXT':
                         textChannels++;
                         totalChannels++;
                         break;
 
-                    case 'voice':
+                    case 'GUILD_VOICE':
                         voiceChannels++;
                         totalChannels++;
                         break;
 
-                    case 'category':
+                    case 'GUILD_STAGE_VOICE':
+                        stageChannels++;
+                        totalChannels++;
+                        break;
+
+                    case 'GUILD_CATEGORY':
                         categoryChannels++;
                         totalChannels++;
                         break;
 
-                    case 'news':
+                    case 'GUILD_NEWS':
                         announcementChannels++;
                         totalChannels++;
                         break;
 
-                    case 'store':
+                    case 'GUILD_STORE':
                         storeChannels++;
                         totalChannels++;
                         break;
@@ -67,11 +109,11 @@ module.exports = {
             let idleMembers = 0;
             let dndMembers = 0;
             let offlineMembers = 0;
-            let numMembers = 0;
+            let numHumans = 0;
             let numBots = 0;
 
-            guild.members.cache.array().forEach(member => {
-                switch (member.user.presence.status) {
+            guild.members.cache.each(member => {
+                switch (member.presence?.status) {
                     case 'online':
                         onlineMembers++;
                         break;
@@ -87,11 +129,14 @@ module.exports = {
                     case 'offline':
                         offlineMembers++;
                         break;
+
+                    default:
+                        offlineMembers++;
                 }
 
                 switch (member.user.bot) {
                     case false:
-                        numMembers++;
+                        numHumans++;
                         break;
 
                     case true:
@@ -99,102 +144,75 @@ module.exports = {
                         break;
                 }
             });
-
-            const featrueNames = {
-                ANIMATED_ICON: 'Animated Icon',
-                BANNER: 'Banner',
-                COMMERCE: 'Commerce',
-                COMMUNITY: 'Community',
-                DISCOVERABLE: 'Discoverable',
-                FEATURABLE: 'Featurable',
-                INVITE_SPLASH: 'Invite Splash',
-                NEWS: 'News',
-                PARTNERED: 'Partnered',
-                RELAY_ENABLED: 'Relay Enabled',
-                VANITY_URL: 'Vanity URL',
-                VERIFIED: 'Verified',
-                VIP_REGIONS: 'VIP Regions',
-                WELCOME_SCREEN_ENABLED: 'Welcome Screen Enabled',
-                PREVIEW_ENABLED: 'Preview Enabled',
-                ENABLED_DISCOVERABLE_BEFORE: 'Enabled Discoverable Before',
-                MEMBER_VERIFICATION_GATE_ENABLED: 'Member Verification Gate Enabled'
-            };
-
-            let features = [];
-
-            guild.features.length === 0 ? features.push('None') : guild.features.forEach(f => features.push(featrueNames[f]));
-
-            const icon = guild.iconURL(options) || 'https://ellie.is.gay/1eUNml2tV';
-
-            const embed1 = new utils.MessageEmbed()
-                .setURL('https://ellie.is.gay')
-                .setAuthor(`${guild.name} - Information`, null, icon)
-                .setDescription(
-                    `Owner: ${guild.owner}\n`+
-                    `System Channel: ${guild.systemChannel || '`None`'}\n`+
-                    `ID: \`${guild.id}\`\n`+
-                    `Created: \`${utils.format(guild.createdAt)}\`\n`+
-                    `Bot Joined: \`${utils.format(guild.joinedAt)}\`\n`+
-                    `Region: \`${guild.region}\`\n`+
-                    `Partnered: \`${guild.partnered ? 'Yes' : 'No'}\`\n`+
-                    `Verified: \`${guild.verified ? 'Yes' : 'No'}\`\n\n`+
-                    `Vanity: \`${guild.vanityURLCode ? `discord.gg/${guild.vanityURLCode}` : 'None'}\`\n`+
-                    `Banner: ${guild.bannerURL() ? `[\`Link\`](${guild.bannerURL(options)})` : '`None`'}\n`+
-                    `Splash: ${guild.splashURL() ? `[\`Link\`](${guild.splashURL(options)})` : '`None`'}\n`+
-                    `Icon: ${guild.iconURL() ? `[\`Link\`](${guild.iconURL(options)})` : '`None`'}\n\n`+
-                    `Rules or Guidelines Channel: ${guild.rulesChannel || '`None`'}\n`+
-                    `Community Updates Channel: ${guild.publicUpdatesChannel || '`None`'}\n`+
-                    `Primary Language: \`${guild.preferredLocale || '`None`'}\`\n\n`+
-                    `Boosts: \`${guild.premiumSubscriptionCount} Boosts\`\n`+
-                    `Boost Level: \`Tier ${guild.premiumTier}\`\n\n`+
-                    `Verification Level: \`${verificationNames[guild.verificationLevel]}\`\n`+
-                    `Default Notifications: \`${notificationNames[guild.defaultMessageNotifications]}\`\n`+
-                    `Content Filter: \`${filterNames[guild.explicitContentFilter]}\`\n`+
-                    `2FA Requirement: \`${guild.mfaLevel ? 'On' : 'Off'}\`\n\n`+
-                    `Channels [\`${totalChannels} Total\`]:\n`+
-                    `<:text:772577583648210965> \`${textChannels} Text Channels\`\n`+
-                    `<:voice:772577600400392192> \`${voiceChannels} Voice Channels\`\n`+
-                    `<:category:772577614157709363> \`${categoryChannels} Categories\`\n`+
-                    `<:announcement:772577634571517952> \`${announcementChannels} Announcement Channels\`\n`+
-                    `<:store:794645005398048808> \`${storeChannels} Store Channels\`\n\n`+
-                    `<:emojis:773417353144172554> \`${guild.emojis.cache.array().length} Emojis\`\n`+
-                    `<:roles:773418244140171324> \`${guild.roles.cache.array().length} Roles\`\n\n`+
-                    `Members [\`${guild.memberCount} Total\`]:\n`+
-                    `<:online:718302081399783573> \`${onlineMembers} Online\`\n`+
-                    `<:idle:718302096096624741> \`${idleMembers} Idle\`\n`+
-                    `<:dnd:718302130695438346> \`${dndMembers} Busy\`\n`+
-                    `<:offline:718302145698594838> \`${offlineMembers} Offline\`\n\n`+
-                    `<:member:772872418481930282> \`${numMembers} Members\`\n`+
-                    `<:bot:772872483661414400> \`${numBots} Bots\`\n\n`+
-                    `Features: \`${features.join(', ')}\``
+            
+            const embed = new discord.MessageEmbed()
+                .setThumbnail(guild.iconURL({dynamic: true}) || 'https://ellie.hep.gg/jtW0IuJWR')
+                .setImage(guild.bannerURL({size: 4096}) || guild.splashURL({size: 4096}))
+                .setAuthor(`${guild.name}`, guild.iconURL({dynamic: true}) || 'https://ellie.hep.gg/jtW0IuJWR')
+                .setColor(0x2F3136)
+                .addField(
+                    'About',
+                    `Owner: ${owner.toString()}\n` +
+                    `Created: <t:${Math.round(guild.createdTimestamp / 1000)}:R>\n` +
+                    `Primary Language: **${guild.preferredLocale}**\n` +
+                    `Default Notifications: **${notificationNames[guild.defaultMessageNotifications]}**\n` +
+                    `Content Filter: **${filterNames[guild.explicitContentFilter]}**\n` +
+                    `Verification Level: **${verificationNames[guild.verificationLevel]}**\n` +
+                    `2FA Requirement: **${guild.mfaLevel === 'ELEVATED' ? 'On' : 'Off'}**\n` +
+                    `Boost Level: **${premiumTierNames[guild.premiumTier]}**\n` +
+                    `Boosts: **${guild.premiumSubscriptionCount} Boosts**\n` +
+                    `Partnered: **${guild.partnered ? 'Yes' : 'No'}**\n` +
+                    `Verified: **${guild.verified ? 'Yes' : 'No'}**\n` +
+                    `Vanity: **${guild.vanityURLCode || 'None'}**`
                 )
-                .setColor(process.env.color)
-                .setThumbnail(icon);
+                .addField(
+                    'Links',
+                    `Banner: **${guild.bannerURL() ? `[Link](${guild.bannerURL(options)})` : 'None'}**\n` +
+                    `Splash: **${guild.splashURL() ? `[Link](${guild.splashURL(options)})` : 'None'}**\n` +
+                    `Icon: **${guild.iconURL() ? `[Link](${guild.iconURL(options)})` : 'None'}**`
+                )
+                .addField(
+                    `Channels [\`${totalChannels}\`]`,
+                    `<:text:908800033057546291> \`${textChannels}\` Text Channels\n` +
+                    `<:voice:908800107003125781> \`${voiceChannels}\` Voice Channels\n` +
+                    `<:stage:908805658835550249> \`${stageChannels}\` Stage Channels\n` +
+                    `<:category:908800137143418941> \`${categoryChannels}\` Categories\n` +
+                    `<:announcement:908800175089278996> \`${announcementChannels}\` Announcement Channels\n` +
+                    `<:store:908800246161735680> \`${storeChannels}\` Store Channels\n` +
+                    `<:emoji:908800355226222603> \`${guild.emojis.cache.size}\` Emojis\n` +
+                    `<:sticker:908800325031436308> \`${guild.stickers.cache.size}\` Stickers\n` +
+                    `<:role:908800286632579103> \`${guild.roles.cache.size}\` Roles`
+                )
+                .addField(
+                    `Members [\`${guild.memberCount}\`]`,
+                    `<:online:718302081399783573> \`${onlineMembers}\` Online\n` +
+                    `<:idle:718302096096624741> \`${idleMembers}\` Idle\n` +
+                    `<:dnd:718302130695438346> \`${dndMembers}\` Busy\n` +
+                    `<:offline:718302145698594838> \`${offlineMembers}\` Offline\n` +
+                    `<:member:772872418481930282> \`${numHumans}\` Humans\n` +
+                    `<:bot:772872483661414400> \`${numBots}\` Bots`
+                )
+                .addField(
+                    'Features',
+                    `${features.length ? features.join(', ') : 'None'}`
+                );
 
-            let embeds = [embed1];
-
-            if (guild.splashURL() !== null && guild.bannerURL() !== null) {
-                embed1.setImage(guild.splashURL(options));
-
-                const embed2 = new utils.MessageEmbed()
-                    .setURL('https://ellie.is.gay')
-                    .setImage(guild.bannerURL(options));
-
-                embeds.push(embed2);
-
-            } else if (guild.splashURL() !== null || guild.bannerURL() !== null) {
-                embed1.setImage(guild.splashURL(options) || guild.bannerURL(options));
-            }
-
-            await command.embed(embeds);
+            await command.editReply({embeds: [embed]});
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: 'server',
-        description: 'Get a server\'s info'
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: 'server',
+            description: 'Get info on the server'
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

@@ -1,35 +1,39 @@
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     * @param {import('../utils')} utils
-     */
-    async execute(command, utils) {
+    /** @param {import('discord.js/typings').CommandInteraction} command */
+    async execute(command) {
         try {
-            const userID = command.data.options ? command.data.options[0].value : command.authorID;
-            const user = await command.client.users.fetch(userID);
-            const avatarURL = user.displayAvatarURL({dynamic: true, size: 4096});
+            const user = command.options.getUser('user') || command.user;
+            const avatar = user.displayAvatarURL({format: 'png', dynamic: true, size: 4096});
 
-            const embed = new utils.MessageEmbed()
-                .setAuthor(`${user.tag} - Avatar`, null, avatarURL)
-                .setImage(avatarURL)
-                .setColor(process.env.color);
+            // TODO: Add support for banners
 
-            await command.embed([embed]);
+            await command.reply(avatar);
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: 'avatar',
-        description: 'Get a user\'s avatar',
-        options: [
-            {
-                name: 'user',
-                description: 'User to get',
-                type: 6
-            }
-        ]
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: 'avatar',
+            description: 'Get a user\'s avatar',
+            options: [
+                {
+                    type: 'USER',
+                    name: 'user',
+                    description: 'The user to get an avatar from'
+                }
+            ]
+        },
+        {
+            type: 'USER',
+            name: 'avatar'
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

@@ -1,29 +1,26 @@
-const axios = require('axios');
-
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     * @param {import('../utils')} utils
-     */
-    async execute(command, utils) {
+    /** @param {import('discord.js/typings').CommandInteraction} command */
+    async execute(command) {
         try {
-            const data = await axios.get('https://api.chewey-bot.top/red-panda?auth=2d3aca1f-e0dc-4d23-acea-049f926ed38d');
-            const link = data.data.data;
+            const axios = require('axios');
 
-            const embed = new utils.MessageEmbed()
-                .setAuthor('Red Panda', null, link)
-                .setImage(link)
-                .setColor(process.env.color);
-
-            await command.embed([embed]);
+            const res = await axios.get('https://api.chewey-bot.top/red-panda?auth=2d3aca1f-e0dc-4d23-acea-049f926ed38d');
+            await command.reply(res.data.data);
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: 'redpanda',
-        description: 'Get a red panda image'
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: 'redpanda',
+            description: 'Get a random red panda image'
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

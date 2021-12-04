@@ -1,82 +1,71 @@
-const schedule = require('node-schedule');
-/**
- * @param {import('discord.js').Client} client
- * @param {import('../utils')} utils
- * @param {import('redis').RedisClient} cache
- */
-module.exports = async (client, utils, cache) => {
-    try {
-        let counter = -1;
+module.exports = {
+    name: 'ready',
+    async execute() {
+        try {
+            const schedule = require('node-schedule');
 
-        setInterval(async () => {
-            (counter === 3) ? counter = 0 : counter++;
+            const Reminders = sequelize.define('reminders', {
+                reminderId: {type: DataTypes.STRING(10), primaryKey: true},
+                authorId: DataTypes.STRING(20),
+                channelId: DataTypes.STRING(20),
+                userId: DataTypes.STRING(20),
+                time: DataTypes.BIGINT({length: 20}),
+                message: DataTypes.TEXT
+            });
 
-            const activity = [
-                {type: 'LISTENING', name: '/'},
-                {type: 'WATCHING', name: 'over Bongo'},
-                {type: 'PLAYING', name: 'with the API'},
-                {type: 'WATCHING', name: `${client.guilds.cache.array().length} Guilds`}
-            ];
+            const reminders = await Reminders.findAll();
 
-            client.user.setActivity(activity[counter].name, {type: activity[counter].type});
+            reminders.forEach(reminder => {
+                schedule.scheduleJob(reminder.time, async () => {
+                    try {
+                        const user = client.users.cache.get(reminder.userId);
+                        const channel = client.channels.cache.get(reminder.channelId) || await user?.createDM();
 
-        }, 30000);
+                        await reminder.destroy();
 
-        const database = new utils.database();
+                        const data = JSON.stringify(reminder.toJSON(), null, 4);
+                        if (!channel) throw new Error(`Reminder not sent: ${data}`);
 
-        await database
-            .select('*')
-            .from('filters')
-            .query(async (err, res) => {
-                if (err) throw err;
+                        await channel.send(reminder.message);
 
-                res.forEach(async (filter) => {
-                    await cache.hmsetAsync(filter.guildID, 'regex', filter.regex);
+                    } catch (err) {
+                        logger.error(err);
+                    }
                 });
             });
 
-        await database
-            .select('*')
-            .from('bumps')
-            .query(async (err, res) => {
-                if (err) throw err;
+            const commands = await client.application.commands.fetch();
 
-                res.forEach(async (bump) => {
-                    await cache.hmsetAsync(bump.guildID, 'bump', true);
-                });
+            client.commands.each(async cmd => {
+                if (cmd.flags.developer) return;
+
+                for (const data of cmd.data) {
+                    const command = commands.find(c => c.name === data.name && c.type === data.type);
+
+                    if (command === undefined) {
+                        await client.application.commands.create(data);
+                        logger.debug(`Created ${data.type} Command: ${data.name}`);
+
+                    } else if (!command.equals(data)) {
+                        await command.edit(data);
+                        logger.debug(`Updated ${data.type} Command: ${data.name}`);
+                    }
+                }
             });
 
-        await database
-            .select('*')
-            .from('reminders')
-            .query(async (err, res) => {
-                if (err) throw err;
+            commands.each(async command => {
+                const data = client.commands.find(c => c.data.find(d => d.name === command.name && d.type === command.type));
 
-                res.forEach(async (reminder) => {
-                    const reminderID = reminder.reminderID;
-                    const text = reminder.text;
-                    const date = reminder.date;
-
-                    const channel = await client.channels.fetch(reminder.channelID);
-                    const user = await client.users.fetch(reminder.userID);
-                    const mention = channel.type === 'dm' ? user.username : user.toString();
-
-                    schedule.scheduleJob(date, async () => {
-                        await database
-                            .delete('reminders')
-                            .where('reminderID', reminderID)
-                            .query(async (err) => {
-                                if (err) throw err;
-                                await channel.send(`Hello ${mention}! You asked me to remind you about \`${text}\``);
-                            
-                            }).catch(async (err) => {utils.logger.error(err)});
-                    });
-                });
+                if (data === undefined) {
+                    await command.delete();
+                    logger.debug(`Deleted ${command.type} Command: ${command.name}`);
+                }
             });
 
-        utils.logger.info(`Bot ready in ${client.guilds.cache.array().length} guilds`);
+            logger.info(`Ready to serve ${client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0)} users in ${client.guilds.cache.size} servers`);
 
-    } catch (err) {
-        utils.logger.error(err);
+        } catch (err) {
+            logger.error(err);
+        }
     }
 };

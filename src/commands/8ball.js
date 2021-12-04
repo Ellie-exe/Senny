@@ -1,7 +1,5 @@
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     */
+    /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
             const responses = [
@@ -27,26 +25,33 @@ module.exports = {
                 'Very doubtful.'
             ];
 
-            const question = command.data.options[0].value;
+            const question = command.options.getString('question');
             const response = responses[Math.floor(Math.random() * responses.length)]
 
-            await command.send(`**Question:** ${question}\n**Response:** ${response}`);
+            await command.reply(`You asked **"${question}"** and the Magic 8-ball says: **${response}**`);
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: '8ball',
-        description: 'Ask the Magic 8-ball a question',
-        options: [
-            {
-                name: 'question',
-                description: 'Question to ask',
-                required: true,
-                type: 3
-            }
-        ]
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: '8ball',
+            description: 'Ask the Magic 8-ball a question',
+            options: [
+                {
+                    type: 'STRING',
+                    name: 'question',
+                    description: 'The question to ask',
+                    required: true
+                }
+            ]
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

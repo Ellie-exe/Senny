@@ -2,8 +2,8 @@ module.exports = {
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
-            const sent = await command.reply({content: 'Pinging...', fetchReply: true});
-            await command.editReply(`Pong! Took **${sent.createdTimestamp - command.createdTimestamp} ms**`);
+            await command.reply('Restarting...');
+            process.exit(0);
 
         } catch (err) {
             logger.error(err);
@@ -13,12 +13,13 @@ module.exports = {
     data: [
         {
             type: 'CHAT_INPUT',
-            name: 'ping',
-            description: 'Get the bot\'s ping'
+            name: 'restart',
+            description: 'Restarts the bot',
+            defaultPermission: false
         }
     ],
 
     flags: {
-        developer: false
+        developer: true
     }
 };

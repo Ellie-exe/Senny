@@ -1,19 +1,38 @@
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     * @param {import('../utils')} utils
-     */
-    async execute(command, utils) {
+    /** @param {import('discord.js/typings').CommandInteraction} command */
+    async execute(command) {
         try {
+            // Code here
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: '',
-        description: '',
-        options: []
+    data: [
+        {
+            type: '',
+            name: '',
+            description: '',
+            defaultPermission: true,
+            options: [
+                {
+                    type: '',
+                    name: '',
+                    description: '',
+                    required: true,
+                    choices: [
+                        {
+                            name: '',
+                            value: ''
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

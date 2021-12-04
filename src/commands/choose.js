@@ -1,31 +1,35 @@
 module.exports = {
-    /**
-     * @param {import('../utils').Interaction} command
-     */
+    /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
-            const options = command.data.options[0].value;
-            const choices = options.split(options.includes(',') ? /\s*,\s*/ : / +/);
-
+            const list = command.options.getString('choices');
+            const choices = list.split(list.includes(',') ? /\s*,\s*/ : / +/);
             const choice = choices[Math.floor(Math.random() * choices.length)];
 
-            await command.send(`**Options:** ${choices.join(', ')}\n**Choice:** ${choice}`);
+            await command.reply(`Between **"${choices.join(', ')}"** I choose **${choice}**`);
 
         } catch (err) {
-            await command.error(err);
+            logger.error(err);
         }
     },
 
-    data: {
-        name: 'choose',
-        description: 'Picks a random choice',
-        options: [
-            {
-                name: 'choices',
-                description: 'List of choices',
-                required: true,
-                type: 3
-            }
-        ]
+    data: [
+        {
+            type: 'CHAT_INPUT',
+            name: 'choose',
+            description: 'Have something randomly chosen from a list',
+            options: [
+                {
+                    type: 'STRING',
+                    name: 'choices',
+                    description: 'The list to choose from (either comma or space separated)',
+                    required: true
+                }
+            ]
+        }
+    ],
+
+    flags: {
+        developer: false
     }
 };

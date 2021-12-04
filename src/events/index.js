@@ -1,9 +1,9 @@
-module.exports.funky = require('./funky');
-module.exports.guildMemberAdd = require('./guildMemberAdd');
-module.exports.guildMemberUpdate = require('./guildMemberUpdate');
-module.exports.interaction = require('./interaction');
-module.exports.message = require('./message');
-module.exports.ready = require('./ready');
-module.exports.shardError = require('./shardError');
-module.exports.shardReconnecting = require('./shardReconnecting');
-module.exports.unhandledRejection = require('./unhandledRejection');
+module.exports = {
+    funkyMonkeyFriday: require('./funkyMonkeyFriday'),
+    guildMemberAdd: require('./guildMemberAdd'),
+    guildMemberUpdate: require('./guildMemberUpdate'),
+    interactionCreate: require('./interactionCreate'),
+    messageCreate: require('./messageCreate'),
+    questionOfTheDay: require('./questionOfTheDay'),
+    ready: require('./ready')
+}
