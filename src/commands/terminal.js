@@ -5,11 +5,12 @@ module.exports = {
             const { exec } = require('child_process');
 
             const cmd = command.options.getString('command');
+            await command.deferReply();
 
             exec(`${cmd}`, async (err, stdout, stderr) => {
                 if (err) return await command.reply(`\`\`\`ps\n${err}\n\`\`\``);
 
-                await command.reply(`\`\`\`ps\n${stdout}\n${stderr}\n\`\`\``);
+                await command.editReply(`\`\`\`ps\n${stdout}\n${stderr}\n\`\`\``);
             });
 
         } catch (err) {
