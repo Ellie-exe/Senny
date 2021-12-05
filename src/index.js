@@ -6,7 +6,8 @@ const discord = require('discord.js');
 const client = new discord.Client({intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_PRESENCES', 'GUILD_MESSAGES']});
 const sequelize = new Sequelize('senny', process.env.USERNAME, process.env.PASSWORD, {
     host: 'localhost',
-    dialect: 'mariadb'
+    dialect: 'mariadb',
+    logging: false
 });
 
 global.DataTypes = DataTypes;

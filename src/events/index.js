@@ -1,4 +1,6 @@
 module.exports = {
+    bump: require('./bump'),
+    counter: require('./counter'),
     funkyMonkeyFriday: require('./funkyMonkeyFriday'),
     guildMemberAdd: require('./guildMemberAdd'),
     guildMemberUpdate: require('./guildMemberUpdate'),
