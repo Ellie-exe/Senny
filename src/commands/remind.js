@@ -130,6 +130,7 @@ module.exports = {
                     embed.setDescription('You have no reminders');
 
                 } else {
+                    let counter = 1;
                     reminders.forEach(reminder => {
                         const time = `<t:${Math.round(reminder.time / 1000)}:R>`;
 
@@ -140,9 +141,11 @@ module.exports = {
                         const msg = reminder.message.substring(start + 1, end);
 
                         embed.addField(
-                            `${msg}`,
+                            `${counter}. ${msg}`,
                             `\`${reminder.reminderId}\` ${time} ${channel.toString()}`
                         );
+
+                        counter++;
                     });
                 }
 
