@@ -20,16 +20,16 @@ module.exports = {
 
             switch (day) {
                 case 'Friday': {
-                    await category.updateOverwrite(role, { VIEW_CHANNEL: true });
-                    await channel.updateOverwrite(role, { VIEW_CHANNEL: true });
+                    await category.permissionOverwrites.edit(role, { VIEW_CHANNEL: true });
+                    await channel.permissionOverwrites.edit(role, { VIEW_CHANNEL: true });
 
                     await channel.send(announcements[Math.floor(Math.random() * announcements.length)]);
                     break;
                 }
 
                 case 'Saturday': {
-                    await channel.updateOverwrite(role, { VIEW_CHANNEL: false });
-                    await category.updateOverwrite(role, { VIEW_CHANNEL: false });
+                    await channel.permissionOverwrites.edit(role, { VIEW_CHANNEL: false });
+                    await category.permissionOverwrites.edit(role, { VIEW_CHANNEL: false });
                     break;
                 }
             }
