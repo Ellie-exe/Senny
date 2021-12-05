@@ -12,7 +12,7 @@ module.exports = {
             const newValue = parseInt(newMessage.content);
             const currentValue = parseInt(oldMessage.content);
 
-            if (isNaN(newValue) || newMessage.content.match(/\D/g) || newValue <= currentValue || newMessage.author === oldMessage.author) {
+            if (isNaN(newValue) || newMessage.content.match(/\D/g) || newValue <= currentValue || newValue > currentValue + 1 || newMessage.author === oldMessage.author) {
                 await message.delete();
             }
 
