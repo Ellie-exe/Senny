@@ -1,21 +1,22 @@
 module.exports = {
-    name: 'qotd',
+    name: 'questionOfTheDay',
     async execute() {
         try {
             const fs = require('fs');
-            const questions = require('./questions');
-
             const channel = client.channels.cache.get('755904698363674774');
 
-            const question = questions[Math.floor(Math.random() * questions.length)];
-            channel.send(`**${question}**`);
-
-            fs.readFile('./src/events/questions.js', 'utf-8', (err, data) => {
+            fs.readFile('./questionOfTheDay.json', 'utf-8', (err, data) => {
                 if (err) throw err;
 
-                const newData = data.replace(`\n    "${question}",`, '');
+                const json = JSON.parse(data);
+                const rand = Math.floor(Math.random() * json.questions.length);
 
-                fs.writeFile('./src/events/questions.js', newData, 'utf-8', (err) => {
+                channel.send(`**${json.questions[rand]}**`);
+
+                json.questions.splice(rand, 1);
+                const newData = JSON.stringify(json, null, 4);
+
+                fs.writeFile('./questionOfTheDay.json', newData, 'utf-8', (err) => {
                     if (err) throw err;
                 });
             });

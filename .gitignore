@@ -2,3 +2,4 @@
 /node_modules
 /ecosystem.config.js
 /events.log
+/questionOfTheDay.json
