@@ -4,11 +4,11 @@ module.exports = {
     async execute(message) {
         try {
             if (message.channelId === '755904515080847493') {
-                client.emit('counter');
+                client.emit('countingChannelCheck');
             }
 
             if (message.channelId === '578219142742802462' && message.content === '!d bump') {
-                client.emit('bump', message);
+                client.emit('bumpReminder', message);
             }
 
         } catch (err) {

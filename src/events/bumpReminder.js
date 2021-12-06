@@ -1,9 +1,10 @@
-const schedule = require('node-schedule');
 module.exports = {
-    name: 'bump',
+    name: 'bumpReminder',
     /** @param {import('discord.js/typings').Message} message */
     async execute(message) {
         try {
+            const schedule = require('node-schedule');
+
             /** @param {int} length */
             const newId = (length) => {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
