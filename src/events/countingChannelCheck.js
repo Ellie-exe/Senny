@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'counter',
+    name: 'countingChannelCheck',
     /** @param {import('discord.js/typings').Message} message */
     async execute(message) {
         try {

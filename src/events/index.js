@@ -1,6 +1,6 @@
 module.exports = {
-    bump: require('./bump'),
-    counter: require('./counter'),
+    bumpReminder: require('./bumpReminder'),
+    countingChannelCheck: require('./countingChannelCheck'),
     funkyMonkeyFriday: require('./funkyMonkeyFriday'),
     guildMemberAdd: require('./guildMemberAdd'),
     guildMemberUpdate: require('./guildMemberUpdate'),
