@@ -25,6 +25,7 @@ module.exports = {
     ],
 
     flags: {
-        developer: true
+        developer: true,
+        guild: false
     }
 };
