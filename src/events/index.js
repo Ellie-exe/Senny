@@ -1,5 +1,6 @@
 module.exports = {
     bumpReminder: require('./bumpReminder'),
+    commandSync: require('./commandSync'),
     countingChannelCheck: require('./countingChannelCheck'),
     funkyMonkeyFriday: require('./funkyMonkeyFriday'),
     guildMemberAdd: require('./guildMemberAdd'),
