@@ -51,9 +51,11 @@ module.exports = {
 
             } else if (subcommand === 'leaderboard') {
                 const userList = await users.findAll({order: [['balance', 'DESC']]});
+                userList.shift();
+
                 const embed = new discord.MessageEmbed()
                     .setTitle('Gamblping Leaderboard')
-                    .setDescription(userList.shift().map((u, i) => `${i + 1}. ${client.users.cache.get(u.userId).toString()} - $${u.balance.toFixed(2)}`).join('\n'))
+                    .setDescription(userList.map((u, i) => `${i + 1}. ${client.users.cache.get(u.userId).toString()} - $${u.balance.toFixed(2)}`).join('\n'))
                     .setColor(0x2F3136);
 
                 await command.reply({embeds: [embed]});
