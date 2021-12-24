@@ -7,10 +7,7 @@ module.exports = {
                 balance: DataTypes.DOUBLE
             });
 
-            await users.sync();
-
-            let bank = await users.findOne({where: {userId: 'bank'}});
-            if (!bank) bank = await users.create({userId: 'bank', balance: 1000000000000});
+            const bank = await users.findOne({where: {userId: 'bank'}});
 
             let user = await users.findOne({where: {userId: command.user.id}});
             if (!user) {
