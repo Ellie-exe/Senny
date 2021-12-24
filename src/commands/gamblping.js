@@ -47,7 +47,7 @@ module.exports = {
                 }
 
             } else if (subcommand === 'balance') {
-                await command.reply(`Your balance is **$${user.balance}**`);
+                await command.reply(`Your balance is **$${user.balance.toFixed(2)}**`);
             }
 
         } catch (err) {
