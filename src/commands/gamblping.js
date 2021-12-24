@@ -34,11 +34,16 @@ module.exports = {
                     await command.editReply(`Pong! Took **${ping} ms** and you guessed **${guess} ms** meaning you lost **$${wager}**`);
 
                 } else {
-                    winnings = wager * ((50 - diff) / 50);
+                    winnings = Math.round((wager * ((50 - diff) / 50)) * 100) / 100;
 
                     await users.update({balance: bank.balance - winnings}, {where: {userId: 'bank'}});
                     await users.update({balance: user.balance + winnings}, {where: {userId: command.user.id}});
-                    await command.editReply(`Pong! Took **${ping} ms** and you guessed **${guess} ms** meaning you won **$${winnings}**`);
+                    await command.editReply(`Pong! Took **${ping} ms** and you guessed **${guess} ms** meaning you won **$${winnings.toFixed(2)}**`);
+                }
+
+                if (user.balance < 10) {
+                    await users.update({balance: bank.balance - (10 - user.balance)}, {where: {userId: 'bank'}});
+                    await users.update({balance: user.balance + (10 - user.balance)}, {where: {userId: command.user.id}});
                 }
 
             } else if (subcommand === 'balance') {
