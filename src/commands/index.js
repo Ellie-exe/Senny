@@ -1,6 +1,7 @@
 module.exports = {
     _8ball: require('./8ball'),
     avatar: require('./avatar'),
+    gamblping: require('./gamblping'),
     choose: require('./choose'),
     convert: require('./convert'),
     dev: require('./dev'),
