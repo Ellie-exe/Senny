@@ -31,7 +31,7 @@ module.exports = {
                 if (diff > 50) {
                     await users.update({balance: bank.balance + wager}, {where: {userId: 'bank'}});
                     await users.update({balance: user.balance - wager}, {where: {userId: command.user.id}});
-                    await command.editReply(`Pong! Took **${ping} ms** and you guessed **${guess} ms** meaning you lost **$${wager}**`);
+                    await command.editReply(`Pong! Took **${ping} ms** and you guessed **${guess} ms** meaning you lost **$${wager.toFixed(2)}**`);
 
                 } else {
                     winnings = Math.round((wager * ((50 - diff) / 50)) * 100) / 100;
