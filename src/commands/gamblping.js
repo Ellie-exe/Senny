@@ -26,7 +26,6 @@ module.exports = {
                 if (user.balance < wager) return command.editReply('You do not have enough money for that bet');
 
                 const difference = Math.abs(ping - guess);
-                let winnings = 0;
 
                 if (difference > 50) {
                     let userBalance = user.balance - wager;
@@ -44,7 +43,7 @@ module.exports = {
                     await command.editReply(`Pong! Took **${ping} ms** Guessed **${guess} ms** Lost **$${wager.toFixed(2)}**`);
 
                 } else {
-                    winnings = Math.round((wager * ((50 - difference) / 50)) * 100) / 100;
+                    const winnings = Math.round((wager * ((50 - difference) / 50)) * 100) / 100;
 
                     await users.update({balance: bank.balance - winnings}, {where: {userId: 'bank'}});
                     await users.update({balance: user.balance + winnings}, {where: {userId: command.user.id}});
