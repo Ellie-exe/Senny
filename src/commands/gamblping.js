@@ -65,8 +65,8 @@ module.exports = {
 
                 const embed = new discord.MessageEmbed()
                     .setTitle('Gamblping Leaderboard')
-                    .setDescription(userList.map((u, i) => {
-                        `${i + 1}. ${client.users.cache.get(u.userId).toString()} - $${u.balance.toFixed(2)}`})
+                    .setDescription(userList.map((u, i) =>
+                        `${i + 1}. ${client.users.cache.get(u.userId).toString()} - $${u.balance.toFixed(2)}`)
                     .join('\n'))
                     .setColor(0x2F3136);
 
