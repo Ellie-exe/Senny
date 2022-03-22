@@ -27,7 +27,7 @@ module.exports = {
             switch (subcommand) {
                 case 'set': {
                     const user = command.options.getUser('user');
-                    const month = command.options.getInteger('month');
+                    const month = command.options.getString('month');
                     const day = command.options.getInteger('day');
                     const year = command.options.getInteger('year');
 
@@ -105,58 +105,58 @@ module.exports = {
                             required: true
                         },
                         {
-                            type: 'INTEGER',
+                            type: 'STRING',
                             name: 'month',
                             description: 'The month of the birthday',
                             required: true,
                             choices: [
                                 {
                                     name: 'January',
-                                    value: 1
+                                    value: '01'
                                 },
                                 {
                                     name: 'February',
-                                    value: 2
+                                    value: '02'
                                 },
                                 {
                                     name: 'March',
-                                    value: 3
+                                    value: '03'
                                 },
                                 {
                                     name: 'April',
-                                    value: 4
+                                    value: '04'
                                 },
                                 {
                                     name: 'May',
-                                    value: 5
+                                    value: '05'
                                 },
                                 {
                                     name: 'June',
-                                    value: 6
+                                    value: '06'
                                 },
                                 {
                                     name: 'July',
-                                    value: 7
+                                    value: '07'
                                 },
                                 {
                                     name: 'August',
-                                    value: 8
+                                    value: '08'
                                 },
                                 {
                                     name: 'September',
-                                    value: 9
+                                    value: '09'
                                 },
                                 {
                                     name: 'October',
-                                    value: 10
+                                    value: '10'
                                 },
                                 {
                                     name: 'November',
-                                    value: 11
+                                    value: '11'
                                 },
                                 {
                                     name: 'December',
-                                    value: 12
+                                    value: '12'
                                 }
                             ]
                         },
