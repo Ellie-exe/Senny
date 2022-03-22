@@ -2,10 +2,12 @@ module.exports = {
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
+            const schedule = require('node-schedule');
             await command.deferReply();
 
             const Birthdays = sequelize.define('birthdays', {
                 userId: {type: DataTypes.STRING(20), primaryKey: true},
+                timestamp: DataTypes.BIGINT({length: 20}),
                 date: DataTypes.DATEONLY
             });
 
@@ -32,8 +34,17 @@ module.exports = {
                     const year = command.options.getInteger('year');
                     const timezone = command.options.getString('timezone').toUpperCase();
 
-                    const date = `${year}-${month}-${day} ${timezone}`;
+                    const monthDay = `${month}-${day} ${timezone}`;
+                    const date = `${year}-${monthDay}`;
                     const displayDate = getTimeMarkdown(date);
+
+                    const currentYear = new Date().getFullYear();
+
+                    let next = `${currentYear}-${monthDay}`;
+                    if (Date.parse(next) < Date.now()) next = `${currentYear + 1}-${monthDay}`;
+
+                    const timestamp = Date.parse(next);
+                    if (isNaN(timestamp)) return await command.editReply('Invalid date');
 
                     const birthday = await Birthdays.findOne({where: {userId: user.id}});
                     if (birthday) {
@@ -43,7 +54,18 @@ module.exports = {
 
                     await Birthdays.create({
                         userId: user.id,
+                        timestamp: timestamp,
                         date: date
+                    });
+
+                    schedule.scheduleJob(timestamp, async () => {
+                        const birthday = await Birthdays.findOne({where: {userId: user.id}});
+                        if (birthday) {
+                            const channel = client.channels.cache.get('405147700825292827');
+                            const user = client.users.cache.get(birthday.userId);
+
+                            await channel.send(`It is ${user.toString()}'s birthday today!`);
+                        }
                     });
 
                     await command.editReply(`Okay! I have set ${user.toString()}'s birthday as ${displayDate}`);
@@ -62,6 +84,30 @@ module.exports = {
 
                     } else {
                         await command.editReply(`${user.toString()} does not have a birthday set`);
+                    }
+
+                    break;
+                }
+
+                case 'list': {
+                    const birthdays = await Birthdays.findAll();
+
+                    const embed = new discord.MessageEmbed()
+                        .setAuthor(`Birthdays`)
+                        .setColor(0x2F3136);
+
+                    if (birthdays.length === 0) {
+                        embed.setDescription('There are no birthdays set');
+
+                    } else {
+                        let counter = 1;
+                        for (const birthday of birthdays) {
+                            const user = command.users.cache.get(birthday.userId);
+                            if (!user) continue;
+
+                            embed.addField(`${counter}. ${user.toString()}`, `${getTimeMarkdown(birthday.date)}`);
+                            counter++;
+                        }
                     }
 
                     break;
@@ -193,6 +239,11 @@ module.exports = {
                             required: true
                         }
                     ]
+                },
+                {
+                    type: 'SUB_COMMAND',
+                    name: 'list',
+                    description: 'List all birthdays'
                 },
                 {
                     type: 'SUB_COMMAND',

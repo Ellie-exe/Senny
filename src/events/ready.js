@@ -1,3 +1,4 @@
+const schedule = require("node-schedule");
 module.exports = {
     name: 'ready',
     async execute() {
@@ -51,6 +52,23 @@ module.exports = {
                     }
                 });
             });
+
+            const Birthdays = sequelize.define('birthdays', {
+                userId: {type: DataTypes.STRING(20), primaryKey: true},
+                timestamp: DataTypes.BIGINT({length: 20}),
+                date: DataTypes.DATEONLY
+            });
+
+            const birthdays = await Birthdays.findAll();
+
+            for (const birthday of birthdays) {
+                schedule.scheduleJob(birthday.timestamp, async () => {
+                    const channel = client.channels.cache.get('405147700825292827');
+                    const user = client.users.cache.get(birthday.userId);
+
+                    await channel.send(`It is ${user.toString()}'s birthday today!`);
+                });
+            }
 
             logger.info(`Ready to serve ${client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0)} users in ${client.guilds.cache.size} servers`);
 
