@@ -30,8 +30,9 @@ module.exports = {
                     const month = command.options.getString('month');
                     const day = command.options.getInteger('day');
                     const year = command.options.getInteger('year');
+                    const timezone = command.options.getString('timezone').toUpperCase();
 
-                    const date = `${year}-${month}-${day}`;
+                    const date = `${year}-${month}-${day} ${timezone}`;
                     const displayDate = getTimeMarkdown(date);
 
                     const birthday = await Birthdays.findOne({where: {userId: user.id}});
@@ -170,6 +171,12 @@ module.exports = {
                             type: 'INTEGER',
                             name: 'year',
                             description: 'The year of the birthday',
+                            required: true
+                        },
+                        {
+                            type: 'STRING',
+                            name: 'timezone',
+                            description: 'The timezone of the birthday',
                             required: true
                         }
                     ]
