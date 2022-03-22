@@ -35,7 +35,7 @@ module.exports = {
                     const displayDate = getTimeMarkdown(date);
 
                     const birthday = await Birthdays.findOne({where: {userId: user.id}});
-                    if (!birthday) {
+                    if (birthday) {
                         await command.editReply(`${user.toString()} already has a birthday set`);
                         break;
                     }
