@@ -11,7 +11,7 @@ module.exports = {
                 date: DataTypes.DATEONLY
             });
 
-            await Birthdays.sync();
+            await Birthdays.sync({alter: true});
 
             const getTimeMarkdown = (date) => {
                 const timestamp = Date.parse(date);
