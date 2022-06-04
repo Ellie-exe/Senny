@@ -6,14 +6,17 @@ module.exports = {
             const unit = command.options.getString('unit');
             const newUnit = command.options.getString('convert');
 
+            const cmtoft = ((value / 2.54) % 12) === 0 ? '' : ` ${Math.round((value / 2.54) % 12)} in`;
+            const intoft = (value % 12) === 0 ? '' : ` ${value % 12} in`;
+
             const conversions = {
                 FC: `**${value}°F** is **${Math.round((value - 32) * 5 / 9)}°C**`,
                 CF: `**${value}°C** is **${Math.round((value * 9 / 5) + 32)}°F**`,
                 incm: `**${value} in** is **${Math.round(value * 2.54)} cm**`,
-                inft: `**${value} in** is **${Math.floor(value / 12)} ft${(value % 12) === 0 ? '' : ` ${value % 12} in`}**`,
+                inft: `**${value} in** is **${Math.floor(value / 12)} ft${intoft}**`,
                 ftin: `**${value} ft** is **${Math.round(value * 12)} in**`,
                 cmin: `**${value} cm** is **${Math.round(value / 2.54)} in**`,
-                cmft: `**${value} cm** is **${Math.floor((value / 2.54) / 12)} ft${((value / 2.54) % 12) === 0 ? '' : ` ${Math.round((value / 2.54) % 12)} in`}**`
+                cmft: `**${value} cm** is **${Math.floor((value / 2.54) / 12)} ft${cmtoft}**`
             };
 
             await command.reply(conversions[unit + newUnit] || 'Invalid conversion');
