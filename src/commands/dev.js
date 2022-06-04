@@ -2,7 +2,7 @@ module.exports = {
     /** @param {import('discord.js/typings').CommandInteraction} command */
     async execute(command) {
         try {
-            if (command.user.id !== process.env.OWNER_ID) return await command.reply('You are not a developer');
+            if (command.user.id !== process.env.OWNER_ID) return await command.reply('You are not a developer!');
 
             const perms = [{
                 id: process.env.OWNER_ID,
