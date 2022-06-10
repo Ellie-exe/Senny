@@ -73,6 +73,8 @@ module.exports = {
                     timestamp = Date.now() + await parse(time);
                 }
 
+                if (timestamp < Date.now()) throw new Error('Invalid time');
+
                 const end = `<t:${Math.round(timestamp / 1000)}:R>`;
                 const now = `<t:${Math.round(Date.now() / 1000)}:R>`;
 
