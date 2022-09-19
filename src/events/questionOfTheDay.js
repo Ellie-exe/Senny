@@ -2,23 +2,20 @@ module.exports = {
     name: 'questionOfTheDay',
     async execute() {
         try {
-            const fs = require('fs');
+            const axios = require("axios");
             const channel = client.channels.cache.get('755904698363674774');
 
-            fs.readFile('./questionOfTheDay.json', 'utf-8', (err, data) => {
-                if (err) throw err;
+            const options = {
+                method: 'GET',
+                url: 'https://conversation-starter1.p.rapidapi.com/',
+                headers: {
+                    'X-RapidAPI-Key': '83218fae53msh4dce9cdb2fc8e7ep18c5ffjsn9acd49c28bee',
+                    'X-RapidAPI-Host': 'conversation-starter1.p.rapidapi.com'
+                }
+            };
 
-                const json = JSON.parse(data);
-                const rand = Math.floor(Math.random() * json.questions.length);
-
-                channel.send(`**${json.questions[rand]}**`);
-
-                json.questions.splice(rand, 1);
-                const newData = JSON.stringify(json, null, 4);
-
-                fs.writeFile('./questionOfTheDay.json', newData, 'utf-8', (err) => {
-                    if (err) throw err;
-                });
+            axios.request(options).then(res => {
+                channel.send(`**${res.data.question}**`);
             });
 
         } catch (err) {
