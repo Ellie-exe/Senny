@@ -3,7 +3,10 @@ module.exports = {
     async execute() {
         try {
             const axios = require("axios");
-            const channel = client.channels.cache.get('755904698363674774');
+            const channels = [];
+
+            channels.push(client.channels.cache.get('755904698363674774'));
+            channels.push(client.channels.cache.get('1062482192300785696'));
 
             const options = {
                 method: 'GET',
@@ -15,7 +18,9 @@ module.exports = {
             };
 
             axios.request(options).then(res => {
-                channel.send(`**${res.data.question}**`);
+                for (const channel of channels) {
+                    channel.send(`**${res.data.question}**`);
+                }
             });
 
         } catch (err) {
