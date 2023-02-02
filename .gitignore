@@ -1,5 +1,5 @@
-/.idea
-/node_modules
-/ecosystem.config.js
-/events.log
-/questionOfTheDay.json
+.idea
+node_modules
+events.log
+.env
+senny-app.tar.gz

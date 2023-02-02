@@ -4,8 +4,8 @@ const schedule = require('node-schedule');
 const discord = require('discord.js');
 
 const client = new discord.Client({intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_PRESENCES', 'GUILD_MESSAGES']});
-const sequelize = new Sequelize('senny', process.env.USERNAME, process.env.PASSWORD, {
-    host: 'localhost',
+const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_USER, process.env.MYSQL_PASSWORD, {
+    host: 'mariadb',
     dialect: 'mariadb',
     logging: false
 });

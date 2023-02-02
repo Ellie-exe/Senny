@@ -1,0 +1,13 @@
+.git
+.idea
+node_modules
+events.log
+LICENSE
+README.md
+.gitignore
+package-lock.json
+.env
+docker-compose.yml
+senny-app.tar.gz
+.dockerignore
+Dockerfile

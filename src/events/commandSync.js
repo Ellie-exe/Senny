@@ -21,6 +21,7 @@ module.exports = {
 
             client.commands.filter(cmd => cmd.flags.guild && !cmd.flags.developer).each(async cmd => {
                 const guild = client.guilds.cache.get(cmd.flags.guild);
+                if (guild === undefined) return;
                 const guildCommands = await guild.commands.fetch();
 
                 for (const data of cmd.data) {
