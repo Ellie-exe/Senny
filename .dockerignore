@@ -11,3 +11,4 @@ docker-compose.yml
 senny-app.tar.gz
 .dockerignore
 Dockerfile
+build.sh

@@ -3,3 +3,4 @@ node_modules
 events.log
 .env
 senny-app.tar.gz
+build.sh
