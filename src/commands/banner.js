@@ -3,18 +3,18 @@ const { logger } = require('../utils');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('avatar')
-        .setDescription('Get the avatar of a user')
+        .setName('banner')
+        .setDescription('Get the banner of a user')
         .addUserOption(option =>
             option.setName('user')
-                .setDescription('The user to get the avatar of')),
+                .setDescription('The user to get the banner of')),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {
         try {
-            const user = interaction.options.getUser('user') ?? interaction.user;
-            const avatar = user.displayAvatarURL({extension: 'png', size: 4096});
-            await interaction.reply(avatar);
+            const user = await interaction.options.getUser('user')?.fetch() ?? await interaction.user.fetch();
+            const banner = user.bannerURL({extension: 'png', size: 4096});
+            await interaction.reply(banner);
 
         } catch (err) {
             logger.error(err.stack);

@@ -3,15 +3,14 @@ const { logger } = require('../utils');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Replies with Pong!'),
+        .setName('flip')
+        .setDescription('Flips a coin'),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {
         try {
-            const message = await interaction.reply({content: 'Pinging...', fetchReply: true});
-            const ping = message.createdTimestamp - interaction.createdTimestamp;
-            await interaction.editReply(`Pong! Took **${ping} ms**`);
+            const coin = Math.random() < 0.5 ? 'heads' : 'tails';
+            await interaction.reply(`You flipped **${coin}**`);
 
         } catch (err) {
             logger.error(err.stack);

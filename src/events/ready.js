@@ -1,79 +1,88 @@
-const schedule = require("node-schedule");
+const { Events, REST, Routes, ActivityType } = require('discord.js');
+const { scheduleJob } = require("node-schedule");
+const { reminders, birthdays, logger } = require('../utils');
+
 module.exports = {
-    name: 'ready',
-    async execute() {
+    name: Events.ClientReady,
+
+    /** @param {import('discord.js').Client} client */
+    async execute(client) {
         try {
-            const schedule = require('node-schedule');
-
-            client.emit('commandSync');
-
-            const activity = [
-                {type: 'LISTENING', name: '/'},
-                {type: 'WATCHING', name: 'over Bongo'},
-                {type: 'PLAYING', name: 'with the API'},
-                {type: 'WATCHING', name: `${client.guilds.cache.size} Guilds`}
+            const activities = [
+                { type: ActivityType.Watching, name: `${client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0)} users` },
+                { type: ActivityType.Watching, name: `${client.guilds.cache.size} servers` }
             ];
 
+            client.user.setActivity(activities[0].name, { type: activities[0].type });
             let counter = 0;
-            client.user.setActivity(activity[0].name, {type: activity[0].type});
 
             setInterval(async () => {
-                (counter === 3) ? counter = 0 : counter++;
-                client.user.setActivity(activity[counter].name, {type: activity[counter].type});
+                try {
+                    counter === activities.length - 1 ? counter = 0 : counter++;
+                    client.user.setActivity(activities[counter].name, {type: activities[counter].type});
+
+                } catch (err) {
+                    logger.error(err.stack);
+                }
 
             }, 30000);
 
-            const Reminders = sequelize.define('reminders', {
-                reminderId: {type: DataTypes.STRING(10), primaryKey: true},
-                authorId: DataTypes.STRING(20),
-                channelId: DataTypes.STRING(20),
-                userId: DataTypes.STRING(20),
-                time: DataTypes.BIGINT({length: 20}),
-                message: DataTypes.TEXT
-            });
+            const reminderList = await reminders.find().exec();
+            const birthdayList = await birthdays.find().exec();
 
-            const reminders = await Reminders.findAll();
-
-            reminders.forEach(reminder => {
-                schedule.scheduleJob(reminder.time, async () => {
+            for (const reminder of reminderList) {
+                scheduleJob(reminder.endTimestamp, async () => {
                     try {
-                        const user = client.users.cache.get(reminder.userId);
-                        const channel = client.channels.cache.get(reminder.channelId) || await user?.createDM();
+                        const channel = /** @type {import('discord.js').TextChannel} */ (await client.channels.fetch(/** @type {String} */ reminder.destinationId));
 
-                        await reminder.destroy();
+                        const message = `Hello! ${reminder.authorString} asked me to remind ${reminder.destinationString} ` +
+                            `about **"${reminder.message}"** <t:${Math.round(reminder.startTimestamp / 1000)}:R>`;
 
-                        const data = JSON.stringify(reminder.toJSON(), null, 4);
-                        if (!channel) throw new Error(`Reminder not sent: ${data}`);
-
-                        await channel.send(reminder.message);
+                        await channel.send(message);
+                        await reminder.delete();
 
                     } catch (err) {
-                        logger.error(err);
+                        logger.error(err.stack);
                     }
-                });
-            });
-
-            const Birthdays = sequelize.define('birthdays', {
-                userId: {type: DataTypes.STRING(20), primaryKey: true},
-                timestamp: DataTypes.BIGINT({length: 20}),
-                date: DataTypes.DATEONLY
-            });
-
-            const birthdays = await Birthdays.findAll();
-
-            for (const birthday of birthdays) {
-                schedule.scheduleJob(birthday.timestamp, async () => {
-                    const channel = client.channels.cache.get('405147700825292827');
-                    const user = client.users.cache.get(birthday.userId);
-
-                    await channel.send(`It is ${user.toString()}'s birthday today!`);
                 });
             }
 
-            logger.info(`Ready to serve ${client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0)} users in ${client.guilds.cache.size} servers`);
+            for (const birthday of birthdayList) {
+                scheduleJob(`0 7 ${birthday.day} ${birthday.month} *`, async () => {
+                    try {
+                        const channel = /** @type {import('discord.js').TextChannel} */ (client.channels.cache.get('405147700825292827'));
+                        const user = await client.users.fetch(/** @type {String} */ birthday.userId);
+
+                        await channel.send(`Hello <@&396534463489769475>! Today is ${user.toString()}'s birthday today!`);
+
+                    } catch (err) {
+                        logger.error(err.stack);
+                    }
+                });
+            }
+
+            const commands = [];
+
+            for (const command of require('../commands')) {
+                commands.push(command.data.toJSON());
+            }
+
+            const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+
+            if (process.env.NODE_ENV === 'production') {
+                await rest.put(Routes.applicationCommands('665318329040371725'), { body: commands });
+
+            } else {
+                await rest.put(Routes.applicationGuildCommands(client.user.id, '660745210556448781'), { body: commands });
+                await rest.put(Routes.applicationGuildCommands(client.user.id, '573272766149558272'), { body: commands });
+                await rest.put(Routes.applicationGuildCommands(client.user.id, '396523509871935489'), { body: commands });
+            }
+
+            const userCount = client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0);
+            logger.info(`Ready to serve ${userCount} in ${client.guilds.cache.size} servers! Logged in as ${client.user.tag}`);
 
         } catch (err) {
-            logger.error(err);
+            logger.error(err.stack);
         }
     }
 };

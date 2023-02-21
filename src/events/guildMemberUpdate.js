@@ -1,15 +1,19 @@
+const { Events, GuildMember } = require('discord.js');
+const { logger } = require('../utils');
+
 module.exports = {
-    name: 'guildMemberUpdate',
+    name: Events.GuildMemberUpdate,
+
     /**
-     * @param {import('discord.js/typings').GuildMember} oldMember
-     * @param {import('discord.js/typings').GuildMember} newMember
+     * @param {GuildMember} oldMember
+     * @param {GuildMember} newMember
      */
     async execute(oldMember, newMember) {
         try {
             if (newMember.guild.id !== '573272766149558272') return;
 
             if (oldMember.pending && !newMember.pending && !newMember.user.bot) {
-                const channel = newMember.guild.channels.cache.get('573272766611193867');
+                const channel = /** @type {import('discord.js').TextChannel} */ (newMember.guild.channels.cache.get('573272766611193867'));
                 await newMember.roles.add('578211559390576640');
 
                 const message = await channel.send(
@@ -57,7 +61,7 @@ module.exports = {
             }
 
         } catch (err) {
-            logger.error(err);
+            logger.error(err.stack);
         }
     }
 };

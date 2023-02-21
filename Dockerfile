@@ -1,9 +1,11 @@
-FROM arm64v8/node
+FROM node
 
-WORKDIR /app
+WORKDIR /usr/src/senny
 
-COPY . /app
+COPY package.json .
 
 RUN npm install
+
+COPY src ./src
 
 CMD ["node", "src/index.js"]

@@ -1,6 +1,17 @@
+const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js');
+const { logger } = require('../utils');
+
 module.exports = {
-    /** @param {import('discord.js/typings').CommandInteraction} command */
-    async execute(command) {
+    data: new SlashCommandBuilder()
+        .setName('8ball')
+        .setDescription('Ask the magic 8ball a question!')
+        .addStringOption(option =>
+            option.setName('question')
+                .setDescription('The question to ask the magic 8ball')
+                .setRequired(true)),
+
+    /** @param {ChatInputCommandInteraction} interaction */
+    async execute(interaction) {
         try {
             const responses = [
                 'It is certain.',
@@ -25,34 +36,13 @@ module.exports = {
                 'Very doubtful.'
             ];
 
-            const question = command.options.getString('question');
-            const response = responses[Math.floor(Math.random() * responses.length)]
+            const question = interaction.options.getString('question');
+            const response = responses[Math.floor(Math.random() * responses.length)];
 
-            await command.reply(`You asked **"${question}"** and the Magic 8-ball says: **${response}**`);
+            await interaction.reply(`You asked **"${question}"** and the Magic 8-ball says: **${response}**`);
 
         } catch (err) {
-            logger.error(err);
+            logger.error(err.stack);
         }
-    },
-
-    data: [
-        {
-            type: 'CHAT_INPUT',
-            name: '8ball',
-            description: 'Ask the Magic 8-ball a question',
-            options: [
-                {
-                    type: 'STRING',
-                    name: 'question',
-                    description: 'The question to ask',
-                    required: true
-                }
-            ]
-        }
-    ],
-
-    flags: {
-        developer: false,
-        guild: false
     }
 };

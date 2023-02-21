@@ -1,36 +1,24 @@
-module.exports = {
-    /** @param {import('discord.js/typings').CommandInteraction} command */
-    async execute(command) {
-        try {
-            const list = command.options.getString('choices');
-            const choices = list.split(list.includes(',') ? /\s*,\s*/ : / +/);
-            const choice = choices[Math.floor(Math.random() * choices.length)];
+const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js');
+const { logger } = require('../utils');
 
-            await command.reply(`Between **"${choices.join(', ')}"** I choose **${choice}**`);
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('choose')
+        .setDescription('Choose between multiple options')
+        .addStringOption(option =>
+            option.setName('options')
+                .setDescription('The comma separated options to choose from')
+                .setRequired(true)),
+
+    /** @param {ChatInputCommandInteraction} interaction */
+    async execute(interaction) {
+        try {
+            const options = interaction.options.getString('options').split(',');
+            const choice = options[Math.floor(Math.random() * options.length)];
+            await interaction.reply(`Between **"${options.join(', ')}"** I choose **${choice}**`);
 
         } catch (err) {
-            logger.error(err);
+            logger.error(err.stack);
         }
-    },
-
-    data: [
-        {
-            type: 'CHAT_INPUT',
-            name: 'choose',
-            description: 'Have something randomly chosen from a list',
-            options: [
-                {
-                    type: 'STRING',
-                    name: 'choices',
-                    description: 'The list to choose from (either comma or space separated)',
-                    required: true
-                }
-            ]
-        }
-    ],
-
-    flags: {
-        developer: false,
-        guild: false
     }
 };

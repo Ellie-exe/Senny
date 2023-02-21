@@ -1,43 +1,42 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const logger = require('@jakeyprime/logger');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const schedule = require('node-schedule');
-const discord = require('discord.js');
+const mongoose = require('mongoose');
 
-const client = new discord.Client({intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_PRESENCES', 'GUILD_MESSAGES']});
-const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_USER, process.env.MYSQL_PASSWORD, {
-    host: 'mariadb',
-    dialect: 'mariadb',
-    logging: false
-});
+try {
+    const client = new Client({
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.MessageContent,
+            GatewayIntentBits.GuildMembers
+        ]
+    });
 
-global.DataTypes = DataTypes;
-global.sequelize = sequelize;
-global.discord = discord;
-global.client = client;
-global.logger = logger;
+    mongoose.connect(process.env.MONGO_URI);
+    client.commands = new Collection();
 
-client.commands = new discord.Collection();
+    for (const command of require('./commands')) {
+        client.commands.set(command.data.name, command);
+    }
 
-const commands = require('./commands');
-Object.values(commands).forEach(command => {
-    client.commands.set(command.data[0].name, command);
-});
+    for (const event of require('./events')) {
+        client.on(event.name, (...args) => event.execute(...args));
+    }
 
-const events = require('./events');
-Object.values(events).forEach(event => {
-    client.on(event.name, (...args) => event.execute(...args));
-});
+    schedule.scheduleJob('0 0 0 * * 5', async () => {
+        client.emit('funkyMonkeyFriday', 'Friday', client);
+    });
 
-schedule.scheduleJob('0 0 0 * * 5', async () => {
-    client.emit('funkyMonkeyFriday', 'Friday');
-});
+    schedule.scheduleJob('0 0 0 * * 6', async () => {
+        client.emit('funkyMonkeyFriday', 'Saturday', client);
+    });
 
-schedule.scheduleJob('0 0 0 * * 6', async () => {
-    client.emit('funkyMonkeyFriday', 'Saturday');
-});
+    schedule.scheduleJob('0 0 12 * * *', async () => {
+        client.emit('questionOfTheDay', client);
+    });
 
-schedule.scheduleJob('0 0 12 * * *', async () => {
-    client.emit('questionOfTheDay');
-});
+    client.login(process.env.TOKEN);
 
-client.login(process.env.TOKEN);
+} catch (err) {
+    console.error(err.stack);
+}

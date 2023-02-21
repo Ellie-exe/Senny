@@ -1,8 +1,26 @@
+const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js');
+const { logger } = require('../utils');
+
 module.exports = {
-    /** @param {import('discord.js/typings').CommandInteraction} command */
-    async execute(command) {
+    data: new SlashCommandBuilder()
+        .setName('eval')
+        .setDescription('Evaluate JavaScript code')
+        .addStringOption(option =>
+            option.setName('code')
+                .setDescription('The code to evaluate')
+                .setRequired(true)),
+
+    /** @param {ChatInputCommandInteraction} interaction */
+    async execute(interaction) {
         try {
-            let code = command.options.getString('code');
+            if (interaction.user.id !== '468854398806654976') {
+                await interaction.reply('You do not have permission to use this command.');
+                return;
+            }
+
+            await interaction.deferReply();
+
+            let code = interaction.options.getString('code');
             if (code.includes('await')) code = `(async () => {${code}})();`;
 
             const output = await eval(code);
@@ -10,35 +28,13 @@ module.exports = {
 
             let result = output;
             if (typeof output === 'function') result = output.toString();
-            if (typeof output !== 'string') result = require('util').inspect(output, {depth: 0});
+            if (typeof output !== 'string') result = require('util').inspect(output, { depth: 0 });
 
-            await command.reply(`\`\`\`ps\n${result}\n\`\`\``);
+            await interaction.editReply(`\`\`\`ansi\n${result}\n\`\`\``);
 
         } catch (err) {
-            await command.reply(`\`\`\`ps\n${err}\n\`\`\``);
-            logger.error(err);
+            await interaction.editReply(`\`\`\`ansi\n${err.stack}\n\`\`\``);
+            logger.error(err.stack);
         }
-    },
-
-    data: [
-        {
-            type: 'CHAT_INPUT',
-            name: 'eval',
-            description: 'Evaluates a JavaScript expression',
-            defaultPermission: false,
-            options: [
-                {
-                    type: 'STRING',
-                    name: 'code',
-                    description: 'The code to evaluate',
-                    required: true
-                }
-            ]
-        }
-    ],
-
-    flags: {
-        developer: true,
-        guild: false
     }
 };

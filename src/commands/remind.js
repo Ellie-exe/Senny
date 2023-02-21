@@ -1,265 +1,187 @@
+const { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction } = require('discord.js');
+const { scheduleJob } = require('node-schedule');
+const { reminders, logger } = require('../utils');
+
 module.exports = {
-    /** @param {import('discord.js/typings').CommandInteraction} command */
-    async execute(command) {
+    data: new SlashCommandBuilder()
+        .setName('remind')
+        .setDescription('Reminds you of something')
+        .addSubcommand(subcommand =>
+            subcommand.setName('at')
+                .setDescription('Remind you at a date and time')
+                .addStringOption(option =>
+                    option.setName('date')
+                        .setDescription('The date and time to remind you at')
+                        .setRequired(true))
+                .addStringOption(option =>
+                    option.setName('message')
+                        .setDescription('The message to remind you of')
+                        .setRequired(true))
+                .addChannelOption(option =>
+                    option.setName('channel')
+                        .setDescription('The channel to remind you in'))
+                .addUserOption(option =>
+                    option.setName('user')
+                        .setDescription('The user to remind')))
+        .addSubcommand(subcommand =>
+            subcommand.setName('in')
+                .setDescription('Remind you in a duration')
+                .addStringOption(option =>
+                    option.setName('time')
+                        .setDescription('The duration to remind you in')
+                        .setRequired(true))
+                .addStringOption(option =>
+                    option.setName('message')
+                        .setDescription('The message to remind you of')
+                        .setRequired(true))
+                .addChannelOption(option =>
+                    option.setName('channel')
+                        .setDescription('The channel to remind you in'))
+                .addUserOption(option =>
+                    option.setName('user')
+                        .setDescription('The user to remind')))
+        .addSubcommand(subcommand =>
+            subcommand.setName('list')
+                .setDescription('List your reminders'))
+        .addSubcommand(subcommand =>
+            subcommand.setName('delete')
+                .setDescription('Delete a reminder')
+                .addStringOption(option =>
+                    option.setName('id')
+                        .setDescription('The id of the reminder to delete')
+                        .setRequired(true))),
+
+    /** @param {ChatInputCommandInteraction} interaction */
+    async execute(interaction) {
         try {
-            const schedule = require('node-schedule');
+            const subcommand = interaction.options.getSubcommand();
 
-            // TODO: Add a way to make reminders repeat
-            // TODO: Sanitize the message
+            if (subcommand === 'list') {
+                const reminderList = await reminders.find({userId: interaction.user.id}).exec();
+                const embed = new EmbedBuilder()
+                    .setColor(0x2F3136)
+                    .setTitle(`Reminders for ${interaction.user.username}`);
 
-            const Reminders = sequelize.define('reminders', {
-                reminderId: {type: DataTypes.STRING(10), primaryKey: true},
-                authorId: DataTypes.STRING(20),
-                channelId: DataTypes.STRING(20),
-                userId: DataTypes.STRING(20),
-                time: DataTypes.BIGINT({length: 20}),
-                message: DataTypes.TEXT
-            });
-
-            /** @param {int} length */
-            const newId = (length) => {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                let reminderId = '';
-
-                for (let i = 0; i < length; i++) {
-                    reminderId += chars.charAt(Math.floor(Math.random() * chars.length));
+                if (reminderList.length === 0) {
+                    embed.setDescription('You have no reminders');
                 }
 
-                return reminderId;
+                let count = 1;
+
+                for (const reminder of reminderList) {
+                    const offset = Math.floor(Math.random() * 18);
+                    const reminderId = reminder.id.substring(offset, offset + 7);
+                    const channel = interaction.client.channels.cache.get(/** @type String */ reminder.destinationId);
+                    const info = `\`${reminderId}\` <t:${Math.round(reminder.endTimestamp / 1000)}:R> ${channel.toString()}`;
+
+                    embed.addFields(/** @type any */ {name: `${count}. ${reminder.message}`, value: info});
+                    count++;
+                }
+
+                await interaction.reply({embeds: [embed]});
+                return;
             }
 
-            /** @param {string} time */
-            const parse = async (time) => {
-                const times = time.match(/\d+\s*\w+/g);
+            if (subcommand === 'delete') {
+                const id = interaction.options.getString('id');
+                const reminder = await reminders.findOne({id: new RegExp(id)}).exec();
+
+                if (!reminder) {
+                    await interaction.reply('Reminder not found!');
+                    return;
+                }
+
+                if (reminder.authorId !== interaction.user.id) {
+                    await interaction.reply('You can only delete your own reminders!');
+                    return;
+                }
+
+                await reminder.delete();
+                await interaction.reply('Reminder deleted!');
+                return;
+            }
+
+            const user = interaction.options.getUser('user');
+            const channel = await user?.createDM() ?? interaction.options.getChannel('channel') ?? interaction.channel;
+
+            let timestamp = Date.now();
+
+            if (subcommand === 'at') {
+                timestamp = Date.parse(interaction.options.getString('date'));
+
+                if (isNaN(timestamp)) {
+                    await interaction.reply('Invalid date!');
+
+                    const error = new Error('Invalid date');
+                    logger.error(error.stack);
+
+                    return;
+                }
+            }
+
+            if (subcommand === 'in') {
+                const timeString = interaction.options.getString('time');
+                const times = timeString.match(/\d+\s*\w+/g);
+
                 let duration = 0;
 
-                if (!times) return await command.reply('Invalid time format');
-
-                times.forEach(time => {
+                for (const time of times) {
                     const value = time.match(/\d+/g)[0];
                     const label = time.match(/(?<=\s|\d)(mo|[ywdhms])/gi)[0];
 
                     const conversions = {
-                        y: value * 31536000000,
-                        mo: value * 2592000000,
-                        w: value * 604800000,
-                        d: value * 86400000,
-                        h: value * 3600000,
-                        m: value * 60000,
-                        s: value * 1000,
+                        y: value * 365 * 24 * 60 * 60 * 1000,
+                        mo: value * 30 * 24 * 60 * 60 * 1000,
+                        w: value * 7 * 24 * 60 * 60 * 1000,
+                        d: value * 24 * 60 * 60 * 1000,
+                        h: value * 60 * 60 * 1000,
+                        m: value * 60 * 1000,
+                        s: value * 1000
                     };
 
                     duration += conversions[label];
-                });
+                }
 
-                return duration;
+                timestamp += duration;
             }
 
-            const subcommand = command.options.getSubcommand();
+            const reminder = await reminders.create({
+                authorString: interaction.user.id === user?.id ? 'You' : interaction.user.toString(),
+                destinationString: user !== null ? 'you' : channel.toString(),
+                message: interaction.options.getString('message'),
+                authorId: interaction.user.id,
+                destinationId: channel.id,
+                startTimestamp: Date.now(),
+                endTimestamp: timestamp
+            });
 
-            if (subcommand === 'channel' || subcommand === 'user') {
-                const time = command.options.getString('time');
-                const msg = command.options.getString('message');
-                const channel = command.options.getChannel('channel');
-                const user = command.options.getUser('user');
-                const reminderId = newId(5);
+            reminder.id = reminder._id;
+            await reminder.save();
 
-                let timestamp = Date.parse(time);
-                if (isNaN(timestamp)) {
-                    const duration = await parse(time);
+            scheduleJob(timestamp, async () => {
+                try {
+                    const r = await reminders.findOne({_id: reminder.id}).exec();
+                    if (!r) return;
 
-                    if (!duration) return await command.reply('Invalid time format');
+                    const message = `Hello! ${r.authorString} asked me to remind ${r.destinationString} ` +
+                        `about **"${r.message}"** <t:${Math.round(r.startTimestamp / 1000)}:R>`;
 
-                    timestamp = Date.now() + await parse(time);
+                    await channel.send(message);
+                    await r.delete();
+
+                } catch (err) {
+                    logger.error(err.stack);
                 }
+            });
 
-                if (timestamp < Date.now()) throw new Error('Invalid time');
+            const response = `Okay ${interaction.user.toString()}! I'll remind ` +
+                `${interaction.user.id === user?.id ? 'you' : channel.toString()} about ` +
+                `**"${interaction.options.getString('message')}"** <t:${Math.round(timestamp / 1000)}:R>`;
 
-                const end = `<t:${Math.round(timestamp / 1000)}:R>`;
-                const now = `<t:${Math.round(Date.now() / 1000)}:R>`;
-
-                const location = channel?.toString() || 'you';
-
-                let destination = channel?.toString() || user?.toString();
-                let invoker = command.user.toString();
-                if (user?.id === command.user.id) {
-                    invoker = 'You';
-                    destination = 'you';
-                }
-
-                const message = `Hello! ${invoker} asked me to remind ${location} about **"${msg}"** ${now}`;
-
-                await Reminders.create({
-                    reminderId: reminderId,
-                    authorId: command.user.id,
-                    channelId: channel?.id,
-                    userId: user?.id,
-                    time: timestamp,
-                    message: message
-                });
-
-                schedule.scheduleJob(timestamp, async () => {
-                    try {
-                        const reminder = await Reminders.findOne({where: {reminderId: reminderId}});
-
-                        if (reminder) {
-                            const user = client.users.cache.get(reminder.userId);
-                            const channel = client.channels.cache.get(reminder.channelId) || await user?.createDM();
-
-                            await reminder.destroy();
-
-                            const data = JSON.stringify(reminder.toJSON(), null, 4);
-                            if (!channel) throw new Error(`Reminder not sent: ${data}`);
-
-                            await channel.send(reminder.message);
-                        }
-
-                    } catch (err) {
-                        logger.error(err);
-                    }
-                });
-
-                await command.reply(`Okay ${command.user.toString()}! I'll remind ${destination} about **"${msg}"** ${end}`);
-
-            } else if (subcommand === 'list') {
-                const reminders = await Reminders.findAll({where: {authorId: command.user.id}});
-
-                const embed = new discord.MessageEmbed()
-                    .setAuthor(`Reminders for ${command.user.username}`)
-                    .setColor(0x2F3136);
-
-                if (reminders.length === 0) {
-                    embed.setDescription('You have no reminders');
-
-                } else {
-                    let counter = 1;
-                    reminders.forEach(reminder => {
-                        const time = `<t:${Math.round(reminder.time / 1000)}:R>`;
-
-                        const channel = client.channels.cache.get(reminder.channelId) || client.users.cache.get(reminder.userId);
-
-                        const start = reminder.message.indexOf('"');
-                        const end = reminder.message.lastIndexOf('"');
-                        const msg = reminder.message.substring(start + 1, end);
-
-                        embed.addField(
-                            `${counter}. ${msg}`,
-                            `\`${reminder.reminderId}\` ${time} ${channel.toString()}`
-                        );
-
-                        counter++;
-                    });
-                }
-
-                await command.reply({embeds: [embed]});
-
-            } else {
-                const reminderId = command.options.getString('id').toLowerCase();
-
-                if (reminderId === 'all') {
-                    const rows = await Reminders.destroy({where: {authorId: command.user.id}});
-
-                    if (!rows) return await command.reply('You have no reminders to delete');
-
-                    await command.reply('All your reminders have been deleted');
-
-                } else {
-                    const reminder = await Reminders.findOne({where: {reminderId: reminderId}});
-
-                    if (!reminder) return await command.reply('Reminder not found');
-                    if (reminder.authorId !== command.user.id) return await command.reply('You cannot delete this reminder');
-
-                    await reminder.destroy();
-                    await command.reply('Reminder deleted');
-                }
-            }
+            interaction.reply(response);
 
         } catch (err) {
-            logger.error(err);
+            logger.error(err.stack);
         }
-    },
-
-    data: [
-        {
-            type: 'CHAT_INPUT',
-            name: 'remind',
-            description: 'Set a reminder',
-            options: [
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'channel',
-                    description: 'Send the reminder in a channel',
-                    options: [
-                        {
-                            type: 'CHANNEL',
-                            name: 'channel',
-                            description: 'The channel to send the reminder to',
-                            channel_types: [0],
-                            required: true
-                        },
-                        {
-                            type: 'STRING',
-                            name: 'time',
-                            description: 'The time to set the reminder for (accepts both durations and dates)',
-                            required: true
-                        },
-                        {
-                            type: 'STRING',
-                            name: 'message',
-                            description: 'The message to send',
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'user',
-                    description: 'Send the reminder to a user in DMs',
-                    options: [
-                        {
-                            type: 'USER',
-                            name: 'user',
-                            description: 'The user to send the reminder to',
-                            required: true
-                        },
-                        {
-                            type: 'STRING',
-                            name: 'time',
-                            description: 'The time to set the reminder for (accepts both durations and dates)',
-                            required: true
-                        },
-                        {
-                            type: 'STRING',
-                            name: 'message',
-                            description: 'The message to send',
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'list',
-                    description: 'List all reminders'
-                },
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'delete',
-                    description: 'Delete a reminder',
-                    options: [
-                        {
-                            type: 'STRING',
-                            name: 'id',
-                            description: 'The id of the reminder to delete',
-                            required: true
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-
-    flags: {
-        developer: false,
-        guild: false
     }
 };

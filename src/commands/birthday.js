@@ -1,269 +1,68 @@
-module.exports = {
-    /** @param {import('discord.js/typings').CommandInteraction} command */
-    async execute(command) {
-        try {
-            const schedule = require('node-schedule');
-            await command.deferReply();
+const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js');
+const { birthdays, logger } = require('../utils');
+const schedule = require('node-schedule');
 
-            const Birthdays = sequelize.define('birthdays', {
-                userId: {type: DataTypes.STRING(20), primaryKey: true},
-                timestamp: DataTypes.BIGINT({length: 20}),
-                date: DataTypes.DATEONLY
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('birthday')
+        .setDescription('Set your birthday')
+        .addIntegerOption(option =>
+            option.setName('month')
+                .setDescription('The month of your birthday')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'January', value: 1 },
+                    { name: 'February', value: 2 },
+                    { name: 'March', value: 3 },
+                    { name: 'April', value: 4 },
+                    { name: 'May', value: 5 },
+                    { name: 'June', value: 6 },
+                    { name: 'July', value: 7 },
+                    { name: 'August', value: 8 },
+                    { name: 'September', value: 9 },
+                    { name: 'October', value: 10 },
+                    { name: 'November', value: 11 },
+                    { name: 'December', value: 12 }
+                ))
+        .addIntegerOption(option =>
+            option.setName('day')
+                .setDescription('The day of your birthday')
+                .setRequired(true)
+                .setMinValue(1)
+                .setMaxValue(31)),
+
+    /** @param {ChatInputCommandInteraction} interaction */
+    async execute(interaction) {
+        try {
+            if (interaction.guild.id !== '396523509871935489') {
+                interaction.reply({ content: 'This command cannot be used in this server', ephemeral: true });
+                return;
+            }
+
+            const channel = /** @type {import('discord.js').TextChannel} */ (interaction.client.channels.cache.get('405147700825292827'));
+            const month = interaction.options.getInteger('month');
+            const day = interaction.options.getInteger('day');
+
+            const birthday = await birthdays.create({
+                userId: interaction.user.id,
+                month: month,
+                day: day
             });
 
-            await Birthdays.sync();
+            await birthday.save();
+            await interaction.reply(`Your birthday has been set to **${month}/${day}**`);
 
-            const getTimeMarkdown = (date) => {
-                const timestamp = Date.parse(date);
+            schedule.scheduleJob(`0 7 ${day} ${month} *`, async () => {
+                try {
+                    await channel.send(`Hello <@396534463489769475>! Today is ${interaction.user.toString()}'s birthday today!`);
 
-                let displayDate = `${date}`;
-                if (!isNaN(timestamp)) {
-                    displayDate = `<t:${timestamp / 1000}:D>`;
+                } catch (err) {
+                    logger.error(err.stack);
                 }
-
-                return displayDate;
-            }
-
-            const subcommand = command.options.getSubcommand();
-
-            switch (subcommand) {
-                case 'set': {
-                    const user = command.options.getUser('user');
-                    const month = command.options.getString('month');
-                    const day = command.options.getInteger('day');
-                    const year = command.options.getInteger('year');
-                    const timezone = command.options.getString('timezone').toUpperCase();
-
-                    const monthDay = `${month}-${day} ${timezone}`;
-                    const date = `${year}-${monthDay}`;
-                    const displayDate = getTimeMarkdown(date);
-
-                    const currentYear = new Date().getFullYear();
-
-                    let next = `${currentYear}-${monthDay}`;
-                    if (Date.parse(next) < Date.now()) next = `${currentYear + 1}-${monthDay}`;
-
-                    const timestamp = Date.parse(next);
-                    if (isNaN(timestamp)) return await command.editReply('Invalid date');
-
-                    const birthday = await Birthdays.findOne({where: {userId: user.id}});
-                    if (birthday) {
-                        await command.editReply(`${user.toString()} already has a birthday set`);
-                        break;
-                    }
-
-                    await Birthdays.create({
-                        userId: user.id,
-                        timestamp: timestamp,
-                        date: date
-                    });
-
-                    schedule.scheduleJob(timestamp, async () => {
-                        const birthday = await Birthdays.findOne({where: {userId: user.id}});
-                        if (birthday) {
-                            const channel = client.channels.cache.get('405147700825292827');
-                            const user = client.users.cache.get(birthday.userId);
-
-                            await channel.send(`It is ${user.toString()}'s birthday today!`);
-                        }
-                    });
-
-                    await command.editReply(`Okay! I have set ${user.toString()}'s birthday as ${displayDate}`);
-
-                    break;
-                }
-
-                case 'get': {
-                    const user = command.options.getUser('user');
-                    const birthday = await Birthdays.findOne({where: {userId: user.id}});
-
-                    const displayDate = getTimeMarkdown(birthday.date);
-
-                    if (birthday) {
-                        await command.editReply(`${user.toString()}'s birthday is ${displayDate}`);
-
-                    } else {
-                        await command.editReply(`${user.toString()} does not have a birthday set`);
-                    }
-
-                    break;
-                }
-
-                case 'list': {
-                    const birthdays = await Birthdays.findAll();
-
-                    const embed = new discord.MessageEmbed()
-                        .setAuthor(`Birthdays`)
-                        .setColor(0x2F3136);
-
-                    if (birthdays.length === 0) {
-                        embed.setDescription('There are no birthdays set');
-
-                    } else {
-                        let counter = 1;
-                        for (const birthday of birthdays) {
-                            const user = command.users.cache.get(birthday.userId);
-                            if (!user) continue;
-
-                            embed.addField(`${counter}. ${user.toString()}`, `${getTimeMarkdown(birthday.date)}`);
-                            counter++;
-                        }
-                    }
-
-                    break;
-                }
-
-                case 'remove': {
-                    const user = command.options.getUser('user');
-                    const birthday = await Birthdays.findOne({where: {userId: user.id}});
-
-                    if (birthday) {
-                        await birthday.destroy();
-                        await command.editReply(`Okay! I have removed ${user.toString()}'s birthday`);
-
-                    } else {
-                        await command.editReply(`${user.toString()} does not have a birthday set`);
-                    }
-
-                    break;
-                }
-            }
+            });
 
         } catch (err) {
-            logger.error(err);
+            logger.error(err.stack);
         }
-    },
-
-    data: [
-        {
-            type: 'CHAT_INPUT',
-            name: 'birthday',
-            description: 'Set and get birthdays',
-            options: [
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'set',
-                    description: 'Set a user\'s birthday',
-                    options: [
-                        {
-                            type: 'USER',
-                            name: 'user',
-                            description: 'The user to set the birthday for',
-                            required: true
-                        },
-                        {
-                            type: 'STRING',
-                            name: 'month',
-                            description: 'The month of the birthday',
-                            required: true,
-                            choices: [
-                                {
-                                    name: 'January',
-                                    value: '01'
-                                },
-                                {
-                                    name: 'February',
-                                    value: '02'
-                                },
-                                {
-                                    name: 'March',
-                                    value: '03'
-                                },
-                                {
-                                    name: 'April',
-                                    value: '04'
-                                },
-                                {
-                                    name: 'May',
-                                    value: '05'
-                                },
-                                {
-                                    name: 'June',
-                                    value: '06'
-                                },
-                                {
-                                    name: 'July',
-                                    value: '07'
-                                },
-                                {
-                                    name: 'August',
-                                    value: '08'
-                                },
-                                {
-                                    name: 'September',
-                                    value: '09'
-                                },
-                                {
-                                    name: 'October',
-                                    value: '10'
-                                },
-                                {
-                                    name: 'November',
-                                    value: '11'
-                                },
-                                {
-                                    name: 'December',
-                                    value: '12'
-                                }
-                            ]
-                        },
-                        {
-                            type: 'INTEGER',
-                            name: 'day',
-                            description: 'The day of the birthday',
-                            required: true
-                        },
-                        {
-                            type: 'INTEGER',
-                            name: 'year',
-                            description: 'The year of the birthday',
-                            required: true
-                        },
-                        {
-                            type: 'STRING',
-                            name: 'timezone',
-                            description: 'The timezone of the birthday',
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'get',
-                    description: 'Gets a birthday',
-                    options: [
-                        {
-                            type: 'USER',
-                            name: 'user',
-                            description: 'The user to get the birthday of',
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'list',
-                    description: 'List all birthdays'
-                },
-                {
-                    type: 'SUB_COMMAND',
-                    name: 'remove',
-                    description: 'Remove a user\'s birthday',
-                    options: [
-                        {
-                            type: 'USER',
-                            name: 'user',
-                            description: 'The user to remove the birthday from',
-                            required: true
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-
-    flags: {
-        developer: false,
-        guild: '396523509871935489'
     }
 };

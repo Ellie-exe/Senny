@@ -1,21 +1,22 @@
 {
   "name": "senny",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "pm2 start ecosystem.config.js && pm2 save && pm2 logs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "docker build -t senny . && docker run --name senny --env-file .env -it senny && docker rmi $(docker images -f 'dangling=true' -q)",
+    "deploy": "docker buildx build --platform linux/arm64/v8 --push -t elliefloof/senny . && ssh ellie@45.47.73.5 '~/projects/senny/deploy.sh'",
+    "build": "docker buildx build --platform linux/arm64/v8 --push -t elliefloof/senny .",
+    "stop": "docker stop senny && docker rm senny"
   },
   "keywords": [],
-  "author": "Ellie",
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "@jakeyprime/logger": "^1.0.4",
-    "axios": "^0.24.0",
-    "discord.js": "^13.2.0",
-    "mariadb": "^2.5.5",
-    "node-schedule": "^2.0.0",
-    "sequelize": "^6.9.0"
+    "axios": "^1.3.2",
+    "discord.js": "^14.7.1",
+    "mongoose": "^6.9.1",
+    "node-schedule": "^2.1.1",
+    "winston": "^3.8.2"
   }
 }

@@ -4,11 +4,11 @@ const { logger } = require('../utils');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('terminal')
-        .setDescription('Executes a command in the terminal')
+        .setName('pipe')
+        .setDescription('Pipes a command to the host terminal')
         .addStringOption(option =>
             option.setName('command')
-                .setDescription('The command to execute')
+                .setDescription('The command to pipe')
                 .setRequired(true)),
 
     /** @param {ChatInputCommandInteraction} interaction */
@@ -22,7 +22,7 @@ module.exports = {
             const command = interaction.options.getString('command');
             await interaction.deferReply();
 
-            exec(`${command}`, async (err, stdout, stderr) => {
+            exec(`echo "${command}" > pipe && cat pipe`, async (err, stdout, stderr) => {
                 try {
                     if (err) {
                         await interaction.editReply(`\`\`\`ansi\n${err}\n\`\`\``);
@@ -32,7 +32,7 @@ module.exports = {
                     await interaction.editReply(`\`\`\`ansi\n${stdout}\n${stderr}\n\`\`\``);
 
                 } catch (err) {
-                    await interaction.editReply(`\`\`\`ansi\n${err}\n\`\`\``);
+                    await interaction.editReply(`\`\`\`ansi\n${err.stack}\n\`\`\``);
                     logger.error(err.stack);
                 }
             });

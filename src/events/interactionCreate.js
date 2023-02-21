@@ -1,15 +1,27 @@
+const { Events, ChatInputCommandInteraction } = require('discord.js');
+const { logger } = require('../utils');
+
 module.exports = {
-    name: 'interactionCreate',
-    /** @param {import('discord.js/typings').CommandInteraction} interaction */
+    name: Events.InteractionCreate,
+
+    /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {
         try {
-            const command = client.commands.get(interaction.commandName);
+            const commands = interaction.client['commands'];
+            const command = commands.get(interaction.commandName);
 
-            logger.info(`${interaction.channelId} ${interaction.user.tag}: /${interaction.commandName}`);
+            try { interaction.options.getSubcommand(); } catch (err) {
+                logger.info(`${interaction.channel.id} ${interaction.user.tag}: /${interaction.commandName}`);
+                await command.execute(interaction);
+                return;
+            }
+
+            let commandName = `${interaction.commandName} ${interaction.options.getSubcommand()}`;
+            logger.info(`${interaction.channel.id} ${interaction.user.tag}: /${commandName}`);
             await command.execute(interaction);
 
         } catch (err) {
-            logger.error(err);
+            logger.error(err.stack);
         }
     }
 };
