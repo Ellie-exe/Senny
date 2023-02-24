@@ -1,6 +1,7 @@
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const schedule = require('node-schedule');
 const mongoose = require('mongoose');
+const { logger } = require('./utils');
 
 try {
     const client = new Client({
@@ -23,6 +24,14 @@ try {
         client.on(event.name, (...args) => event.execute(...args));
     }
 
+    process.on('unhandledRejection', (reason, promise) => {
+        logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    });
+
+    process.on('uncaughtException', (err) => {
+        logger.error('Uncaught Exception thrown:', err);
+    });
+
     schedule.scheduleJob('0 0 0 * * 5', async () => {
         client.emit('funkyMonkeyFriday', 'Friday', client);
     });
@@ -38,5 +47,5 @@ try {
     client.login(process.env.TOKEN);
 
 } catch (err) {
-    console.error(err.stack);
+    logger.error(err.stack);
 }
