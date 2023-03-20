@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "docker build --load -t senny . && docker rmi $(docker images -f 'dangling=true' -q) && docker run --name senny --env-file .env -it senny",
+    "start": "docker build -t senny . && docker rmi $(docker images -f 'dangling=true' -q) && docker run --name senny --env-file .env -v ./:/usr/src/senny/events -v ./pipe:/usr/src/senny/pipe -it senny",
     "deploy": "docker buildx build --platform linux/arm64/v8 --push -t elliefloof/senny . && ssh ellie@45.47.73.5 '~/projects/senny/deploy.sh'",
     "build": "docker buildx build --platform linux/arm64/v8 --push -t elliefloof/senny .",
     "run": "docker run --name senny --env-file .env -it senny",
     "stop": "docker stop senny && docker rm senny",
-    "local": "docker build --load -t senny ."
+    "local": "docker build -t senny ."
   },
   "keywords": [],
   "author": "",

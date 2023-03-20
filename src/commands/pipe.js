@@ -20,25 +20,56 @@ module.exports = {
             }
 
             const command = interaction.options.getString('command');
+            const channel = interaction.channel;
             await interaction.deferReply();
 
             exec(`echo "${command}" > pipe && cat pipe`, async (err, stdout, stderr) => {
                 try {
                     if (err) {
-                        await interaction.editReply(`\`\`\`ansi\n${err}\n\`\`\``);
+                        logger.error(err.stack);
                         return;
                     }
 
-                    await interaction.editReply(`\`\`\`ansi\n${stdout}\n${stderr}\n\`\`\``);
+                    const paginate = (string, messages) => {
+                        const lines = string.split('\n');
+                        let out = '```ansi\n';
+
+                        for (const line of lines) {
+                            if (out.length + line.length < 1997) {
+                                out += line + '\n';
+                                continue;
+                            }
+
+                            messages.push(out + '```');
+                            out = '```ansi\n' + line + '\n';
+                        }
+
+                        if (out.length > 9) {
+                            messages.push(out + '```');
+                        }
+
+                        return messages;
+                    }
+
+                    const messages = [];
+
+                    paginate(stdout, messages);
+                    paginate(stderr, messages);
+
+                    await interaction.editReply(messages.shift());
+
+                    for (const message of messages) {
+                        await channel.send(message);
+                    }
 
                 } catch (err) {
-                    await interaction.editReply(`\`\`\`ansi\n${err.stack}\n\`\`\``);
+                    await interaction.editReply(`\`\`\`ansi\n${err.stack}\`\`\``);
                     logger.error(err.stack);
                 }
             });
 
         } catch (err) {
-            await interaction.editReply(`\`\`\`ansi\n${err.stack}\n\`\`\``);
+            await interaction.editReply(`\`\`\`ansi\n${err.stack}\`\`\``);
             logger.error(err.stack);
         }
     }
