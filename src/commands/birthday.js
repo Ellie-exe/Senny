@@ -54,7 +54,7 @@ module.exports = {
 
             schedule.scheduleJob(`0 7 ${day} ${month} *`, async () => {
                 try {
-                    await channel.send(`Hello <@396534463489769475>! Today is ${interaction.user.toString()}'s birthday today!`);
+                    await channel.send(`Hello <@396534463489769475>! Today is ${interaction.user.toString()}'s birthday!`);
 
                 } catch (err) {
                     logger.error(err.stack);

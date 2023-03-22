@@ -50,7 +50,7 @@ try {
         client.emit('questionOfTheDay', client);
     });
 
-    client.login(process.env.TOKEN);
+    client.login(process.env.TOKEN).then();
 
 } catch (err) {
     logger.error(err.stack);
