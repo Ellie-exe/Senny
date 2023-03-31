@@ -79,7 +79,7 @@ module.exports = {
             }
 
             const userCount = client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0);
-            logger.info(`Ready to serve ${userCount} in ${client.guilds.cache.size} servers! Logged in as ${client.user.tag}`);
+            logger.info(`Ready to serve ${userCount} users in ${client.guilds.cache.size} servers! Logged in as ${client.user.tag}`);
 
         } catch (err) {
             logger.error(err.stack);
