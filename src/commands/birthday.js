@@ -1,35 +1,44 @@
-const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js');
+const { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder} = require('discord.js');
 const { birthdays, logger } = require('../utils');
 const schedule = require('node-schedule');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('birthday')
-        .setDescription('Set your birthday')
-        .addIntegerOption(option =>
-            option.setName('month')
-                .setDescription('The month of your birthday')
-                .setRequired(true)
-                .addChoices(
-                    { name: 'January', value: 1 },
-                    { name: 'February', value: 2 },
-                    { name: 'March', value: 3 },
-                    { name: 'April', value: 4 },
-                    { name: 'May', value: 5 },
-                    { name: 'June', value: 6 },
-                    { name: 'July', value: 7 },
-                    { name: 'August', value: 8 },
-                    { name: 'September', value: 9 },
-                    { name: 'October', value: 10 },
-                    { name: 'November', value: 11 },
-                    { name: 'December', value: 12 }
-                ))
-        .addIntegerOption(option =>
-            option.setName('day')
-                .setDescription('The day of your birthday')
-                .setRequired(true)
-                .setMinValue(1)
-                .setMaxValue(31)),
+        .setDescription('Track birthdays in the server')
+        .addSubcommand(subcommand =>
+            subcommand.setName('set')
+                .setDescription('Set your birthday')
+                .addIntegerOption(option =>
+                    option.setName('month')
+                        .setDescription('The month of your birthday')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'January', value: 1 },
+                            { name: 'February', value: 2 },
+                            { name: 'March', value: 3 },
+                            { name: 'April', value: 4 },
+                            { name: 'May', value: 5 },
+                            { name: 'June', value: 6 },
+                            { name: 'July', value: 7 },
+                            { name: 'August', value: 8 },
+                            { name: 'September', value: 9 },
+                            { name: 'October', value: 10 },
+                            { name: 'November', value: 11 },
+                            { name: 'December', value: 12 }
+                        ))
+                .addIntegerOption(option =>
+                    option.setName('day')
+                        .setDescription('The day of your birthday')
+                        .setRequired(true)
+                        .setMinValue(1)
+                        .setMaxValue(31)))
+        .addSubcommand(subcommand =>
+            subcommand.setName('remove')
+                .setDescription('Remove your birthday'))
+        .addSubcommand(subcommand =>
+            subcommand.setName('list')
+                .setDescription('List all birthdays')),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {
@@ -39,27 +48,86 @@ module.exports = {
                 return;
             }
 
-            const channel = /** @type {import('discord.js').TextChannel} */ (interaction.client.channels.cache.get('405147700825292827'));
-            const month = interaction.options.getInteger('month');
-            const day = interaction.options.getInteger('day');
+            const subcommand = interaction.options.getSubcommand();
 
-            const birthday = await birthdays.create({
-                userId: interaction.user.id,
-                month: month,
-                day: day
-            });
+            if (subcommand === 'set') {
+                const channel = /** @type {import('discord.js').TextChannel} */ (interaction.client.channels.cache.get('405147700825292827'));
+                const month = interaction.options.getInteger('month');
+                const day = interaction.options.getInteger('day');
 
-            await birthday.save();
-            await interaction.reply(`Your birthday has been set to **${month}/${day}**`);
+                const birthday = await birthdays.create({
+                    userId: interaction.user.id,
+                    month: month,
+                    day: day
+                });
 
-            schedule.scheduleJob(`0 7 ${day} ${month} *`, async () => {
-                try {
-                    await channel.send(`Hello <@396534463489769475>! Today is ${interaction.user.toString()}'s birthday!`);
+                await birthday.save();
+                await interaction.reply(`Your birthday has been set to **${month}/${day}**`);
 
-                } catch (err) {
-                    logger.error(err.stack);
+                schedule.scheduleJob(`0 7 ${day} ${month} *`, async () => {
+                    try {
+                        await channel.send(`Hello <@396534463489769475>! Today is ${interaction.user.toString()}'s birthday!`);
+
+                    } catch (err) {
+                        logger.error(err.stack);
+                    }
+                });
+
+            } else if (subcommand === 'remove') {
+                const birthday = await birthdays.findOne({ userId: interaction.user.id }).exec();
+
+                if (!birthday) {
+                    await interaction.reply('You do not have a birthday set');
+                    return;
                 }
-            });
+
+                await birthday.delete();
+                await interaction.reply('Your birthday has been removed');
+
+            } else if (subcommand === 'list') {
+                const months = {
+                    1: 'January',
+                    2: 'February',
+                    3: 'March',
+                    4: 'April',
+                    5: 'May',
+                    6: 'June',
+                    7: 'July',
+                    8: 'August',
+                    9: 'September',
+                    10: 'October',
+                    11: 'November',
+                    12: 'December'
+                }
+
+                const birthdayList = await birthdays.find().exec();
+
+                let description = '';
+                let count = 1;
+
+                birthdayList.sort((a, b) => {
+                    if (a.month < b.month) return -1;
+                    if (a.month > b.month) return 1;
+                    if (a.day < b.day) return -1;
+                    if (a.day > b.day) return 1;
+                    return 0;
+                });
+
+                for (const birthday of birthdayList) {
+                    const user = await interaction.client.users.fetch(/** @type String */ birthday.userId);
+
+                    description += `${count}. ${user.toString()} - ${months[birthday.month]} ${birthday.day}`;
+                    if (count < birthdayList.length) description += '\n';
+
+                    count++;
+                }
+
+                const embed = new EmbedBuilder()
+                    .setTitle('Birthdays')
+                    .setDescription(description);
+
+                await interaction.reply({ embeds: [embed] });
+            }
 
         } catch (err) {
             logger.error(err.stack);
