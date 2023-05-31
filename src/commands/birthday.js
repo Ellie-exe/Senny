@@ -55,17 +55,28 @@ module.exports = {
                 const month = interaction.options.getInteger('month');
                 const day = interaction.options.getInteger('day');
 
-                const birthday = await birthdays.create({
-                    userId: interaction.user.id,
-                    month: month,
-                    day: day
-                });
+                let birthday = await birthdays.findOne({ userId: interaction.user.id }).exec();
 
-                await birthday.save();
-                await interaction.reply(`Your birthday has been set to **${month}/${day}**`);
+                if (birthday) {
+                    birthdays.updateOne({ userId: interaction.user.id }, { month: month, day: day }).exec();
+                    await interaction.reply(`Your birthday has been updated to **${month}/${day}**`);
+
+                } else {
+                    birthday = await birthdays.create({
+                        userId: interaction.user.id,
+                        month: month,
+                        day: day
+                    });
+
+                    await birthday.save();
+                    await interaction.reply(`Your birthday has been set to **${month}/${day}**`);
+                }
 
                 schedule.scheduleJob(`0 7 ${day} ${month} *`, async () => {
                     try {
+                        const birthday = await birthdays.findOne({ month: month, day: day }).exec();
+                        if (!birthday) { return; }
+
                         await channel.send(`Hello <@396534463489769475>! Today is ${interaction.user.toString()}'s birthday!`);
 
                     } catch (err) {
