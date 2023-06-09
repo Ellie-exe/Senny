@@ -57,16 +57,17 @@ module.exports = {
             const subcommand = interaction.options.getSubcommand();
 
             if (subcommand === 'list') {
-                const reminderList = await reminders.find({userId: interaction.user.id}).exec();
+                const reminderList = await reminders.find({ authorId: interaction.user.id }).exec();
                 const embed = new EmbedBuilder()
                     .setColor(0x2F3136)
-                    .setTitle(`Reminders for ${interaction.user.username}`);
+                    .setTitle(`Reminders for ${interaction.member.displayName}`);
+
+                let description = '';
+                let count = 1;
 
                 if (reminderList.length === 0) {
-                    embed.setDescription('You have no reminders');
+                    description = 'You have no reminders!';
                 }
-
-                let count = 1;
 
                 for (const reminder of reminderList) {
                     const offset = Math.floor(Math.random() * 18);
@@ -74,17 +75,21 @@ module.exports = {
                     const channel = interaction.client.channels.cache.get(/** @type String */ reminder.destinationId);
                     const info = `\`${reminderId}\` <t:${Math.round(reminder.endTimestamp / 1000)}:R> ${channel.toString()}`;
 
-                    embed.addFields(/** @type any */ {name: `${count}. ${reminder.message}`, value: info});
+                    description += `${count}. \`${reminderId}\` - **"${reminder.message}"**\n   \u200b<t:${Math.round(reminder.endTimestamp / 1000)}:R> ${channel.toString()}`;
+                    if (count < reminderList.length) { description += '\n\n'; }
+
                     count++;
                 }
 
-                await interaction.reply({embeds: [embed]});
+                embed.setDescription(description);
+
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             if (subcommand === 'delete') {
                 const id = interaction.options.getString('id');
-                const reminder = await reminders.findOne({id: new RegExp(id)}).exec();
+                const reminder = await reminders.findOne({ id: new RegExp(id) }).exec();
 
                 if (!reminder) {
                     await interaction.reply('Reminder not found!');
@@ -160,7 +165,7 @@ module.exports = {
 
             scheduleJob(timestamp, async () => {
                 try {
-                    const r = await reminders.findOne({_id: reminder.id}).exec();
+                    const r = await reminders.findOne({ _id: reminder.id }).exec();
                     if (!r) return;
 
                     const message = `Hello! ${r.authorString} asked me to remind ${r.destinationString} ` +
