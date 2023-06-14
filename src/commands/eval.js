@@ -8,7 +8,11 @@ module.exports = {
         .addStringOption(option =>
             option.setName('code')
                 .setDescription('The code to evaluate')
-                .setRequired(true)),
+                .setRequired(true))
+        .addIntegerOption(option =>
+            option.setName('depth')
+                .setDescription('The depth to inspect to')
+                .setRequired(false)),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {
@@ -19,6 +23,7 @@ module.exports = {
             }
 
             await interaction.deferReply();
+            const depth = interaction.options.getInteger('depth') || 0;
 
             let code = interaction.options.getString('code');
             if (code.includes('await')) code = `(async () => {${code}})();`;
@@ -28,9 +33,36 @@ module.exports = {
 
             let result = output;
             if (typeof output === 'function') result = output.toString();
-            if (typeof output !== 'string') result = require('util').inspect(output, { depth: 0 });
+            if (typeof output !== 'string') result = require('util').inspect(output, { depth: depth });
 
-            await interaction.editReply(`\`\`\`ansi\n${result}\n\`\`\``);
+            const paginate = (string) => {
+                const lines = string.split('\n');
+                let out = '```ansi\n';
+                const pages = [];
+
+                for (const line of lines) {
+                    if (out.length + line.length < 1997) {
+                        out += line + '\n';
+                        continue;
+                    }
+
+                    pages.push(out + '```');
+                    out = '```ansi\n' + line + '\n';
+                }
+
+                if (out.length > 9) {
+                    pages.push(out + '```');
+                }
+
+                return pages;
+            }
+
+            const pages = paginate(result);
+            await interaction.editReply(pages.shift());
+
+            for (const page of pages) {
+                await interaction.channel.send(page);
+            }
 
         } catch (err) {
             await interaction.editReply(`\`\`\`ansi\n${err.stack}\n\`\`\``);
