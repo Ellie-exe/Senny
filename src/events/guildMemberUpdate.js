@@ -18,15 +18,15 @@ module.exports = {
 
                 const message = await channel.send(
                     `Welcome to **RedNet**! Be sure to read the rules in <#578226946786459649>, ` +
-                    `grab yourself some roles in <#781959946635444255>, and introduce yourself in <#647970191090909185>! ` +
-                    `If you have any questions, feel free to ask! We hope you have a great time here!\n` +
+                    `and if you want, introduce yourself in <#647970191090909185>! If you have any questions, ` +
+                    `feel free to ask! We hope you have a great time here!\n` +
                     `https://ellie.hep.gg/welcome.gif`
                 );
 
                 await message.edit(
                     `Welcome to **RedNet**, ${newMember}! Be sure to read the rules in <#578226946786459649>, ` +
-                    `grab yourself some roles in <#781959946635444255>, and introduce yourself in <#647970191090909185>! ` +
-                    `If you have any questions, feel free to ask! We hope you have a great time here!\n` +
+                    `and if you want, introduce yourself in <#647970191090909185>! If you have any questions, ` +
+                    `feel free to ask! We hope you have a great time here!\n` +
                     `https://ellie.hep.gg/welcome.gif`
                 );
 
