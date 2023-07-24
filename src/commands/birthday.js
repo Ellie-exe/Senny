@@ -72,7 +72,7 @@ module.exports = {
                     await interaction.reply(`Your birthday has been set to **${month}/${day}**`);
                 }
 
-                schedule.scheduleJob(`0 7 ${day} ${month} *`, async () => {
+                schedule.scheduleJob(`0 0 ${day} ${month} *`, async () => {
                     try {
                         const birthday = await birthdays.findOne({ month: month, day: day }).exec();
                         if (!birthday) { return; }
