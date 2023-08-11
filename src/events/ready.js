@@ -48,7 +48,7 @@ module.exports = {
             }
 
             for (const birthday of birthdayList) {
-                scheduleJob(`0 7 ${birthday.day} ${birthday.month} *`, async () => {
+                scheduleJob(`0 0 ${birthday.day} ${birthday.month} *`, async () => {
                     try {
                         const channel = /** @type {import('discord.js').TextChannel} */ (client.channels.cache.get('405147700825292827'));
                         const user = await client.users.fetch(/** @type {String} */ birthday.userId);
