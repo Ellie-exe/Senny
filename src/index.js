@@ -47,7 +47,7 @@ try {
     });
 
     schedule.scheduleJob('0 0 12 * * *', async () => {
-        client.emit('questionOfTheDay', client);
+        client.emit('questionOfTheDay', client, null);
     });
 
     client.login(process.env.TOKEN).then();

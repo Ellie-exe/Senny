@@ -46,11 +46,18 @@ try {
         id: String,
     });
 
+    const questionSchema = new Schema({
+        question: String,
+        authorId: String,
+        timestamp: Number,
+    });
+
     const accounts = mongoose.model('accounts', accountSchema);
     const birthdays = mongoose.model('birthdays', birthdaySchema);
     const reminders = mongoose.model('reminders', reminderSchema);
+    const questions = mongoose.model('questions', questionSchema);
 
-    module.exports = {logger, accounts, birthdays, reminders};
+    module.exports = {logger, accounts, birthdays, reminders, questions};
 
 } catch (err) {
     console.error(err.stack);

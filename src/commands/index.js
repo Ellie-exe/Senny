@@ -11,6 +11,7 @@ module.exports = [
     require('./flip'),
     require('./ping'),
     require('./pipe'),
+    require('./qotd'),
     require('./remind'),
     require('./roll'),
     // require('./server'),
