@@ -6,50 +6,54 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('remind')
         .setDescription('Reminds you of something')
-        .addSubcommand(subcommand =>
-            subcommand.setName('at')
-                .setDescription('Remind you at a date and time')
-                .addStringOption(option =>
-                    option.setName('date')
-                        .setDescription('The date and time to remind you at')
-                        .setRequired(true))
-                .addStringOption(option =>
-                    option.setName('message')
-                        .setDescription('The message to remind you of')
-                        .setRequired(true))
-                .addChannelOption(option =>
-                    option.setName('channel')
-                        .setDescription('The channel to remind you in'))
-                .addUserOption(option =>
-                    option.setName('user')
-                        .setDescription('The user to remind')))
-        .addSubcommand(subcommand =>
-            subcommand.setName('in')
-                .setDescription('Remind you in a duration')
-                .addStringOption(option =>
-                    option.setName('time')
-                        .setDescription('The duration to remind you in')
-                        .setRequired(true))
-                .addStringOption(option =>
-                    option.setName('message')
-                        .setDescription('The message to remind you of')
-                        .setRequired(true))
-                .addChannelOption(option =>
-                    option.setName('channel')
-                        .setDescription('The channel to remind you in'))
-                .addUserOption(option =>
-                    option.setName('user')
-                        .setDescription('The user to remind')))
-        .addSubcommand(subcommand =>
-            subcommand.setName('list')
-                .setDescription('List your reminders'))
-        .addSubcommand(subcommand =>
-            subcommand.setName('delete')
-                .setDescription('Delete a reminder')
-                .addStringOption(option =>
-                    option.setName('id')
-                        .setDescription('The id of the reminder to delete')
-                        .setRequired(true))),
+        .addSubcommand(subcommand => subcommand
+            .setName('at')
+            .setDescription('Remind you at a date and time')
+            .addStringOption(option => option
+                .setName('date')
+                .setDescription('The date and time to remind you at')
+                .setRequired(true))
+            .addStringOption(option => option
+                .setName('message')
+                .setDescription('The message to remind you of')
+                .setRequired(true))
+            .addChannelOption(option => option
+                .setName('channel')
+                .setDescription('The channel to remind you in')
+                .setRequired(false))
+            .addUserOption(option => option
+                .setName('user')
+                .setDescription('The user to remind')
+                .setRequired(false)))
+        .addSubcommand(subcommand => subcommand
+            .setName('in')
+            .setDescription('Remind you in a duration')
+            .addStringOption(option => option
+                .setName('time')
+                .setDescription('The duration to remind you in')
+                .setRequired(true))
+            .addStringOption(option => option
+                .setName('message')
+                .setDescription('The message to remind you of')
+                .setRequired(true))
+            .addChannelOption(option => option
+                .setName('channel')
+                .setDescription('The channel to remind you in')
+                .setRequired(false))
+            .addUserOption(option => option
+                .setName('user')
+                .setDescription('The user to remind')
+                .setRequired(false)))
+        .addSubcommand(subcommand => subcommand
+            .setName('list')
+            .setDescription('List your reminders'))
+        .addSubcommand(subcommand => subcommand
+            .setName('delete')
+            .setDescription('Delete a reminder')
+            .addStringOption(option => option
+                .setName('id')
+                .setDescription('The id of the reminder to delete')
+                .setRequired(true))),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {
@@ -72,7 +76,7 @@ module.exports = {
                 for (const reminder of reminderList) {
                     const offset = Math.floor(Math.random() * 18);
                     const reminderId = reminder.id.substring(offset, offset + 7);
-                    const channel = interaction.client.channels.cache.get(/** @type String */ reminder.destinationId);
+                    const channel = await interaction.client.channels.fetch(/** @type String */ reminder.destinationId);
                     const info = `\`${reminderId}\` <t:${Math.round(reminder.endTimestamp / 1000)}:R> ${channel.toString()}`;
 
                     description += `${count}. \`${reminderId}\` - **"${reminder.message}"**\n   \u200b<t:${Math.round(reminder.endTimestamp / 1000)}:R> ${channel.toString()}`;

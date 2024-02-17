@@ -5,20 +5,20 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('qotd')
         .setDescription('Question of the day commands')
-        .addSubcommand(subcommand =>
-            subcommand.setName('send')
-                .setDescription('Sends a new question of the day')
-                .addStringOption(option =>
-                    option.setName('message')
-                        .setDescription('An optional message to send with the question')
-                        .setRequired(false)))
-        .addSubcommand(subcommand =>
-            subcommand.setName('add')
-                .setDescription('Adds a new question of the day')
-                .addStringOption(option =>
-                    option.setName('question')
-                        .setDescription('The question to add')
-                        .setRequired(true))),
+        .addSubcommand(subcommand => subcommand
+            .setName('send')
+            .setDescription('Sends a new question of the day')
+            .addStringOption(option => option
+                .setName('message')
+                .setDescription('An optional message to send with the question')
+                .setRequired(false)))
+        .addSubcommand(subcommand => subcommand
+            .setName('add')
+            .setDescription('Adds a new question of the day')
+            .addStringOption(option => option
+                .setName('question')
+                .setDescription('The question to add')
+                .setRequired(true))),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {
