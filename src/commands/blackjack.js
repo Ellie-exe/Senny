@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction } = requi
 const { accounts } = require('../utils');
 
 module.exports = {
+    guildId: 'global',
     data: new SlashCommandBuilder()
         .setName('gamble')
         .setDescription('Gamble your money away!')

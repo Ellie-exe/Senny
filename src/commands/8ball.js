@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js
 const { logger } = require('../utils');
 
 module.exports = {
+    guildId: 'global',
     data: new SlashCommandBuilder()
         .setName('8ball')
         .setDescription('Ask the magic 8ball a question!')

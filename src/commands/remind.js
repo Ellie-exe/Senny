@@ -3,6 +3,7 @@ const { scheduleJob } = require('node-schedule');
 const { reminders, logger } = require('../utils');
 
 module.exports = {
+    guildId: 'global',
     data: new SlashCommandBuilder()
         .setName('remind')
         .setDescription('Reminds you of something')

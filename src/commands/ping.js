@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js
 const { logger } = require('../utils');
 
 module.exports = {
+    guildId: 'global',
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Replies with Pong!'),

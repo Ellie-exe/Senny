@@ -62,8 +62,10 @@ module.exports = {
             }
 
             const commands = [];
+            const guildCommands = [];
 
             for (const command of require('../commands')) {
+                if (command.data.toJSON().type !== 'global') { guildCommands.push(command.data.toJSON()); continue; }
                 commands.push(command.data.toJSON());
             }
 
@@ -71,6 +73,7 @@ module.exports = {
 
             if (process.env.NODE_ENV === 'production') {
                 await rest.put(Routes.applicationCommands('665318329040371725'), { body: commands });
+                await rest.put(Routes.applicationGuildCommands(client.user.id, '396523509871935489'), { body: guildCommands });
 
             } else {
                 await rest.put(Routes.applicationGuildCommands(client.user.id, '660745210556448781'), { body: commands });

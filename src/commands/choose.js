@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js
 const { logger } = require('../utils');
 
 module.exports = {
+    guildId: 'global',
     data: new SlashCommandBuilder()
         .setName('choose')
         .setDescription('Choose between multiple options')
