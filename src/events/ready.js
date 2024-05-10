@@ -65,7 +65,7 @@ module.exports = {
             const guildCommands = [];
 
             for (const command of require('../commands')) {
-                if (command.data.toJSON().type !== 'global') { guildCommands.push(command.data.toJSON()); continue; }
+                if (command.data.toJSON().guildId !== 'global') { guildCommands.push(command.data.toJSON()); continue; }
                 commands.push(command.data.toJSON());
             }
 
