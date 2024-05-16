@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 const { logger } = require('../utils');
 
 module.exports = {
-    guildId: 'global',
+    guild: null,
     data: new SlashCommandBuilder()
         .setName('pipe')
         .setDescription('Pipes a command to the host terminal')

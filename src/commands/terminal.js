@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 const { logger } = require('../utils');
 
 module.exports = {
-    guildId: 'global',
+    guild: null,
     data: new SlashCommandBuilder()
         .setName('terminal')
         .setDescription('Executes a command in the terminal')

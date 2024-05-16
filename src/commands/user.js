@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction } = requi
 const { logger } = require('../utils');
 
 module.exports = {
-    guildId: 'global',
+    guild: null,
     data: new SlashCommandBuilder()
         .setName('user')
         .setDescription('Get information about a user')

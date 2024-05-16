@@ -3,7 +3,7 @@ const { birthdays, logger } = require('../utils');
 const schedule = require('node-schedule');
 
 module.exports = {
-    guildId: '396523509871935489',
+    guild: '396523509871935489',
     data: new SlashCommandBuilder()
         .setName('birthday')
         .setDescription('Track birthdays in the server')

@@ -2,7 +2,7 @@ const { SlashCommandBuilder, ChatInputCommandInteraction } = require('discord.js
 const { logger } = require('../utils');
 
 module.exports = {
-    guildId: 'global',
+    guild: null,
     data: new SlashCommandBuilder()
         .setName('banner')
         .setDescription('Get the banner of a user')

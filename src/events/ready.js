@@ -1,6 +1,7 @@
 const { Events, REST, Routes, ActivityType } = require('discord.js');
 const { scheduleJob } = require("node-schedule");
 const { reminders, birthdays, logger } = require('../utils');
+const { cli } = require('winston/lib/winston/config');
 
 module.exports = {
     name: Events.ClientReady,
@@ -61,19 +62,33 @@ module.exports = {
                 });
             }
 
-            const commands = [];
+            const globalCommands = [];
             const guildCommands = [];
 
             for (const command of require('../commands')) {
-                if (command.data.toJSON().guildId !== 'global') { guildCommands.push(command.data.toJSON()); continue; }
-                commands.push(command.data.toJSON());
+                if (command.guild !== null) {
+                    const guild = guildCommands.find(c => c.guildId === command.guild);
+
+                    if (guild) {
+                        guild.commands.push(command.data.toJSON());
+                        continue;
+                    }
+
+                    guildCommands.push({ guildId: command.guild, commands: [command.data.toJSON()] });
+                    continue;
+                }
+
+                globalCommands.push(command.data.toJSON());
             }
 
             const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
             if (process.env.NODE_ENV === 'production') {
-                await rest.put(Routes.applicationCommands('665318329040371725'), { body: commands });
-                await rest.put(Routes.applicationGuildCommands(client.user.id, '396523509871935489'), { body: guildCommands });
+                await rest.put(Routes.applicationCommands(client.user.id), { body: globalCommands });
+
+                for (const guild of guildCommands) {
+                    await rest.put(Routes.applicationGuildCommands(client.user.id, guild.guildId), { body: guild.commands });
+                }
 
             } else {
                 await rest.put(Routes.applicationGuildCommands(client.user.id, '660745210556448781'), { body: commands });
