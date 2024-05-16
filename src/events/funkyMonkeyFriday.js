@@ -10,7 +10,7 @@ module.exports = {
     async execute(day, client) {
         try {
             const guild = client.guilds.cache.get('376505103923806219');
-            const channel = /** @type {import('discord.js').TextChannel} */ guild.channels.cache.get('738161372029911050');
+            const channel = /** @type {import('discord.js').TextChannel} */ guild.channels.cache.get('738161399548870756');
             const role = guild.roles.cache.get('376505103923806219');
 
             switch (day) {
