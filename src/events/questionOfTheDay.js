@@ -14,6 +14,7 @@ module.exports = {
 
             channels.push(client.channels.cache.get('755904698363674774'));
             channels.push(client.channels.cache.get('1062482192300785696'));
+            channels.push(client.channels.cache.get('1294774519348723812'));
 
             const question = await questions.findOneAndDelete().sort({ timestamp: 'asc' }).exec();
             const msg = message === null ? '' : `Note: ${message}. `;
