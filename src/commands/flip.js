@@ -5,7 +5,9 @@ module.exports = {
     guild: null,
     data: new SlashCommandBuilder()
         .setName('flip')
-        .setDescription('Flips a coin'),
+        .setDescription('Flips a coin')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2]),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {

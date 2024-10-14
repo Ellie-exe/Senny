@@ -7,6 +7,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('remind')
         .setDescription('Reminds you of something')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addSubcommand(subcommand => subcommand
             .setName('at')
             .setDescription('Remind you at a date and time')
@@ -65,7 +67,7 @@ module.exports = {
                 const reminderList = await reminders.find({ authorId: interaction.user.id }).exec();
                 const embed = new EmbedBuilder()
                     .setColor(0x2F3136)
-                    .setTitle(`Reminders for ${interaction.member.displayName}`);
+                    .setTitle(`Reminders for ${interaction.member?.displayName ?? interaction.user.globalName}`);
 
                 let description = '';
                 let count = 1;
@@ -113,6 +115,14 @@ module.exports = {
 
             const user = interaction.options.getUser('user');
             const channel = await user?.createDM() ?? interaction.options.getChannel('channel') ?? interaction.channel;
+
+            if (interaction.context === 2 && channel === null) {
+                await interaction.reply('You need to specify a destination!');
+                const error = new Error('Invalid destination');
+                logger.error(error.stack);
+
+                return;
+            }
 
             let timestamp = Date.now();
 

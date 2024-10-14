@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('qotd')
         .setDescription('Question of the day commands')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addSubcommand(subcommand => subcommand
             .setName('send')
             .setDescription('Sends a new question of the day')

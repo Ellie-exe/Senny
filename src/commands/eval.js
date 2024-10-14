@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('eval')
         .setDescription('Evaluate JavaScript code')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addStringOption(option =>
             option.setName('code')
                 .setDescription('The code to evaluate')

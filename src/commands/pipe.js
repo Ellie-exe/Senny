@@ -7,6 +7,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('pipe')
         .setDescription('Pipes a command to the host terminal')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addStringOption(option =>
             option.setName('command')
                 .setDescription('The command to pipe')

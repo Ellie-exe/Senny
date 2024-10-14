@@ -5,7 +5,9 @@ module.exports = {
     guild: null,
     data: new SlashCommandBuilder()
         .setName('server')
-        .setDescription('Replies with server info!'),
+        .setDescription('Replies with server info!')
+        .setIntegrationTypes([0])
+        .setContexts([0]),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {

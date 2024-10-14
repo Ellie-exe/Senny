@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('gamble')
         .setDescription('Gamble your money away!')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addSubcommand(subcommand =>
             subcommand.setName('bet')
                 .setDescription('Bet your money on a number')

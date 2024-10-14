@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('emoji')
         .setDescription('Get the image of an emoji')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addStringOption(option =>
             option.setName('emoji')
                 .setDescription('The emoji to get the image of')

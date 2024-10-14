@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('choose')
         .setDescription('Choose between multiple options')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addStringOption(option =>
             option.setName('options')
                 .setDescription('The comma separated options to choose from')

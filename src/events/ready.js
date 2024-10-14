@@ -78,7 +78,10 @@ module.exports = {
                     continue;
                 }
 
-                globalCommands.push(command.data.toJSON());
+                const data = command.data.toJSON();
+                // data['integration_types'] = [0, 1];
+                // data['contexts'] = [0, 1, 2];
+                globalCommands.push(data);
             }
 
             const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
@@ -91,9 +94,9 @@ module.exports = {
                 }
 
             } else {
-                await rest.put(Routes.applicationGuildCommands(client.user.id, '660745210556448781'), { body: commands });
-                await rest.put(Routes.applicationGuildCommands(client.user.id, '573272766149558272'), { body: commands });
-                await rest.put(Routes.applicationGuildCommands(client.user.id, '396523509871935489'), { body: commands });
+                await rest.put(Routes.applicationGuildCommands(client.user.id, '660745210556448781'), { body: globalCommands });
+                await rest.put(Routes.applicationGuildCommands(client.user.id, '573272766149558272'), { body: globalCommands });
+                await rest.put(Routes.applicationGuildCommands(client.user.id, '396523509871935489'), { body: globalCommands });
             }
 
             const userCount = client.guilds.cache.reduce((users, guild) => users + guild.memberCount, 0);

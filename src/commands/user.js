@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('user')
         .setDescription('Get information about a user')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addUserOption(option =>
             option.setName('user')
                 .setDescription('The user to get information about')),

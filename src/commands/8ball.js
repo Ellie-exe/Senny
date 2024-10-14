@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('8ball')
         .setDescription('Ask the magic 8ball a question!')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addStringOption(option =>
             option.setName('question')
                 .setDescription('The question to ask the magic 8ball')

@@ -7,6 +7,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('birthday')
         .setDescription('Track birthdays in the server')
+        .setIntegrationTypes([0])
+        .setContexts([0])
         .addSubcommand(subcommand =>
             subcommand.setName('set')
                 .setDescription('Set your birthday')

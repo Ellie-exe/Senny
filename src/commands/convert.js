@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('convert')
         .setDescription('Converts a number from one unit to another')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addNumberOption(option =>
             option.setName('number')
                 .setDescription('The number to convert')

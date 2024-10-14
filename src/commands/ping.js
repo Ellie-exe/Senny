@@ -5,7 +5,9 @@ module.exports = {
     guild: null,
     data: new SlashCommandBuilder()
         .setName('ping')
-        .setDescription('Replies with Pong!'),
+        .setDescription('Replies with Pong!')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2]),
 
     /** @param {ChatInputCommandInteraction} interaction */
     async execute(interaction) {

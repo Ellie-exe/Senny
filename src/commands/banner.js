@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('banner')
         .setDescription('Get the banner of a user')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addUserOption(option =>
             option.setName('user')
                 .setDescription('The user to get the banner of')),

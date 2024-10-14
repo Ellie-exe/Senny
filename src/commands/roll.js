@@ -6,6 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('roll')
         .setDescription('Rolls a dice')
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2])
         .addIntegerOption(option =>
             option.setName('number')
                 .setDescription('The number of dice to roll'))
